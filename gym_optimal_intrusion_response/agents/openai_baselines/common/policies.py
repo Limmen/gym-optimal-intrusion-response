@@ -10,13 +10,8 @@ import numpy as np
 import torch as th
 from torch import nn
 
-from stable_baselines3.common.distributions import (
-    BernoulliDistribution,
-    CategoricalDistribution,
-    DiagGaussianDistribution,
+from gym_optimal_intrusion_response.agents.openai_baselines.common.distributions import (
     Distribution,
-    MultiCategoricalDistribution,
-    StateDependentNoiseDistribution,
     make_proba_distribution,
 )
 from gym_optimal_intrusion_response.agents.openai_baselines.common.preprocessing import get_action_dim, maybe_transpose, preprocess_obs
@@ -24,6 +19,7 @@ from gym_optimal_intrusion_response.agents.openai_baselines.common.torch_layers 
 from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import Schedule
 from gym_optimal_intrusion_response.agents.openai_baselines.common.utils import get_device
 from gym_optimal_intrusion_response.envs.optimal_intrusion_response_env import OptimalIntrusionResponseEnv
+from gym_optimal_intrusion_response.agents.config.agent_config import AgentConfig
 
 
 class BaseModel(nn.Module, ABC):
@@ -58,6 +54,7 @@ class BaseModel(nn.Module, ABC):
         normalize_images: bool = True,
         optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
         optimizer_kwargs: Optional[Dict[str, Any]] = None,
+        agent_config: AgentConfig = None
     ):
         super(BaseModel, self).__init__()
 
@@ -78,6 +75,7 @@ class BaseModel(nn.Module, ABC):
 
         self.features_extractor_class = features_extractor_class
         self.features_extractor_kwargs = features_extractor_kwargs
+        self.agent_config = agent_config
 
     @abstractmethod
     def forward(self, *args, **kwargs):
@@ -271,58 +269,22 @@ class BasePolicy(BaseModel):
 
 
 class ActorCriticPolicy(BasePolicy):
-    """
-    Policy class for actor-critic algorithms (has both policy and value prediction).
-    Used by A2C, PPO and the likes.
-
-    :param observation_space: Observation space
-    :param action_space: Action space
-    :param lr_schedule: Learning rate schedule (could be constant)
-    :param net_arch: The specification of the policy and value networks.
-    :param activation_fn: Activation function
-    :param ortho_init: Whether to use or not orthogonal initialization
-    :param use_sde: Whether to use State Dependent Exploration or not
-    :param log_std_init: Initial value for the log standard deviation
-    :param full_std: Whether to use (n_features x n_actions) parameters
-        for the std instead of only (n_features,) when using gSDE
-    :param sde_net_arch: Network architecture for extracting features
-        when using gSDE. If None, the latent features from the policy will be used.
-        Pass an empty list to use the states as features.
-    :param use_expln: Use ``expln()`` function instead of ``exp()`` to ensure
-        a positive standard deviation (cf paper). It allows to keep variance
-        above zero and prevent it from growing too fast. In practice, ``exp()`` is usually enough.
-    :param squash_output: Whether to squash the output using a tanh function,
-        this allows to ensure boundaries when using gSDE.
-    :param features_extractor_class: Features extractor to use.
-    :param features_extractor_kwargs: Keyword arguments
-        to pass to the features extractor.
-    :param normalize_images: Whether to normalize images or not,
-         dividing by 255.0 (True by default)
-    :param optimizer_class: The optimizer to use,
-        ``th.optim.Adam`` by default
-    :param optimizer_kwargs: Additional keyword arguments,
-        excluding the learning rate, to pass to the optimizer
-    """
-
     def __init__(
         self,
         observation_space: gym.spaces.Space,
         action_space: gym.spaces.Space,
-        lr_schedule: Schedule,
+        lr: float,
         net_arch: Optional[List[Union[int, Dict[str, List[int]]]]] = None,
         activation_fn: Type[nn.Module] = nn.Tanh,
         ortho_init: bool = True,
-        use_sde: bool = False,
         log_std_init: float = 0.0,
-        full_std: bool = True,
-        sde_net_arch: Optional[List[int]] = None,
-        use_expln: bool = False,
         squash_output: bool = False,
         features_extractor_class: Type[BaseFeaturesExtractor] = FlattenExtractor,
         features_extractor_kwargs: Optional[Dict[str, Any]] = None,
         normalize_images: bool = True,
         optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
         optimizer_kwargs: Optional[Dict[str, Any]] = None,
+        agent_config: AgentConfig = None
     ):
 
         if optimizer_kwargs is None:
@@ -339,6 +301,7 @@ class ActorCriticPolicy(BasePolicy):
             optimizer_class=optimizer_class,
             optimizer_kwargs=optimizer_kwargs,
             squash_output=squash_output,
+            agent_config=agent_config
         )
 
         # Default network architecture, from stable-baselines
@@ -351,6 +314,7 @@ class ActorCriticPolicy(BasePolicy):
         self.net_arch = net_arch
         self.activation_fn = activation_fn
         self.ortho_init = ortho_init
+        self.lr = lr
 
         self.features_extractor = features_extractor_class(self.observation_space, **self.features_extractor_kwargs)
         self.features_dim = self.features_extractor.features_dim
@@ -358,24 +322,12 @@ class ActorCriticPolicy(BasePolicy):
         self.normalize_images = normalize_images
         self.log_std_init = log_std_init
         dist_kwargs = None
-        # Keyword arguments for gSDE distribution
-        if use_sde:
-            dist_kwargs = {
-                "full_std": full_std,
-                "squash_output": squash_output,
-                "use_expln": use_expln,
-                "learn_features": sde_net_arch is not None,
-            }
-
-        self.sde_features_extractor = None
-        self.sde_net_arch = sde_net_arch
-        self.use_sde = use_sde
         self.dist_kwargs = dist_kwargs
 
         # Action distribution
-        self.action_dist = make_proba_distribution(action_space, use_sde=use_sde, dist_kwargs=dist_kwargs)
+        self.action_dist = make_proba_distribution(action_space, dist_kwargs=dist_kwargs)
 
-        self._build(lr_schedule)
+        self._build()
 
     def _get_constructor_parameters(self) -> Dict[str, Any]:
         data = super()._get_constructor_parameters()
@@ -386,11 +338,9 @@ class ActorCriticPolicy(BasePolicy):
             dict(
                 net_arch=self.net_arch,
                 activation_fn=self.activation_fn,
-                use_sde=self.use_sde,
                 log_std_init=self.log_std_init,
                 squash_output=default_none_kwargs["squash_output"],
                 full_std=default_none_kwargs["full_std"],
-                sde_net_arch=self.sde_net_arch,
                 use_expln=default_none_kwargs["use_expln"],
                 lr_schedule=self._dummy_schedule,  # dummy lr schedule, not needed for loading policy alone
                 ortho_init=self.ortho_init,
@@ -401,15 +351,6 @@ class ActorCriticPolicy(BasePolicy):
             )
         )
         return data
-
-    def reset_noise(self, n_envs: int = 1) -> None:
-        """
-        Sample new weights for the exploration matrix.
-
-        :param n_envs:
-        """
-        assert isinstance(self.action_dist, StateDependentNoiseDistribution), "reset_noise() is only available when using gSDE"
-        self.action_dist.sample_weights(self.log_std, batch_size=n_envs)
 
     def _build_mlp_extractor(self) -> None:
         """
@@ -423,40 +364,11 @@ class ActorCriticPolicy(BasePolicy):
             self.features_dim, net_arch=self.net_arch, activation_fn=self.activation_fn, device=self.device
         )
 
-    def _build(self, lr_schedule: Schedule) -> None:
-        """
-        Create the networks and the optimizer.
-
-        :param lr_schedule: Learning rate schedule
-            lr_schedule(1) is the initial learning rate
-        """
+    def _build(self) -> None:
         self._build_mlp_extractor()
 
         latent_dim_pi = self.mlp_extractor.latent_dim_pi
-
-        # Separate features extractor for gSDE
-        if self.sde_net_arch is not None:
-            self.sde_features_extractor, latent_sde_dim = create_sde_features_extractor(
-                self.features_dim, self.sde_net_arch, self.activation_fn
-            )
-
-        if isinstance(self.action_dist, DiagGaussianDistribution):
-            self.action_net, self.log_std = self.action_dist.proba_distribution_net(
-                latent_dim=latent_dim_pi, log_std_init=self.log_std_init
-            )
-        elif isinstance(self.action_dist, StateDependentNoiseDistribution):
-            latent_sde_dim = latent_dim_pi if self.sde_net_arch is None else latent_sde_dim
-            self.action_net, self.log_std = self.action_dist.proba_distribution_net(
-                latent_dim=latent_dim_pi, latent_sde_dim=latent_sde_dim, log_std_init=self.log_std_init
-            )
-        elif isinstance(self.action_dist, CategoricalDistribution):
-            self.action_net = self.action_dist.proba_distribution_net(latent_dim=latent_dim_pi)
-        elif isinstance(self.action_dist, MultiCategoricalDistribution):
-            self.action_net = self.action_dist.proba_distribution_net(latent_dim=latent_dim_pi)
-        elif isinstance(self.action_dist, BernoulliDistribution):
-            self.action_net = self.action_dist.proba_distribution_net(latent_dim=latent_dim_pi)
-        else:
-            raise NotImplementedError(f"Unsupported distribution '{self.action_dist}'.")
+        self.action_net = self.action_dist.proba_distribution_net(latent_dim=latent_dim_pi)
 
         self.value_net = nn.Linear(self.mlp_extractor.latent_dim_vf, 1)
         # Init weights: use orthogonal initialization
@@ -476,7 +388,7 @@ class ActorCriticPolicy(BasePolicy):
                 module.apply(partial(self.init_weights, gain=gain))
 
         # Setup optimizer with initial learning rate
-        self.optimizer = self.optimizer_class(self.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
+        self.optimizer = self.optimizer_class(self.parameters(), lr=self.lr, **self.optimizer_kwargs)
 
     def forward(self, obs: th.Tensor, deterministic: bool = False, attacker: bool = True) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         latent_pi, latent_vf = self._get_latent(obs)
@@ -502,7 +414,7 @@ class ActorCriticPolicy(BasePolicy):
 
         return latent_pi, latent_vf
 
-    def _get_action_dist_from_latent(self, latent_pi: th.Tensor, non_legal_actions) -> Distribution:
+    def _get_action_dist_from_latent(self, latent_pi: th.Tensor, non_legal_actions = None) -> Distribution:
         mean_actions = self.action_net(latent_pi)
 
         action_logits = mean_actions.clone()
@@ -553,38 +465,6 @@ class ActorCriticPolicy(BasePolicy):
 
 
 class ActorCriticCnnPolicy(ActorCriticPolicy):
-    """
-    CNN policy class for actor-critic algorithms (has both policy and value prediction).
-    Used by A2C, PPO and the likes.
-
-    :param observation_space: Observation space
-    :param action_space: Action space
-    :param lr_schedule: Learning rate schedule (could be constant)
-    :param net_arch: The specification of the policy and value networks.
-    :param activation_fn: Activation function
-    :param ortho_init: Whether to use or not orthogonal initialization
-    :param use_sde: Whether to use State Dependent Exploration or not
-    :param log_std_init: Initial value for the log standard deviation
-    :param full_std: Whether to use (n_features x n_actions) parameters
-        for the std instead of only (n_features,) when using gSDE
-    :param sde_net_arch: Network architecture for extracting features
-        when using gSDE. If None, the latent features from the policy will be used.
-        Pass an empty list to use the states as features.
-    :param use_expln: Use ``expln()`` function instead of ``exp()`` to ensure
-        a positive standard deviation (cf paper). It allows to keep variance
-        above zero and prevent it from growing too fast. In practice, ``exp()`` is usually enough.
-    :param squash_output: Whether to squash the output using a tanh function,
-        this allows to ensure boundaries when using gSDE.
-    :param features_extractor_class: Features extractor to use.
-    :param features_extractor_kwargs: Keyword arguments
-        to pass to the features extractor.
-    :param normalize_images: Whether to normalize images or not,
-         dividing by 255.0 (True by default)
-    :param optimizer_class: The optimizer to use,
-        ``th.optim.Adam`` by default
-    :param optimizer_kwargs: Additional keyword arguments,
-        excluding the learning rate, to pass to the optimizer
-    """
 
     def __init__(
         self,
@@ -594,10 +474,8 @@ class ActorCriticCnnPolicy(ActorCriticPolicy):
         net_arch: Optional[List[Union[int, Dict[str, List[int]]]]] = None,
         activation_fn: Type[nn.Module] = nn.Tanh,
         ortho_init: bool = True,
-        use_sde: bool = False,
         log_std_init: float = 0.0,
         full_std: bool = True,
-        sde_net_arch: Optional[List[int]] = None,
         use_expln: bool = False,
         squash_output: bool = False,
         features_extractor_class: Type[BaseFeaturesExtractor] = NatureCNN,
@@ -609,14 +487,11 @@ class ActorCriticCnnPolicy(ActorCriticPolicy):
         super(ActorCriticCnnPolicy, self).__init__(
             observation_space,
             action_space,
-            lr_schedule,
             net_arch,
             activation_fn,
             ortho_init,
-            use_sde,
             log_std_init,
             full_std,
-            sde_net_arch,
             use_expln,
             squash_output,
             features_extractor_class,
@@ -701,27 +576,6 @@ class ContinuousCritic(BaseModel):
         with th.no_grad():
             features = self.extract_features(obs)
         return self.q_networks[0](th.cat([features, actions], dim=1))
-
-
-def create_sde_features_extractor(
-    features_dim: int, sde_net_arch: List[int], activation_fn: Type[nn.Module]
-) -> Tuple[nn.Sequential, int]:
-    """
-    Create the neural network that will be used to extract features
-    for the gSDE exploration function.
-
-    :param features_dim:
-    :param sde_net_arch:
-    :param activation_fn:
-    :return:
-    """
-    # Special case: when using states as features (i.e. sde_net_arch is an empty list)
-    # don't use any activation function
-    sde_activation = activation_fn if len(sde_net_arch) > 0 else None
-    latent_sde_net = create_mlp(features_dim, -1, sde_net_arch, activation_fn=sde_activation, squash_output=False)
-    latent_sde_dim = sde_net_arch[-1] if len(sde_net_arch) > 0 else features_dim
-    sde_features_extractor = nn.Sequential(*latent_sde_net)
-    return sde_features_extractor, latent_sde_dim
 
 
 _policy_registry = dict()  # type: Dict[Type[BasePolicy], Dict[str, Type[BasePolicy]]]

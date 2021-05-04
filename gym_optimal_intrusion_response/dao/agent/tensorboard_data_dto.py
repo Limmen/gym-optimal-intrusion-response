@@ -161,12 +161,12 @@ class TensorboardDataDTO:
                       "avg_t_T:{:.2f},rolling_avg_t_T:{:.2f}," \
                       "loss:{:.6f},lr:{:.2E},episode:{},avg_F_T:{:.2f},avg_F_T%:{:.2f},eps:{:.2f}," \
                       "n_af:{},n_d:{},avg_R_E:{:.2f},avg_reg_E:{:.2f},avg_opt_frac_E:{:.2f}," \
-                      "avg_t_E:{:.2f},avg_F_E:{:.2f},avg_F_E%:{:.2f}," \                      
+                      "avg_t_E:{:.2f},avg_F_E:{:.2f},avg_F_E%:{:.2f}," \
                       "epsilon:{:.2f}," \
                       "c:{:.2f},s:{:.2f},s_i:{:.2f}," \
                       "c_E:{:.2f},s_E:{:.2f},s_i_E:{:.2f}," \
                       "costs:{:.2f},costs_N:{:.2f},alerts:{:.2f}," \
-                      "alerts_N:{:.2f},E_costs:{:.2f},E_costs_N:{:.2f},E_alerts:{:.2f},E_alerts_N:{:.2f}," \                      
+                      "alerts_N:{:.2f},E_costs:{:.2f},E_costs_N:{:.2f},E_alerts:{:.2f},E_alerts_N:{:.2f},"\
                       "tt_h:{:.2f},avg_F_T_E:{:.2f},avg_F_T_E%:{:.2f},".format(
                 self.iteration, self.avg_regret, self.avg_opt_frac, self.avg_episode_rewards, self.rolling_avg_rewards,
                 self.avg_episode_steps, self.rolling_avg_steps, self.avg_episode_loss,
@@ -215,7 +215,7 @@ class TensorboardDataDTO:
                       "avg_R_E:{:.2f},S_sev_avg_R_E:{:.2f},S_warn_avg_R_E:{:.2f}," \
                       "S_crit_avg_R_E:{:.2f},V_log_avg_R_E:{:.2f}," \
                       "avg_reg_E:{:.2f},avg_opt_frac_E:{:.2f}," \
-                      "avg_t_E:{:.2f}," \                                            
+                      "avg_t_E:{:.2f}," \
                       "epsilon:{:.2f}," \
                       "c:{:.2f},s:{:.2f},s_i:{:.2f},n_af:{:.2f}," \
                       "c_E:{:.2f},s_E:{:.2f},s_i_E:{:.2f}," \

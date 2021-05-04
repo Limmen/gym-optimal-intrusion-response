@@ -1,10 +1,13 @@
 import numpy as np
 from gym_optimal_intrusion_response.logic.static_opponents.static_attacker import StaticAttacker
+from gym_optimal_intrusion_response.logic.static_opponents.static_defender import StaticDefender
 
 
 class EnvConfig:
 
-    def __init__(self, attacker_static_opponent : StaticAttacker, num_nodes: int = 4,
+    def __init__(self, attacker_static_opponent : StaticAttacker,
+                 defender_static_opponent: StaticDefender,
+                 num_nodes: int = 4,
                  num_attributes : int = 4,
                  initial_attack_attributes = None, initial_defense_attributes = None,
                  max_attribute_value : int = 100, recon_attribute : int = 4,
@@ -18,6 +21,7 @@ class EnvConfig:
         self.num_nodes = num_nodes
         self.num_attributes = num_attributes
         self.attacker_static_opponent = attacker_static_opponent
+        self.defender_static_opponent = defender_static_opponent
         self.initial_attack_attributes = initial_attack_attributes
         self.initial_defense_attributes = initial_defense_attributes
         if initial_attack_attributes is None:

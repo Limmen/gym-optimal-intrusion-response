@@ -9,7 +9,7 @@ from torch.nn import functional as F
 
 from gym_optimal_intrusion_response.agents.openai_baselines.common.on_policy_algorithm import OnPolicyAlgorithm
 from gym_optimal_intrusion_response.agents.openai_baselines.common.policies import ActorCriticPolicy
-from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import GymEnv, MaybeCallback, Schedule
+from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import GymEnv, Schedule
 from gym_optimal_intrusion_response.agents.openai_baselines.common.utils import explained_variance, get_schedule_fn
 from gym_optimal_intrusion_response.agents.config.agent_config import AgentConfig
 from gym_optimal_intrusion_response.dao.agent.train_mode import TrainMode
@@ -169,8 +169,6 @@ class PPO(OnPolicyAlgorithm):
                                      value_losses_attacker, entropy_losses_attacker):
         # Do a complete pass on the attacker's rollout buffer
         for rollout_data in self.attacker_rollout_buffer.get(self.batch_size):
-            if self.attacker_agent_config.performance_analysis:
-                start = time.time()
 
             actions = rollout_data.actions
             if isinstance(self.attacker_action_space, spaces.Discrete):
@@ -229,8 +227,6 @@ class PPO(OnPolicyAlgorithm):
 
         # Do a complete pass on the defender's rollout buffer
         for rollout_data in self.defender_rollout_buffer.get(self.batch_size):
-            if self.defender_agent_config.performance_analysis:
-                start = time.time()
 
             actions = rollout_data.actions
             if isinstance(self.defender_action_space, spaces.Discrete):
@@ -279,8 +275,6 @@ class PPO(OnPolicyAlgorithm):
             loss.backward()
 
             # Clip grad norm
-            if self.defender_agent_config.performance_analysis:
-                start = time.time()
             th.nn.utils.clip_grad_norm_(self.defender_policy.parameters(), self.max_grad_norm)
 
             self.defender_policy.optimizer.step()
@@ -291,7 +285,6 @@ class PPO(OnPolicyAlgorithm):
     def learn(
         self,
         total_timesteps: int,
-        callback: MaybeCallback = None,
         log_interval: int = 1,
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
@@ -303,9 +296,7 @@ class PPO(OnPolicyAlgorithm):
 
         return super(PPO, self).learn(
             total_timesteps=total_timesteps,
-            callback=callback,
             log_interval=log_interval,
-            eval_env=eval_env,
             eval_freq=eval_freq,
             n_eval_episodes=n_eval_episodes,
             tb_log_name=tb_log_name,

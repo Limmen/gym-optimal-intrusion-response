@@ -10,11 +10,12 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 import gym
 import numpy as np
 import torch as th
+from torch.utils.tensorboard import SummaryWriter
 
-from gym_optimal_intrusion_response.agents.openai_baselines.common.callbacks import BaseCallback, CallbackList, ConvertCallback, EvalCallback
+#from gym_optimal_intrusion_response.agents.openai_baselines.common.callbacks import CallbackList, ConvertCallback, EvalCallback
 from gym_optimal_intrusion_response.agents.openai_baselines.common.policies import BasePolicy, get_policy_from_name
 from gym_optimal_intrusion_response.agents.openai_baselines.common.save_util import load_from_zip_file, recursive_getattr, recursive_setattr, save_to_zip_file
-from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import GymEnv, MaybeCallback, Schedule
+from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import GymEnv, Schedule
 from gym_optimal_intrusion_response.dao.experiment.experiment_result import ExperimentResult
 from stable_baselines3.common.utils import (
     check_for_correct_spaces,
@@ -62,6 +63,15 @@ class BaseAlgorithm(ABC):
         attacker_agent_config: AgentConfig = None,
         defender_agent_config: AgentConfig = None
     ):
+        self.attacker_agent_config = attacker_agent_config
+        self.defender_agent_config = defender_agent_config
+        self.tensorboard_writer = SummaryWriter(self.attacker_agent_config.tensorboard_dir)
+        self.tensorboard_writer.add_hparams(self.attacker_agent_config.hparams_dict(), {})
+        # try:
+        #     self.tensorboard_writer = SummaryWriter(self.attacker_agent_config.tensorboard_dir)
+        #     self.tensorboard_writer.add_hparams(self.attacker_agent_config.hparams_dict(), {})
+        # except:
+        #     print("error creating tensorboard writer")
 
         if isinstance(attacker_policy, str) and policy_base is not None:
             self.attacker_policy_class = get_policy_from_name(policy_base, attacker_policy)
@@ -96,13 +106,12 @@ class BaseAlgorithm(ABC):
         self._last_obs = None
         self._last_episode_starts = None
         self._last_original_obs = None
+        self._last_dones = None
         self._episode_num = 0
         self._current_progress_remaining = 1
         self.ep_info_buffer = None
         self.ep_success_buffer = None
         self._n_updates = 0
-        self.attacker_agent_config = attacker_agent_config
-        self.defender_agent_config = defender_agent_config
         self.train_mode = train_mode
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
@@ -112,8 +121,10 @@ class BaseAlgorithm(ABC):
         if env is not None:
             env = maybe_make_env(env)
             env = self._wrap_env(env)
-            self.attacker_observation_space = env.observation_space
-            self.attacker_action_space = env.action_space
+            self.attacker_observation_space = env.attacker_observation_space
+            self.attacker_action_space = env.attacker_action_space
+            self.defender_observation_space = env.defender_observation_space
+            self.defender_action_space = env.defender_action_space
             self.n_envs = env.num_envs
             self.env = env
 
@@ -158,31 +169,15 @@ class BaseAlgorithm(ABC):
         state_dicts = ["policy"]
         return state_dicts, []
 
-    def _init_callback(
-        self,
-        callback: MaybeCallback
-    ) -> BaseCallback:
-        # Convert a list of callbacks into a callback
-        if isinstance(callback, list):
-            callback = CallbackList(callback)
-
-        # Convert functional callback to object
-        if not isinstance(callback, BaseCallback):
-            callback = ConvertCallback(callback)
-
-        callback.init_callback(self)
-        return callback
-
     def _setup_learn(
         self,
         total_timesteps: int,
-        callback: MaybeCallback = None,
         eval_freq: int = 10000,
         n_eval_episodes: int = 5,
         log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
         tb_log_name: str = "run",
-    ) -> Tuple[int, BaseCallback]:
+    ):
 
         self.start_time = time.time()
         if self.ep_info_buffer is None or reset_num_timesteps:
@@ -206,10 +201,7 @@ class BaseAlgorithm(ABC):
             if self._vec_normalize_env is not None:
                 self._last_original_obs = self._vec_normalize_env.get_original_obs()
 
-        # Create eval callback if needed
-        callback = self._init_callback(callback, eval_freq, n_eval_episodes, log_path)
-
-        return total_timesteps, callback
+        return total_timesteps
 
     def get_env(self) -> Optional[VecEnv]:
         """
@@ -228,7 +220,6 @@ class BaseAlgorithm(ABC):
     def learn(
         self,
         total_timesteps: int,
-        callback: MaybeCallback = None,
         log_interval: int = 100,
         tb_log_name: str = "run",
         eval_freq: int = -1,
@@ -240,7 +231,6 @@ class BaseAlgorithm(ABC):
         Return a trained model.
 
         :param total_timesteps: The total number of samples (env steps) to train on
-        :param callback: callback(s) called at every step with state of the algorithm.
         :param log_interval: The number of timesteps before logging.
         :param tb_log_name: the name of the run for TensorBoard logging
         :param eval_freq: Evaluate the agent every ``eval_freq`` timesteps (this may vary a little)
@@ -507,42 +497,9 @@ class BaseAlgorithm(ABC):
 
         if save_dir is not None:
             path = save_dir + "/" + time_str + "_" + str(seed)  + "_" + str(iteration) + "_policy_network.zip"
-            env_config = None
-            env_configs = None
-            eval_env_config = None
-            eval_env_configs = None
-            if self.attacker_agent_config is not None:
-                self.attacker_agent_config.logger.info("Saving policy-network to: {}".format(path))
-                env_config = self.attacker_agent_config.env_config
-                env_configs = self.attacker_agent_config.env_configs
-                eval_env_config = self.attacker_agent_config.eval_env_config
-                eval_env_configs = self.attacker_agent_config.eval_env_configs
-                self.attacker_agent_config.env_config = None
-                self.attacker_agent_config.env_configs = None
-                self.attacker_agent_config.eval_env_config = None
-                self.attacker_agent_config.eval_env_configs = None
-            if self.defender_agent_config is not None:
-                self.defender_agent_config.logger.info("Saving policy-network to: {}".format(path))
-                if self.defender_agent_config.env_config is not None:
-                    env_config = self.defender_agent_config.env_config
-                    env_configs = self.defender_agent_config.env_configs
-                    eval_env_config = self.defender_agent_config.eval_env_config
-                    eval_env_configs = self.defender_agent_config.eval_env_configs
-                    self.defender_agent_config.env_config = None
-                    self.defender_agent_config.env_configs = None
-                    self.defender_agent_config.eval_env_config = None
-                    self.defender_agent_config.eval_env_configs = None
+            self.attacker_agent_config.logger.info("Saving policy-network to: {}".format(path))
+            self.defender_agent_config.logger.info("Saving policy-network to: {}".format(path))
             self.save(path, exclude=["tensorboard_writer", "eval_env", "env_2", "env"])
-            if self.attacker_agent_config is not None:
-                self.attacker_agent_config.env_config = env_config
-                self.attacker_agent_config.env_configs = env_configs
-                self.attacker_agent_config.eval_env_config = eval_env_config
-                self.attacker_agent_config.eval_env_configs = eval_env_configs
-            if self.defender_agent_config is not None:
-                self.defender_agent_config.env_config = env_config
-                self.defender_agent_config.env_configs = env_configs
-                self.defender_agent_config.eval_env_config = eval_env_config
-                self.defender_agent_config.eval_env_configs = eval_env_configs
         else:
             if self.attacker_agent_config is not None:
                 self.attacker_agent_config.logger.warning("Save path not defined, not saving policy-networks to disk")
@@ -563,8 +520,8 @@ class BaseAlgorithm(ABC):
         :return: the updated train agent log dto
         """
         return LogUtil.log_metrics_attacker(train_log_dto=train_log_dto, eps=eps, eval=eval,
-                                     attacker_agent_config=self.attacker_agent_config, env=self.env,
-                                     env_2=self.env_2, tensorboard_writer=self.tensorboard_writer)
+                                     attacker_agent_config=self.attacker_agent_config,
+                                     tensorboard_writer=self.tensorboard_writer)
 
     def log_metrics_defender(self, train_log_dto: TrainAgentLogDTO, eps: float = None, eval: bool = False) \
             -> TrainAgentLogDTO:
@@ -576,6 +533,6 @@ class BaseAlgorithm(ABC):
         :param eval: flag whether it is evaluation or not
         :return: the updated train agent log dto
         """
-        return LogUtil.log_metrics_defender(train_log_dto=train_log_dto, eps=eps, eval=eval, env=self.env,
-                                     env_2=self.env_2, defender_agent_config=self.defender_agent_config,
+        return LogUtil.log_metrics_defender(train_log_dto=train_log_dto, eps=eps, eval=eval,
+                                     defender_agent_config=self.defender_agent_config,
                                      tensorboard_writer=self.tensorboard_writer)

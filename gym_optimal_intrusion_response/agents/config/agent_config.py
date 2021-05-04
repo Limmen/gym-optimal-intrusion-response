@@ -153,8 +153,7 @@ class AgentConfig:
                "exploration_initial_eps:{66},exploration_final_eps:{67},policy_delay:{68}," \
                "target_policy_noise:{69},target_noise_clip:{70},input_dim_2:{71}," \
                "output_dim_2:{72},pi_hidden_dim_2:{73},pi_hidden_layers_2:{74}," \
-               "vf_hidden_layers_2:{75},vf_hidden_dim_2:{76},filter_illegal_actions:{77}," \               
-               "eval_deterministic:{78}".format(
+               "vf_hidden_layers_2:{75},vf_hidden_dim_2:{76},filter_illegal_actions:{77},eval_deterministic:{78}".format(
             self.gamma, self.alpha, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,

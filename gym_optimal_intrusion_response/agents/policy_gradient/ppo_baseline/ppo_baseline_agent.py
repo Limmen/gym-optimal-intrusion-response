@@ -77,7 +77,7 @@ class PPOBaselineAgent(TrainAgent):
         # Create model
         model = PPO(policy_attacker, policy_defender,
                     self.env,
-                    batch_size=self.attacker_config.mini_batch_size,
+                    batch_size=self.attacker_config.batch_size,
                     attacker_learning_rate=self.attacker_config.alpha,
                     defender_learning_rate=self.defender_config.alpha,
                     n_steps=self.attacker_config.batch_size,

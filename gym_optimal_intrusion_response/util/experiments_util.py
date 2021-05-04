@@ -24,7 +24,7 @@ def run_experiment(config: ClientConfig, random_seed: int, title :str = "v0") ->
     :param title: title of the experiment
     :return: train_csv_path, eval_csv_path
     """
-    from gym_pycr_ctf.runner.runner import Runner
+    from gym_optimal_intrusion_response.runner.runner import Runner
     time_str = str(time.time())
     create_artifact_dirs(config.output_dir, random_seed)
     logger = setup_logger(title, config.output_dir + "/results/logs/" +

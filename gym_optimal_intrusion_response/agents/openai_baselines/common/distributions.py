@@ -646,33 +646,8 @@ class TanhBijector(object):
 
 
 def make_proba_distribution(
-    action_space: gym.spaces.Space, use_sde: bool = False, dist_kwargs: Optional[Dict[str, Any]] = None
+    action_space: gym.spaces.Space, dist_kwargs: Optional[Dict[str, Any]] = None
 ) -> Distribution:
-    """
-    Return an instance of Distribution for the correct type of action space
-
-    :param action_space: the input action space
-    :param use_sde: Force the use of StateDependentNoiseDistribution
-        instead of DiagGaussianDistribution
-    :param dist_kwargs: Keyword arguments to pass to the probability distribution
-    :return: the appropriate Distribution object
-    """
     if dist_kwargs is None:
         dist_kwargs = {}
-
-    if isinstance(action_space, spaces.Box):
-        assert len(action_space.shape) == 1, "Error: the action space must be a vector"
-        cls = StateDependentNoiseDistribution if use_sde else DiagGaussianDistribution
-        return cls(get_action_dim(action_space), **dist_kwargs)
-    elif isinstance(action_space, spaces.Discrete):
-        return CategoricalDistribution(action_space.n, **dist_kwargs)
-    elif isinstance(action_space, spaces.MultiDiscrete):
-        return MultiCategoricalDistribution(action_space.nvec, **dist_kwargs)
-    elif isinstance(action_space, spaces.MultiBinary):
-        return BernoulliDistribution(action_space.n, **dist_kwargs)
-    else:
-        raise NotImplementedError(
-            "Error: probability distribution, not implemented for action space"
-            f"of type {type(action_space)}."
-            " Must be of type Gym Spaces: Box, Discrete, MultiDiscrete or MultiBinary."
-        )
+    return CategoricalDistribution(action_space.n, **dist_kwargs)

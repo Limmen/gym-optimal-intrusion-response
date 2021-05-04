@@ -5,9 +5,8 @@ import torch as th
 import time
 from gym_optimal_intrusion_response.agents.openai_baselines.common.base_class import BaseAlgorithm
 from gym_optimal_intrusion_response.agents.openai_baselines.common.buffers import RolloutBuffer
-from gym_optimal_intrusion_response.agents.openai_baselines.common.callbacks import BaseCallback
 from gym_optimal_intrusion_response.agents.openai_baselines.common.policies import ActorCriticPolicy
-from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import GymEnv, MaybeCallback, Schedule
+from gym_optimal_intrusion_response.agents.openai_baselines.common.type_aliases import GymEnv, Schedule
 from gym_optimal_intrusion_response.agents.openai_baselines.common.vec_env import VecEnv
 from gym_optimal_intrusion_response.dao.agent.train_agent_log_dto import TrainAgentLogDTO
 from gym_optimal_intrusion_response.dao.agent.rollout_data_dto import RolloutDataDTO
@@ -113,6 +112,8 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         self.attacker_policy = self.attacker_policy_class(
             self.attacker_observation_space,
             self.attacker_action_space,
+            self.attacker_learning_rate,
+            agent_config = self.attacker_agent_config,
             **self.attacker_policy_kwargs
         )
         self.attacker_policy = self.attacker_policy.to(self.device)
@@ -120,12 +121,14 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         self.defender_policy = self.defender_policy_class(
             self.defender_observation_space,
             self.defender_action_space,
+            self.defender_learning_rate,
+            agent_config=self.defender_agent_config,
             **self.defender_policy_kwargs
         )
         self.defender_policy = self.defender_policy.to(self.device)
 
     def collect_rollouts(
-        self, env: VecEnv, callback: BaseCallback, attacker_rollout_buffer: RolloutBuffer,
+        self, env: VecEnv, attacker_rollout_buffer: RolloutBuffer,
             defender_rollout_buffer: RolloutBuffer, n_rollout_steps: int) -> Tuple[bool, RolloutDataDTO]:
         assert self._last_obs is not None, "No previous observation was provided"
         n_steps = 0
@@ -141,7 +144,6 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         episode_reward_defender = np.zeros(env.num_envs)
         episode_step = np.zeros(env.num_envs)
 
-        callback.on_rollout_start()
         while n_steps < n_rollout_steps:
 
             new_obs, attacker_rewards, dones, infos, attacker_values, attacker_log_probs, attacker_actions, \
@@ -177,10 +179,8 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                         rollout_data_dto.attacker_action_alerts.append(infos[i]["attacker_alerts"])
                         rollout_data_dto.attacker_action_alerts_norm.append(infos[i]["attacker_alerts_norm"])
                         rollout_data_dto.episode_flags_percentage.append(
-                            infos[i]["flags"] / self.attacker_agent_config.env_config.num_flags)
+                            infos[i]["flags"] / 1)
 
-                        rollout_data_dto.update_env_specific_metrics(
-                            infos=infos, i=i, agent_config=self.attacker_agent_config)
                         episode_reward_attacker[i] = 0
                         episode_reward_defender[i] = 0
                         episode_step[i] = 0
@@ -190,7 +190,6 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         if self.train_mode == TrainMode.TRAIN_DEFENDER or self.train_mode == TrainMode.SELF_PLAY:
             defender_rollout_buffer.compute_returns_and_advantage(defender_values, dones=dones)
 
-        callback.on_rollout_end()
         for i in range(len(dones)):
             if not dones[i]:
                 rollout_data_dto.attacker_episode_rewards.append(episode_reward_attacker[i])
@@ -209,7 +208,6 @@ class OnPolicyAlgorithm(BaseAlgorithm):
     def learn(
         self,
         total_timesteps: int,
-        callback: MaybeCallback = None,
         log_interval: int = 1,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
@@ -221,10 +219,9 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         print("Setting up Training Configuration")
 
         self.iteration = 0
-        total_timesteps, callback = self._setup_learn(
-            total_timesteps, callback, eval_freq, n_eval_episodes, eval_log_path, reset_num_timesteps, tb_log_name
+        total_timesteps = self._setup_learn(
+            total_timesteps, eval_freq, n_eval_episodes, eval_log_path, reset_num_timesteps, tb_log_name
         )
-        callback.on_training_start(locals(), globals())
 
         # Tracking metrics
         train_log_dto = TrainAgentLogDTO()
@@ -238,7 +235,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         while self.num_timesteps < num_iterations:
 
             continue_training, rollout_data_dto = self.collect_rollouts(
-                self.env, callback, self.attacker_rollout_buffer, n_rollout_steps=self.n_steps)
+                self.env, self.attacker_rollout_buffer, self.defender_rollout_buffer, n_rollout_steps=self.n_steps)
 
             train_log_dto.attacker_episode_rewards.extend(rollout_data_dto.attacker_episode_rewards)
             train_log_dto.defender_episode_rewards.extend(rollout_data_dto.defender_episode_rewards)
@@ -265,7 +262,6 @@ class OnPolicyAlgorithm(BaseAlgorithm):
 
             self.iteration += 1
             train_log_dto.iteration = self.iteration
-            #callback.iteration += 1
 
             if self.iteration % self.attacker_agent_config.train_log_frequency == 0 or self.iteration == 1:
                 train_log_dto = quick_evaluate_policy(
@@ -311,8 +307,6 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             train_log_dto.defender_episode_avg_loss.append(entropy_loss_defender + pg_loss_defender + value_loss_defender)
 
 
-        callback.on_training_end()
-
         return self
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
@@ -341,11 +335,11 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             defender_log_probs = None
             if self.train_mode == TrainMode.TRAIN_ATTACKER or self.train_mode == TrainMode.SELF_PLAY:
                 attacker_actions, attacker_values, attacker_log_probs = \
-                    self.attacker_policy.forward(obs_tensor_attacker, env=env, attacker=True)
+                    self.attacker_policy.forward(obs_tensor_attacker, attacker=True)
                 attacker_actions = attacker_actions.cpu().numpy()
             if self.train_mode == TrainMode.TRAIN_DEFENDER or self.train_mode == TrainMode.SELF_PLAY:
                 defender_actions, defender_values, defender_log_probs = \
-                    self.defender_policy.forward(obs_tensor_defender, env=env, attacker=False)
+                    self.defender_policy.forward(obs_tensor_defender, attacker=False)
                 defender_actions = defender_actions.cpu().numpy()
 
         if attacker_actions is None:

@@ -33,6 +33,9 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         if attack_action_id is None:
             attack_action_id = self.env_config.attacker_static_opponent.action(env=self)
 
+        if defense_action_id is None:
+            defense_action_id = self.env_config.defender_static_opponent.action(env=self)
+
         attack_action_id = int(attack_action_id)
         defense_action_id = int(defense_action_id)
 

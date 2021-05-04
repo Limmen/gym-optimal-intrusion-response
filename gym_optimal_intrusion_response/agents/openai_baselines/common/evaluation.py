@@ -31,30 +31,22 @@ def _quick_eval_helper(env, attacker_model, defender_model,
     for episode in range(n_eval_episodes):
         for i in range(env.num_envs):
             obs = env.envs[i].reset()
-            env_conf = env.env_config(i)
-            env_configs = env.env_configs()
             done = False
             state = None
-            env_state = None
             attacker_episode_reward = 0.0
             defender_episode_reward = 0.0
             episode_length = 0
             while not done:
-                env_state = env.envs[i].env_state
                 obs_attacker, obs_defender = obs
                 attacker_actions = None
                 defender_actions = [None]
                 if train_mode == train_mode.TRAIN_ATTACKER or train_mode == train_mode.SELF_PLAY:
                     attacker_actions, state = attacker_model.predict(np.array([obs_attacker]), state=state,
                                                                      deterministic=deterministic,
-                                                                     env=env, env_idx=i,
-                                                                     env_state=env_state,
                                                                      attacker=True)
                 if train_mode == train_mode.TRAIN_DEFENDER or train_mode == train_mode.SELF_PLAY:
                     defender_actions, state = defender_model.predict(np.array([obs_defender]), state=state,
                                                                      deterministic=deterministic,
-                                                                     env=env, env_idx=i,
-                                                                     env_state=env_state,
                                                                      attacker=False)
                     if attacker_actions is None:
                         attacker_actions = np.array([None])
@@ -79,11 +71,10 @@ def _quick_eval_helper(env, attacker_model, defender_model,
             train_log_dto.eval_episode_snort_warning_baseline_rewards.append(_info["snort_warning_baseline_reward"])
             train_log_dto.eval_episode_snort_critical_baseline_rewards.append(_info["snort_critical_baseline_reward"])
             train_log_dto.eval_episode_var_log_baseline_rewards.append(_info["var_log_baseline_reward"])
-            train_log_dto.eval_episode_flags_percentage.append(_info["flags"] / env_conf.num_flags)
+            train_log_dto.eval_episode_flags_percentage.append(_info["flags"]/1)
             train_log_dto.eval_attacker_action_costs.append(_info["attacker_cost"])
             train_log_dto.eval_attacker_action_costs_norm.append(_info["attacker_cost_norm"])
             train_log_dto.eval_attacker_action_alerts.append(_info["attacker_alerts"])
             train_log_dto.eval_attacker_action_alerts_norm.append(_info["attacker_alerts_norm"])
-            train_log_dto.eval_update_env_specific_metrics(env_conf, _info, i)
 
     return train_log_dto
