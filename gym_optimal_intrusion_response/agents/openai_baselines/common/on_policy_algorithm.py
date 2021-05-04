@@ -180,7 +180,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                         rollout_data_dto.attacker_action_alerts_norm.append(infos[i]["attacker_alerts_norm"])
                         rollout_data_dto.episode_flags_percentage.append(
                             infos[i]["flags"] / 1)
-
+                        # print("reset reward:{}".format(episode_reward_attacker))
                         episode_reward_attacker[i] = 0
                         episode_reward_defender[i] = 0
                         episode_step[i] = 0
@@ -335,11 +335,11 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             defender_log_probs = None
             if self.train_mode == TrainMode.TRAIN_ATTACKER or self.train_mode == TrainMode.SELF_PLAY:
                 attacker_actions, attacker_values, attacker_log_probs = \
-                    self.attacker_policy.forward(obs_tensor_attacker, attacker=True)
+                    self.attacker_policy.forward(obs_tensor_attacker, attacker=True, env=env)
                 attacker_actions = attacker_actions.cpu().numpy()
             if self.train_mode == TrainMode.TRAIN_DEFENDER or self.train_mode == TrainMode.SELF_PLAY:
                 defender_actions, defender_values, defender_log_probs = \
-                    self.defender_policy.forward(obs_tensor_defender, attacker=False)
+                    self.defender_policy.forward(obs_tensor_defender, attacker=False, env=env)
                 defender_actions = defender_actions.cpu().numpy()
 
         if attacker_actions is None:

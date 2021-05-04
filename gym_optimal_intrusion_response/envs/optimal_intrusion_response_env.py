@@ -69,8 +69,8 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
                     if k not in info:
                         info[k] = v
 
-        defender_obs = self.env_state.get_defender_observation()
-        attacker_obs = self.env_state.get_attacker_observation()
+        defender_obs = self.env_state.get_defender_observation().flatten()
+        attacker_obs = self.env_state.get_attacker_observation().flatten()
         self.time_step += 1
 
         return (attacker_obs, defender_obs), (attacker_reward, defender_reward), done, info
@@ -88,7 +88,17 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         return attacker_reward, defender_reward, done, {}
 
     @staticmethod
-    def is_attack_action_legal(a_id: int) -> bool:
+    def is_attack_action_legal(a_id: int, env_config: EnvConfig, env_state: EnvState) -> bool:
+        node_id = EnvState.get_attacked_node(a_id, env_config)
+        attribute_id = EnvState.get_attacked_attribute(a_id, env_config)
+        if not env_state.attacker_reachable(node_id):
+            return False
+        if env_state.nodes[node_id].compromised:
+            return False
+        if attribute_id == env_config.recon_attribute and env_state.nodes[node_id].recon_done:
+            return False
+        if attribute_id != env_config.recon_attribute and env_state.nodes[node_id].attack_attributes[attribute_id] >= env_config.max_attribute_value:
+            return False
         return True
 
     @staticmethod
@@ -97,8 +107,8 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
     def reset(self) -> Tuple[np.ndarray, np.ndarray]:
         self.env_state.reset()
-        defender_obs = self.env_state.get_defender_observation()
-        attacker_obs = self.env_state.get_attacker_observation()
+        defender_obs = self.env_state.get_defender_observation().flatten()
+        attacker_obs = self.env_state.get_attacker_observation().flatten()
         return attacker_obs, defender_obs
 
 

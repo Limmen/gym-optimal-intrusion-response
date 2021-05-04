@@ -14,7 +14,8 @@ def test_env(env_name : str, num_steps : int):
     defender_actions = np.array(list(range(num_defender_actions)))
     print("num attacker actions:{}, num defender actions:{}".format(num_attacker_actions, num_defender_actions))
     for i in range(num_steps):
-        legal_attacker_actions = list(filter(lambda x: env.is_attack_action_legal(x), attacker_actions))
+        legal_attacker_actions = list(filter(lambda x: env.is_attack_action_legal(
+            x, env_config=env.env_config, env_state=env.env_state), attacker_actions))
         legal_defender_actions = list(filter(lambda x: env.is_defense_action_legal(x), defender_actions))
         attacker_action = np.random.choice(legal_attacker_actions)
         defender_action = np.random.choice(legal_defender_actions)

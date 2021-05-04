@@ -11,19 +11,19 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    agent_config = AgentConfig(gamma=1, alpha=0.0005, epsilon=1, render=False,
+    agent_config = AgentConfig(gamma=1, alpha=0.001, epsilon=1, render=False,
                                min_epsilon=0.01, eval_episodes=10, train_log_frequency=1,
                                epsilon_decay=0.9999, video=False, eval_log_frequency=1,
                                video_fps=5, video_dir=experiments_util.default_output_dir() + "/results/videos",
                                num_iterations=1000,
                                gif_dir=experiments_util.default_output_dir() + "/results/gifs",
                                save_dir=experiments_util.default_output_dir() + "/results/data",
-                               checkpoint_freq=25, input_dim=(4*(4+2)),
-                               output_dim=(4+1)*4,
+                               checkpoint_freq=25, input_dim=(1 + (20)*33),
+                               output_dim=2,
                                pi_hidden_dim=64, pi_hidden_layers=1,
                                vf_hidden_dim=64, vf_hidden_layers=1,
                                shared_hidden_layers=2, shared_hidden_dim=64,
-                               batch_size=2000,
+                               batch_size=100,
                                gpu=False, tensorboard=True,
                                tensorboard_dir=experiments_util.default_output_dir() + "/results/tensorboard",
                                optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
@@ -37,13 +37,13 @@ def default_config() -> ClientConfig:
                                )
     env_name = "optimal-intrusion-response-v1"
 
-    client_config = ClientConfig(env_name=env_name, attacker_agent_config=agent_config,
+    client_config = ClientConfig(env_name=env_name, defender_agent_config=agent_config,
                                  agent_type=AgentType.PPO_BASELINE.value,
                                  output_dir=experiments_util.default_output_dir(),
                                  title="Optimal Intrusion Response V1",
                                  run_many=True, random_seeds=[0, 999, 299],
                                  random_seed=299,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_ATTACKER,
+                                 mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,
                                  )
     return client_config
 

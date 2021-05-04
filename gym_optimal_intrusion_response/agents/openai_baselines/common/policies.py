@@ -231,7 +231,8 @@ class BasePolicy(BaseModel):
         state: Optional[np.ndarray] = None,
         mask: Optional[np.ndarray] = None,
         deterministic: bool = False,
-        attacker : bool = True
+        attacker : bool = True,
+        env = None
     ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
 
         observation = np.array(observation)
@@ -239,7 +240,7 @@ class BasePolicy(BaseModel):
         observation = th.as_tensor(observation).to(self.device)
 
         with th.no_grad():
-            actions = self._predict(observation, deterministic=deterministic, attacker=attacker)
+            actions = self._predict(observation, deterministic=deterministic, attacker=attacker, env=env)
 
         if type(actions) == th.Tensor:
             # Convert to numpy
@@ -390,14 +391,16 @@ class ActorCriticPolicy(BasePolicy):
         # Setup optimizer with initial learning rate
         self.optimizer = self.optimizer_class(self.parameters(), lr=self.lr, **self.optimizer_kwargs)
 
-    def forward(self, obs: th.Tensor, deterministic: bool = False, attacker: bool = True) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+    def forward(self, obs: th.Tensor, deterministic: bool = False, attacker: bool = True, env = None) \
+            -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         latent_pi, latent_vf = self._get_latent(obs)
         values = self.value_net(latent_vf)
+        env = env.envs[0]
 
         actions = list(range(self.agent_config.output_dim))
         if attacker:
             non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_attack_action_legal(
-                a_id=action), actions))
+                a_id=action, env_config=env.env_config, env_state=env.env_state), actions))
         else:
             non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_defense_action_legal(
                 d_id=action), actions))
@@ -432,13 +435,16 @@ class ActorCriticPolicy(BasePolicy):
         action_logits_1 = action_logits.to(self.device)
         return self.action_dist.proba_distribution(action_logits=action_logits_1)
 
-    def _predict(self, observation: th.Tensor, deterministic: bool = False, attacker: bool = True) -> th.Tensor:
+    def _predict(self, observation: th.Tensor, deterministic: bool = False, attacker: bool = True, env = None) \
+            -> th.Tensor:
         latent_pi, _ = self._get_latent(observation)
+
+        env = env.envs[0]
 
         actions = list(range(self.agent_config.output_dim))
         if attacker:
             non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_attack_action_legal(
-                a_id=action), actions))
+                a_id=action, env_config=env.env_config, env_state=env.env_state), actions))
         else:
             non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_defense_action_legal(
                 d_id=action), actions))

@@ -43,11 +43,11 @@ def _quick_eval_helper(env, attacker_model, defender_model,
                 if train_mode == train_mode.TRAIN_ATTACKER or train_mode == train_mode.SELF_PLAY:
                     attacker_actions, state = attacker_model.predict(np.array([obs_attacker]), state=state,
                                                                      deterministic=deterministic,
-                                                                     attacker=True)
+                                                                     attacker=True, env=env)
                 if train_mode == train_mode.TRAIN_DEFENDER or train_mode == train_mode.SELF_PLAY:
                     defender_actions, state = defender_model.predict(np.array([obs_defender]), state=state,
                                                                      deterministic=deterministic,
-                                                                     attacker=False)
+                                                                     attacker=False, env=env)
                     if attacker_actions is None:
                         attacker_actions = np.array([None])
                 defender_action = defender_actions[0]

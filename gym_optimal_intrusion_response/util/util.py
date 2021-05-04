@@ -10,3 +10,4 @@ def running_average(x, N):
     else:
         y = [x[-1]]
     return y[-1]
+

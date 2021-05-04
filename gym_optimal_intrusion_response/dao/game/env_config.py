@@ -7,6 +7,8 @@ class EnvConfig:
 
     def __init__(self, attacker_static_opponent : StaticAttacker,
                  defender_static_opponent: StaticDefender,
+                 adjacency_matrix,
+                 initial_reachable,
                  num_nodes: int = 4,
                  num_attributes : int = 4,
                  initial_attack_attributes = None, initial_defense_attributes = None,
@@ -16,7 +18,8 @@ class EnvConfig:
                  defender_early_stopping_reward : int = -1,
                  attacker_early_stopping_reward: int = -1,
                  defender_intrusion_prevented_reward : int = 1,
-                 attacker_intrusion_prevented_reward: int = 1
+                 attacker_intrusion_prevented_reward: int = 1,
+                 target_id : int = 4
                  ):
         self.num_nodes = num_nodes
         self.num_attributes = num_attributes
@@ -38,3 +41,7 @@ class EnvConfig:
         self.attacker_intrusion_prevention_reward = attacker_intrusion_prevented_reward
         self.attacker_num_actions = self.num_nodes*self.num_attributes
         self.defender_num_actions = 2
+        self.target_id = target_id
+        self.adjacency_matrix = adjacency_matrix
+        self.initial_reachable = initial_reachable
+

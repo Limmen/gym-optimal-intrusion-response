@@ -246,12 +246,13 @@ class BaseAlgorithm(ABC):
         state: Optional[np.ndarray] = None,
         mask: Optional[np.ndarray] = None,
         deterministic: bool = False,
-        attacker : bool = True
+        attacker : bool = True,
+        env = None
     ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         if attacker:
-            return self.attacker_policy.predict(observation, state, mask, deterministic, attacker=attacker)
+            return self.attacker_policy.predict(observation, state, mask, deterministic, attacker=attacker, env=env)
         else:
-            return self.defender_policy.predict(observation, state, mask, deterministic, attacker=attacker)
+            return self.defender_policy.predict(observation, state, mask, deterministic, attacker=attacker, env=env)
 
     def set_random_seed(self, seed: Optional[int] = None) -> None:
         """
