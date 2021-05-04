@@ -1,6 +1,4 @@
-import gym
-import numpy as np
-from gym_optimal_intrusion_response.dao.env_config import EnvConfig
+from gym_optimal_intrusion_response.dao.env.env_config import EnvConfig
 
 
 class AttackerObservationState:

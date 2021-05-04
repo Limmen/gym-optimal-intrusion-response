@@ -1,0 +1,40 @@
+from typing import Tuple
+import gym
+from gym_optimal_intrusion_response.dao.experiment.client_config import ClientConfig
+from gym_optimal_intrusion_response.dao.agent.agent_type import AgentType
+from gym_optimal_intrusion_response.dao.experiment.experiment_result import ExperimentResult
+from gym_optimal_intrusion_response.agents.policy_gradient.ppo_baseline.ppo_baseline_agent import PPOBaselineAgent
+from gym_optimal_intrusion_response.dao.experiment.runner_mode import RunnerMode
+from gym_optimal_intrusion_response.dao.agent.train_mode import TrainMode
+
+class Runner:
+
+    @staticmethod
+    def run(config: ClientConfig):
+        if config.mode == RunnerMode.TRAIN_ATTACKER.value or config.mode == RunnerMode.TRAIN_DEFENDER.value \
+                or config.mode == RunnerMode.SELF_PLAY.value:
+            return Runner.train(config)
+        else:
+            raise AssertionError("Runner mode not recognized: {}".format(config.mode))
+
+    @staticmethod
+    def train(config: ClientConfig) -> Tuple[ExperimentResult, ExperimentResult]:
+        env = Runner.regular_env_creation(config=config)
+        if config.agent_type == AgentType.PPO_BASELINE.value:
+            agent = PPOBaselineAgent(env,
+                                     attacker_agent_config=config.attacker_agent_config,
+                                     defender_agent_config=config.defender_agent_config,
+                                     train_mode=TrainMode(config.train_mode))
+        else:
+            raise AssertionError("Train agent type not recognized: {}".format(config.agent_type))
+        agent.train()
+        train_result = agent.train_result
+        eval_result = agent.eval_result
+        env.cleanup()
+        env.close()
+        return train_result, eval_result
+
+    @staticmethod
+    def regular_env_creation(config: ClientConfig):
+        env = gym.make(config.env_name)
+        return env

@@ -2,8 +2,8 @@ from typing import Tuple
 import gym
 import numpy as np
 from abc import ABC
-from gym_optimal_intrusion_response.dao.env_config import EnvConfig
-from gym_optimal_intrusion_response.dao.env_state import EnvState
+from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
+from gym_optimal_intrusion_response.dao.game.env_state import EnvState
 from gym_optimal_intrusion_response.logic.transition_operator import TransitionOperator
 
 class OptimalIntrusionResponseEnv(gym.Env, ABC):
@@ -38,8 +38,21 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
         attacker_reward, defender_reward, done, defender_info = self.step_defender(defense_action_id)
         defender_info["flags"] = 0
+        defender_info["caught_attacker"] = 0
+        defender_info["early_stopped"] = 0
+        defender_info["snort_severe_baseline_reward"] = 0
+        defender_info["snort_warning_baseline_reward"] = 0
+        defender_info["snort_critical_baseline_reward"] = 0
+        defender_info["var_log_baseline_reward"] = 0
+        defender_info["successful_intrusion"] = False
+        defender_info["attacker_cost"] = 0
+        defender_info["attacker_cost_norm"] = 0
+        defender_info["attacker_alerts"] = 0
+        defender_info["attacker_alerts_norm"] = 0
+        defender_info["flags"] = 0
 
         info = {}
+
         if not done:
             attacker_reward, defender_reward_2, done, info = self.step_attacker(attack_action_id)
             defender_reward = defender_reward + defender_reward_2
@@ -71,10 +84,12 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         self.env_state = s
         return attacker_reward, defender_reward, done, {}
 
-    def is_attack_action_legal(self, a_id: int) -> bool:
+    @staticmethod
+    def is_attack_action_legal(a_id: int) -> bool:
         return True
 
-    def is_defense_action_legal(self, d_id : int) -> bool:
+    @staticmethod
+    def is_defense_action_legal(d_id : int) -> bool:
         return True
 
     def reset(self) -> Tuple[np.ndarray, np.ndarray]:

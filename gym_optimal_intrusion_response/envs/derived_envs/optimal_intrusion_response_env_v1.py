@@ -1,7 +1,6 @@
 import numpy as np
 from gym_optimal_intrusion_response.envs.optimal_intrusion_response_env import OptimalIntrusionResponseEnv
-from gym_optimal_intrusion_response.dao.env_config import EnvConfig
-from gym_optimal_intrusion_response.logic.static_opponents.static_attacker import StaticAttacker
+from gym_optimal_intrusion_response.dao.env.env_config import EnvConfig
 from gym_optimal_intrusion_response.logic.static_opponents.random_attacker import RandomAttacker
 
 

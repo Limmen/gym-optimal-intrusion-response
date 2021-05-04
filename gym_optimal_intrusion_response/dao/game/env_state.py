@@ -1,9 +1,9 @@
 import gym
 import numpy as np
-from gym_optimal_intrusion_response.dao.env_config import EnvConfig
-from gym_optimal_intrusion_response.dao.attacker_obs_state import AttackerObservationState
-from gym_optimal_intrusion_response.dao.defender_obs_state import DefenderObservationState
-from gym_optimal_intrusion_response.dao.node import Node
+from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
+from gym_optimal_intrusion_response.dao.obs.attacker_obs_state import AttackerObservationState
+from gym_optimal_intrusion_response.dao.obs.defender_obs_state import DefenderObservationState
+from gym_optimal_intrusion_response.dao.game.node import Node
 
 
 class EnvState:

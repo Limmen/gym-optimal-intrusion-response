@@ -1,6 +1,6 @@
 from typing import Tuple
-from gym_optimal_intrusion_response.dao.env_state import EnvState
-from gym_optimal_intrusion_response.dao.env_config import EnvConfig
+from gym_optimal_intrusion_response.dao.env.env_state import EnvState
+from gym_optimal_intrusion_response.dao.env.env_config import EnvConfig
 
 
 class TransitionOperator:
