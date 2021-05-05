@@ -2,7 +2,6 @@ from typing import Tuple
 from gym_optimal_intrusion_response.dao.game.env_state import EnvState
 from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
 
-
 class TransitionOperator:
 
     @staticmethod
@@ -15,6 +14,7 @@ class TransitionOperator:
             node.recon()
         else:
             node.attack(attribute_id)
+        TransitionOperator.update_defender_state(env_state)
         attacker_reward, defender_reward = TransitionOperator.attacker_reward_fun(node, env_config)
         done = (node.target_component and node.compromised)
         s = env_state
@@ -28,6 +28,8 @@ class TransitionOperator:
             s.stopped = True
         attacker_reward, defender_reward = TransitionOperator.defender_reward_fun(env_state, env_config)
         done = s.stopped
+        print("Probability of intrusion:{}".format(s.defender_observation_state.probability_of_intrusion(s.t)))
+        s.t+=1
         return s, attacker_reward, defender_reward, done
 
     @staticmethod
@@ -36,6 +38,11 @@ class TransitionOperator:
             return env_config.attacker_target_compromised_reward, env_config.defender_target_compromised_reward
         else:
             return 0,0
+
+    @staticmethod
+    def update_defender_state(env_state: EnvState):
+        intrusion_in_progress = any(list(map(lambda x: x.compromised, env_state.nodes)))
+        env_state.defender_observation_state.update_state(intrusion_in_progress=intrusion_in_progress)
 
     @staticmethod
     def defender_reward_fun(env_state: EnvState, env_config: EnvConfig) -> Tuple[int, int]:

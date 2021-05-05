@@ -1,0 +1,6 @@
+
+class DP:
+    MAX_ALERTS = 50
+    MAX_LOGINS = 15
+    MAX_TIMESTEPS = 25
+    MAX_TTC = 50

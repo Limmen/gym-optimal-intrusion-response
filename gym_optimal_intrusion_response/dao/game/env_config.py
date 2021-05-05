@@ -19,7 +19,8 @@ class EnvConfig:
                  attacker_early_stopping_reward: int = -1,
                  defender_intrusion_prevented_reward : int = 1,
                  attacker_intrusion_prevented_reward: int = 1,
-                 target_id : int = 4
+                 target_id : int = 4,
+                 use_state_limits : bool = True
                  ):
         self.num_nodes = num_nodes
         self.num_attributes = num_attributes
@@ -44,4 +45,5 @@ class EnvConfig:
         self.target_id = target_id
         self.adjacency_matrix = adjacency_matrix
         self.initial_reachable = initial_reachable
+        self.use_state_limits = use_state_limits
 

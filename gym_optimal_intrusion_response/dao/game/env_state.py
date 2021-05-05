@@ -21,6 +21,7 @@ class EnvState:
         self.initialize_nodes()
         self.stopped = False
         self.caught = False
+        self.t=0
 
 
     def setup_spaces(self, env_config: EnvConfig):
@@ -41,6 +42,7 @@ class EnvState:
         self.initialize_nodes()
         self.stopped = False
         self.caught = False
+        self.t=0
 
     def initialize_nodes(self):
         nodes = []
