@@ -1,6 +1,7 @@
 from typing import Tuple
 from gym_optimal_intrusion_response.dao.game.env_state import EnvState
 from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
+import gym_optimal_intrusion_response.constants.constants as constants
 
 class TransitionOperator:
 
@@ -24,7 +25,7 @@ class TransitionOperator:
     def transition_defender(defender_action_id: int, env_state: EnvState, env_config: EnvConfig) \
             -> Tuple[EnvState, int, int, bool]:
         s = env_state
-        if defender_action_id == 1:
+        if defender_action_id == constants.ACTIONS.STOPPING_ACTION:
             s.stopped = True
         attacker_reward, defender_reward = TransitionOperator.defender_reward_fun(env_state, env_config)
         done = s.stopped

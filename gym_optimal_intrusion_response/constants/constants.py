@@ -1,6 +1,10 @@
 
 class DP:
-    MAX_ALERTS = 50
-    MAX_LOGINS = 15
-    MAX_TIMESTEPS = 25
+    MAX_ALERTS = 40
+    MAX_LOGINS = 10
+    MAX_TIMESTEPS = 20
     MAX_TTC = 50
+
+
+class ACTIONS:
+    STOPPING_ACTION = 1

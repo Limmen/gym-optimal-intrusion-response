@@ -147,9 +147,9 @@ def plot_ttc():
     ax.plot_surface(x, y, z, cmap='viridis_r', linewidth=0.3,
                     alpha=0.8, edgecolor='k')
 
-    ax.set_title(r"$TTC(a,l," + str(constants.DP.MAX_ALERTS) + ")$", fontsize=14)
-    ax.set_xlabel(r"IDS alerts $a$")
-    ax.set_ylabel(r"Login attempts $l$")
+    ax.set_title(r"$TTC(x,y," + str(constants.DP.MAX_ALERTS) + ")$", fontsize=14)
+    ax.set_xlabel(r"IDS alerts $x$")
+    ax.set_ylabel(r"Login attempts $y$")
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
     xlab.set_size(12)
