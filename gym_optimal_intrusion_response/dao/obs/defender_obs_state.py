@@ -38,5 +38,6 @@ class DefenderObservationState:
 
     def probability_of_intrusion(self, t: int):
         ttc = DefenderDynamics.ttc(self.num_alerts, self.num_failed_logins, constants.DP.MAX_ALERTS)
-        hp = DefenderDynamics.hack_prob(ttc, t)
+        print("ttc:{}".format(ttc))
+        hp = DefenderDynamics.hack_prob(ttc)
         return hp

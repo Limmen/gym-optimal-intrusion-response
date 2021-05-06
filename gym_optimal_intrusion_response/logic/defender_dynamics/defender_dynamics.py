@@ -24,9 +24,19 @@ class DefenderDynamics:
         res = t1 * P1 + t2 * (1 - P1) * (1 - u) + t3 * u * (1 - P1)
         return res
 
+    # @staticmethod
+    # def hack_prob(ttc_val, t):
+    #     min(0.5 * (t / ttc_val), 1.0)
+    #     return min(0.5 * (t / ttc_val), 1.0)
+
     @staticmethod
-    def hack_prob(ttc_val, t):
-        return min(0.5 * (t / ttc_val), 1.0)
+    def hack_prob(ttc_val):
+        # ttc_1 = min(25, ttc_val)
+        ttc_1 = max(1, ttc_val)
+        # hp = math.log((25 - ttc_1)/25)
+        hp = (1/math.pow(ttc_1, 2))
+        # hp = (25 - ttc_1)/25
+        return hp
 
     @staticmethod
     def f_fun(s):
@@ -57,7 +67,7 @@ class DefenderDynamics:
 
     @staticmethod
     def f1_a():
-        return poisson(mu=5)
+        return poisson(mu=3)
 
     @staticmethod
     def f2_a():
@@ -65,7 +75,7 @@ class DefenderDynamics:
 
     @staticmethod
     def f1_b():
-        return poisson(mu=3)
+        return poisson(mu=1)
 
     @staticmethod
     def f2_b():
