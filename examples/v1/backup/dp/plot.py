@@ -59,6 +59,20 @@ def load_policy():
         print("policy loaded:{}".format(policy.shape))
         return policy
 
+def load_thresholds():
+    print("loading thresholds..")
+    with open('thresholds.npy', 'rb') as f:
+        thresholds = np.load(f)
+        print("thresholds loaded:{}".format(thresholds.shape))
+        return thresholds
+
+def load_TTC_table():
+    print("loading TTC table..")
+    with open('ttc_table.npy', 'rb') as f:
+        TTC = np.load(f)
+        print("TTC table loaded:{}".format(TTC.shape))
+        return TTC
+
 def plot_value_fun_3d(t : int = 0):
     V = load_value_fun()
     state_to_id = load_state_to_id()
@@ -170,13 +184,106 @@ def plot_policy(t=0):
     #             stopping_times.append(t1)
     # print(stopping_times)
 
+def plot_thresholds():
+    TTC = load_TTC_table()
+    thresholds = load_thresholds()
+    id_to_state = load_id_to_state()
+
+    # for i in range(len(thresholds[1:])):
+    #     pass
+
+    ts_to_thresholds = {}
+    for i in range(len(thresholds)):
+        s = id_to_state[i]
+        if s != "terminal":
+            t1, x1, y1 = s
+            if t1 in ts_to_thresholds:
+                ts_to_thresholds[t1] = ts_to_thresholds[t1] + [thresholds[i]]
+            else:
+                ts_to_thresholds[t1] = [thresholds[i]]
+    x = []
+    y = []
+    for i in range(constants.DP.MAX_TIMESTEPS):
+        print(ts_to_thresholds[i])
+        avg_threshold = np.mean(np.array(ts_to_thresholds[i]))
+        x.append(i)
+        y.append(avg_threshold)
+
+
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
+    plt.rcParams['font.family'] = ['serif']
+    plt.rcParams['axes.titlepad'] = 0.02
+    # plt.rcParams['xtick.major.pad'] = 0.5
+    plt.rcParams['ytick.major.pad'] = 0.05
+    plt.rcParams['axes.labelpad'] = 0.8
+    plt.rcParams['axes.linewidth'] = 0.1
+    plt.rcParams.update({'font.size': 10})
+
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.5, 3.2))
+
+    # ylims = (0, 920)
+
+    # Plot Avg Eval rewards Gensim
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax.plot(x,
+            y, label=r"$\pi_{\theta}$ simulation",
+            ls='-', color=colors[0])
+    ax.fill_between(x, y, np.zeros(len(y)),
+                    alpha=0.35, color=colors[0])
+
+    # if plot_opt:
+    ax.plot(x,
+            [0.5] * len(x), label=r"0.5",
+            color="black",
+            linestyle="dashed")
+
+    ax.set_title(r"$\pi_{\theta^D}(\text{stop}|a)$", fontsize=12.5)
+    ax.set_xlabel(r"\# Alerts $a$", fontsize=11.5)
+    # ax.set_ylabel(r"$\mathbb{P}[\text{stop}|w]$", fontsize=12)
+    # ax.set_xlim(0, len(x))
+    # ax.set_ylim(0, 1.1)
+    # ax.set_ylim(ylim_rew)
+
+    # set the grid on
+    ax.grid('on')
+
+    # tweak the axis labels
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+
+    xlab.set_size(11.5)
+    ylab.set_size(11.5)
+
+    # change the color of the top and right spines to opaque gray
+    ax.spines['right'].set_color((.8, .8, .8))
+    ax.spines['top'].set_color((.8, .8, .8))
+
+    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
+    #           ncol=2, fancybox=True, shadow=True)
+    # ax.legend(loc="lower right")
+    # ax.xaxis.label.set_size(13.5)
+    # ax.yaxis.label.set_size(13.5)
+
+    ttl = ax.title
+    ttl.set_position([.5, 1.05])
+
+    fig.tight_layout()
+    plt.show()
+    # plt.subplots_adjust(wspace=0, hspace=0)
+    # fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
+    # fig.savefig("threshold_alerts" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    # plt.close(fig)
+
+
 if __name__ == '__main__':
-    plot_policy(t=0)
-    plot_policy(t=1)
-    plot_policy(t=2)
-    plot_policy(t=3)
-    plot_policy(t=4)
-    plot_policy(t=5)
+    plot_thresholds()
+    # plot_policy(t=0)
+    # plot_policy(t=1)
+    # plot_policy(t=2)
+    # plot_policy(t=3)
+    # plot_policy(t=4)
+    # plot_policy(t=5)
     # plot_value_fun_3d(t=0)
     # plot_value_fun_3d(t=1)
     # plot_value_fun_3d(t=2)

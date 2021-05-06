@@ -4,7 +4,6 @@ import gym_optimal_intrusion_response.constants.constants as constants
 
 class DefenderDynamics:
 
-
     @staticmethod
     def p1(v, m, k):
         return (1 - math.exp(-(v * m) / k))
