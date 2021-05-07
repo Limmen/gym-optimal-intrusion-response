@@ -240,11 +240,12 @@ def plot_thresholds():
             print(ts_to_thresholds[i])
         x.append(i)
         y.append(avg_threshold)
-    print(y[-1])
-    print(y[-2])
-    print(y[-3])
+    print("len:{}".format(len(y)))
+    # print(y[-1])
+    # print(y[-2])
+    # print(y[-3])
     # y[-2] = y[-3] + (y[-1] - y[-3])/1.2
-    y[-2] = 90
+    # y[-2] = 90
 
     print(y[-1])
     print(y[-2])

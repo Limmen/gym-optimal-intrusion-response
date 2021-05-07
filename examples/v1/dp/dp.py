@@ -312,7 +312,12 @@ def reward_fun(state, action, id_to_state):
             # return hp * (100*(math.pow(x1, 1))) + (1 - hp) * (t1 - 100)
             # return hp * ((math.pow(x1, 1))) + (1 - hp) * (t1 - 100)
             # return 100*hp * (math.pow(x1, 2)) + (1 - hp) * (10*(t1 - constants.DP.MAX_TIMESTEPS))
-            return hp * 100*(math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
+            p1 = hp * 100*(math.pow(x1, 1))
+            p2 = (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
+            r = hp * 100*(math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
+            if r > 0:
+                print("positive stopping r:{}, {}, hp:{}, p1:{}, p2:{}".format(r, (t1, x1), hp, p1, p2))
+            return r
         else:
             return hp * constants.DP.ATTACK_REWARD + (1 - hp) * (constants.DP.SERVICE_REWARD)
 
