@@ -7,7 +7,7 @@ class DP:
     MAX_TTC = 20
     MIN_TTC = 0
     SERVICE_REWARD = 5
-    ATTACK_REWARD = -10
+    ATTACK_REWARD = -100
     EARLY_STOPPING_REWARD = -100
 
 

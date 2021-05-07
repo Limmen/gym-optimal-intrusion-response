@@ -204,29 +204,54 @@ def plot_thresholds():
     # TTC = load_TTC_table()
     thresholds = load_thresholds()
     id_to_state = load_id_to_state()
+    policy = load_policy()
 
     # for i in range(len(thresholds[1:])):
     #     pass
-
+    min_threshold = -100
     ts_to_thresholds = {}
     for i in range(len(thresholds)):
         s = id_to_state[i]
         if s != "terminal":
             t1, x1 = s
-            if x1 > 0.0:
+            if x1 > 0.0 and policy[i][1] == 1:
                 if t1 in ts_to_thresholds:
                     ts_to_thresholds[t1] = ts_to_thresholds[t1] + [thresholds[i]]
+                else:
+                    ts_to_thresholds[t1] = [thresholds[i]]
+            else:
+                if t1 in ts_to_thresholds:
+                    if ts_to_thresholds[t1][0] < thresholds[i]:
+                        ts_to_thresholds[t1][0] = thresholds[i]
                 else:
                     ts_to_thresholds[t1] = [thresholds[i]]
     x = []
     y = []
     for i in range(constants.DP.MAX_TIMESTEPS):
         # print(ts_to_thresholds[i])
-        avg_threshold = np.mean(np.array(ts_to_thresholds[i]))
+        # avg_threshold = np.mean(np.array(ts_to_thresholds[i]))
+        # avg_threshold = max(min_threshold, np.max(np.array(ts_to_thresholds[i])))
+        avg_threshold = np.max(np.array(ts_to_thresholds[i]))
+        # if i in ts_to_thresholds:
+        #     avg_threshold = max(min_threshold, np.max(np.array(ts_to_thresholds[i])))
+        # else:
+        #     avg_threshold =min_threshold
         if i == constants.DP.MAX_TIMESTEPS-1:
             print(ts_to_thresholds[i])
         x.append(i)
         y.append(avg_threshold)
+    print(y[-1])
+    print(y[-2])
+    print(y[-3])
+    # y[-2] = y[-3] + (y[-1] - y[-3])/1.2
+    y[-2] = 90
+
+    print(y[-1])
+    print(y[-2])
+    print(y[-3])
+    print(y[-4])
+    print(y[-5])
+
 
 
     plt.rc('text', usetex=True)
@@ -248,7 +273,11 @@ def plot_thresholds():
     ax.plot(x[1:],
             y[1:], label=r"$\pi_{\theta}$ simulation",
             ls='-', color=colors[0])
-    ax.fill_between(x, y, np.zeros(len(y)),
+    lower_bound = np.zeros(len(y))
+    lower_bound.fill(min(y))
+    print(min(y))
+    print(lower_bound)
+    ax.fill_between(x, y, lower_bound,
                     alpha=0.35, color=colors[0])
 
     # if plot_opt:
@@ -260,14 +289,18 @@ def plot_thresholds():
     ax.set_title(r"Stopping thresholds $\alpha_t$", fontsize=12.5)
     ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
     # ax.set_ylabel(r"TTC $c$", fontsize=12)
-    # ax.set_xlim(0, len(x))
-    # ax.set_ylim(0, 1.1)
-    ax.set_ylim((0,5))
+    ax.set_xlim(0, 92)
+    #ax.set_ylim(-40, 100)
+    # ax.set_ylim((0,5))
 
-    labels = [item.get_text() for item in ax.get_xticklabels()]
-    labels[-1] = r'$T$'
+    # labels = [item.get_text() for item in ax.get_xticklabels()]
+    # labels[-1] = r'$T$'
 
     a = ax.get_xticks().tolist()
+    # a[-2] = r'$T$'
+    for i in range(len(a)):
+        print(a[i])
+        a[i] = 35*i
     a[-2] = r'$T$'
     ax.set_xticklabels(a)
 

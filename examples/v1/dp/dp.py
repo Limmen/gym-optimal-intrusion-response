@@ -31,7 +31,7 @@ def hp_and_ttc_and_r(n_states, n_actions, id_to_state):
             R[i][1] = 0
         else:
             t1, x1 = s1
-            hp = DefenderDynamics.hack_prob(x1)
+            hp = DefenderDynamics.hack_prob(x1, t1)
             HP[i] = hp
             for j in range(n_actions):
                 r = reward_fun(i, j, id_to_state)
@@ -299,7 +299,7 @@ def reward_fun(state, action, id_to_state):
     s1 = id_to_state[state]
     t1, x1 = s1
     # ttc = DefenderDynamics.ttc(x1, y1, constants.DP.MAX_ALERTS)
-    hp = DefenderDynamics.hack_prob(x1)
+    hp = DefenderDynamics.hack_prob(x1, t1)
     if t1 == constants.DP.MAX_TIMESTEPS and action != constants.ACTIONS.STOPPING_ACTION:
         return hp * constants.DP.ATTACK_REWARD
     else:
@@ -312,7 +312,7 @@ def reward_fun(state, action, id_to_state):
             # return hp * (100*(math.pow(x1, 1))) + (1 - hp) * (t1 - 100)
             # return hp * ((math.pow(x1, 1))) + (1 - hp) * (t1 - 100)
             # return 100*hp * (math.pow(x1, 2)) + (1 - hp) * (10*(t1 - constants.DP.MAX_TIMESTEPS))
-            return hp * (100*math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD+t1)
+            return hp * (math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
         else:
             return hp * constants.DP.ATTACK_REWARD + (1 - hp) * (constants.DP.SERVICE_REWARD)
 
@@ -323,20 +323,6 @@ def one_step_lookahead(state, V, num_actions, num_states, T, discount_factor, R,
         for next_state in next_state_lookahead[str(state)]:
             reward = R[state][a]
             prob = T[state][a][next_state]
-            # print("prob:{}".format(prob))
-            # print("reward:{}".format(reward))
-            # print("V[next_state]:{}".format(V[next_state]))
-            if math.isnan(V[next_state]):
-                print(V[next_state])
-                sys.exit(0)
-            upd = prob * (reward + discount_factor * V[next_state])
-            if math.isnan(upd):
-                print("upd is nan")
-                print("prob:{}".format(prob))
-                print("reward:{}".format(reward))
-                print("V[next_state]:{}".format(V[next_state]))
-                sys.exit(0)
-
             A[a] += prob * (reward + discount_factor * V[next_state])
     # print("return A:{}".format(A))
     return A
@@ -488,16 +474,28 @@ def compute_thresholds(V, T, R, n_states, next_state_lookahead):
     return thresholds
 
 
-def compute_thresholds_2(V, T, R, n_states, next_state_lookahead, id_to_state):
+def compute_thresholds_2(V, T, R, n_states, next_state_lookahead, id_to_state, HP):
     thresholds = np.zeros(n_states)
     for i in range(n_states):
+        s1 = id_to_state[i]
         w = 0
+        hp = HP[i]
+        w = R[i][0]
         for next_state in next_state_lookahead[str(i)]:
             prob = T[i][0][next_state]
             w = w + prob * V[next_state]
-        s1 = id_to_state[i]
+            # if s1 != "terminal":
+            #     (t1, x1) = s1
+            #     if t1 == 2:
+            #         print("2 prob :{}".format(prob))
+            #         print("2 val :{}".format(V[next_state]))
         if s1 != "terminal":
             (t1, x1) = s1
+            if t1 == 99:
+                print("99 w:{}".format(w))
+
+            if t1 == 2:
+                print("2 w:{}".format(w))
             # alpha = (math.sqrt(100)) / (math.sqrt(w+120 - t1))
             # alpha = (math.sqrt(t1)) / (math.sqrt(w +180 + 2*t1))
             # alpha = (2*(-100))/(w+2*t1-110)
@@ -508,7 +506,15 @@ def compute_thresholds_2(V, T, R, n_states, next_state_lookahead, id_to_state):
             # alpha = (t1-100) / (t1-w-99)
             # alpha = 100/(99+w)
             # alpha=(t1-100)/(t1-w-99)
-            alpha = (200-t1) / (100 + w -t1)
+            # alpha = (101-t1) / (150 + w -t1)
+            # alpha = 101/(100+w)
+            # alpha = (101 - t1) / (100 + w - t1)
+            alpha =-((w+100-100*hp)/(hp))
+
+            # alpha = - (math.sqrt((w + 100 - 100 * hp) / (hp)))
+            # alpha = - (math.sqrt((w + 100 - 100 * hp + hp*t1 - t1) / (hp)))
+            # alpha = -((w + 100 - 100 * hp + hp * t1 - t1) / (hp))
+
             # alpha = 100/(99+w)
             # alpha = (1) / (101 - w - t1)
             # alpha = (math.sqrt(1000-10*t1)) / (math.sqrt(1200 + w-10*t1))
@@ -549,19 +555,19 @@ if __name__ == '__main__':
     print("num states:{}, num actions:{}".format(num_states(), num_actions()))
     state_to_id, id_to_state = state_to_id_dict()
     # ttc_to_alerts_logins, alerts_logins_to_ttc = ttc_to_alerts_table()
-    # ttc_to_alerts_logins, alerts_logins_to_ttc = load_tcc_to_alerts_logins()
-    # HP, R = hp_and_ttc_and_r(num_states(), num_actions(), id_to_state)
-    # T = transition_kernel(id_to_state, num_states(), num_actions(), HP, ttc_to_alerts_logins, alerts_logins_to_ttc)
-    # next_state_lookahead = next_states_lookahead_table(num_states(), num_actions(), T, id_to_state)
+    ttc_to_alerts_logins, alerts_logins_to_ttc = load_tcc_to_alerts_logins()
+    HP, R = hp_and_ttc_and_r(num_states(), num_actions(), id_to_state)
+    T = transition_kernel(id_to_state, num_states(), num_actions(), HP, ttc_to_alerts_logins, alerts_logins_to_ttc)
+    next_state_lookahead = next_states_lookahead_table(num_states(), num_actions(), T, id_to_state)
     HP = load_HP_table()
     R = load_R_table()
     T = load_transition_kernel()
     next_state_lookahead = load_next_states_lookahead_table()
-    # policy, V = value_iteration(T, num_states(), num_actions(), state_to_id, id_to_state, HP, R,
-    #                             next_state_lookahead, theta=0.0001, discount_factor=1.0)
+    policy, V = value_iteration(T, num_states(), num_actions(), state_to_id, id_to_state, HP, R,
+                                next_state_lookahead, theta=0.0001, discount_factor=1.0)
     V = load_value_fun()
     policy = load_policy()
-    thresholds = compute_thresholds_2(V, T, R, num_states(), next_state_lookahead, id_to_state)
+    thresholds = compute_thresholds_2(V, T, R, num_states(), next_state_lookahead, id_to_state, HP)
     for i in range(len(V)):
         s = id_to_state[i]
         if s != "terminal":

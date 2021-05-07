@@ -30,12 +30,13 @@ class DefenderDynamics:
     #     return min(0.5 * (t / ttc_val), 1.0)
 
     @staticmethod
-    def hack_prob(ttc_val):
+    def hack_prob(ttc_val, t):
         # ttc_1 = min(25, ttc_val)
         ttc_1 = max(1, ttc_val)
         # hp = math.log((25 - ttc_1)/25)
         # hp = (1/math.pow(ttc_1, 2))
         hp = (1 / math.pow(ttc_1, 1))
+        hp = (1 / math.pow(0.5*ttc_1 + 0.5*(constants.DP.MAX_TIMESTEPS- t), 1))
         # hp = (25 - ttc_1)/25
         return hp
 
