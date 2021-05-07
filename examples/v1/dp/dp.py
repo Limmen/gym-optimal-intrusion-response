@@ -314,7 +314,7 @@ def reward_fun(state, action, id_to_state):
             # return 100*hp * (math.pow(x1, 2)) + (1 - hp) * (10*(t1 - constants.DP.MAX_TIMESTEPS))
             p1 = hp * 100*(math.pow(x1, 1))
             p2 = (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
-            r = hp * 100*(math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
+            r = hp * 50 * (max(math.pow(x1, 1), 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
             if r > 0:
                 print("positive stopping r:{}, {}, hp:{}, p1:{}, p2:{}".format(r, (t1, x1), hp, p1, p2))
             return r
@@ -514,7 +514,8 @@ def compute_thresholds_2(V, T, R, n_states, next_state_lookahead, id_to_state, H
             # alpha = (101-t1) / (150 + w -t1)
             # alpha = 101/(100+w)
             # alpha = (101 - t1) / (100 + w - t1)
-            alpha =-((w+100-100*hp)/(hp))
+            # alpha =-((w+100-100*hp)/(hp))
+            alpha = -(w+ 10-10*hp)/(50*hp)
 
             # alpha = - (math.sqrt((w + 100 - 100 * hp) / (hp)))
             # alpha = - (math.sqrt((w + 100 - 100 * hp + hp*t1 - t1) / (hp)))

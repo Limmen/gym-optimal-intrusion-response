@@ -66,7 +66,7 @@ class ManualDefenderAgent:
                             action = (attacker_action, a)
                             latest_obs, latest_rew, done, _ = self.env.step(action)
                             attacker_rew, defender_rew = latest_rew
-                            cumulative_reward += attacker_rew
+                            cumulative_reward += defender_rew
                             history.append(a)
                             if done:
                                 target_compromised = list(filter(lambda x: x.target_component, env.env_state.nodes))[0].compromised

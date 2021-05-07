@@ -262,7 +262,7 @@ def plot_thresholds():
     # plt.rcParams['xtick.major.pad'] = 0.5
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 0.8
-    plt.rcParams['axes.linewidth'] = 0.1
+    plt.rcParams['axes.linewidth'] = 0.8
     plt.rcParams.update({'font.size': 10})
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.5, 3.2))
@@ -282,13 +282,16 @@ def plot_thresholds():
                     alpha=0.35, color=colors[0])
 
     # if plot_opt:
-    ax.plot(x,
-            [0.5] * len(x), label=r"0.5",
-            color="black",
-            linestyle="dashed")
+    # ax.plot(x,
+    #         [0.5] * len(x), label=r"0.5",
+    #         color="black",
+    #         linestyle="dashed")
 
     ax.set_title(r"Stopping thresholds $\alpha_t$", fontsize=12.5)
     ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
+
+    ax.axhline(y=0, color='k', linewidth=0.5)
+    # ax.axvline(x=0, color='k')
     # ax.set_ylabel(r"TTC $c$", fontsize=12)
     #ax.set_xlim(0, 92)
     #ax.set_ylim(-40, 100)
@@ -299,9 +302,9 @@ def plot_thresholds():
 
     a = ax.get_xticks().tolist()
     # a[-2] = r'$T$'
-    for i in range(len(a)):
-        print(a[i])
-        a[i] = 35*i
+    # for i in range(len(a)):
+    #     print(a[i])
+    #     a[i] = 35*i
     a[-2] = r'$T$'
     ax.set_xticklabels(a)
 
@@ -336,8 +339,347 @@ def plot_thresholds():
     # plt.close(fig)
 
 
+def policy_plot_2():
+    # TTC = load_TTC_table()
+    thresholds = load_thresholds()
+    id_to_state = load_id_to_state()
+    policy = load_policy()
+
+    ts_to_thresholds = {}
+    for i in range(len(thresholds)):
+        s = id_to_state[i]
+        if s != "terminal":
+            t1, x1 = s
+            if x1 > 0.0 and policy[i][1] == 1:
+                if t1 in ts_to_thresholds:
+                    ts_to_thresholds[t1] = ts_to_thresholds[t1] + [thresholds[i]]
+                else:
+                    ts_to_thresholds[t1] = [thresholds[i]]
+            else:
+                if t1 in ts_to_thresholds:
+                    if ts_to_thresholds[t1][0] < thresholds[i]:
+                        ts_to_thresholds[t1][0] = thresholds[i]
+                else:
+                    ts_to_thresholds[t1] = [thresholds[i]]
+    timesteps = []
+    thresholds = []
+    for i in range(constants.DP.MAX_TIMESTEPS):
+        avg_threshold = np.max(np.array(ts_to_thresholds[i]))
+        timesteps.append(i)
+        thresholds.append(avg_threshold)
+
+    fontsize = 6.5
+    labelsize = 5
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
+    plt.rcParams['font.family'] = ['serif']
+    plt.rcParams['axes.titlepad'] = 0.02
+    # plt.rcParams['xtick.major.pad'] = 0.5
+    plt.rcParams['ytick.major.pad'] = 0.05
+    plt.rcParams['axes.labelpad'] = 0.8
+    plt.rcParams['axes.linewidth'] = 0.8
+    plt.rcParams.update({'font.size': 6.5})
+
+    fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(5, 4.5))
+
+    x = []
+    y = []
+    t = 11
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[0][0].plot(x[0:],
+            y[0:], label=r"$\pi_{\theta}$ simulation",
+            ls='-', color=colors[0])
+
+    ax[0][0].set_title(r"Optimal policy $\pi^{*}, t=11$", fontsize=fontsize)
+    ax[0][0].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[0][0].grid('on')
+    ax[0][0].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[0][0].xaxis.get_label()
+    ylab = ax[0][0].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][0].spines['right'].set_color((.8, .8, .8))
+    ax[0][0].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 12
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[0][1].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[0][1].set_title(r"Optimal policy $\pi^{*}, t=12$", fontsize=fontsize)
+    ax[0][1].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[0][1].grid('on')
+    ax[0][1].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[0][1].xaxis.get_label()
+    ylab = ax[0][1].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][1].spines['right'].set_color((.8, .8, .8))
+    ax[0][1].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 13
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[0][2].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[0][2].set_title(r"Optimal policy $\pi^{*}, t=13$", fontsize=fontsize)
+    ax[0][2].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[0][2].grid('on')
+    ax[0][2].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[0][2].xaxis.get_label()
+    ylab = ax[0][2].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][2].spines['right'].set_color((.8, .8, .8))
+    ax[0][2].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 14
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[1][0].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[1][0].set_title(r"Optimal policy $\pi^{*}, t=14$", fontsize=fontsize)
+    ax[1][0].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[1][0].grid('on')
+
+    ax[1][0].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[1][0].xaxis.get_label()
+    ylab = ax[1][0].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][0].spines['right'].set_color((.8, .8, .8))
+    ax[1][0].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 15
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[1][1].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[1][1].set_title(r"Optimal policy $\pi^{*}, t=15$", fontsize=fontsize)
+    ax[1][1].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[1][1].grid('on')
+
+    ax[1][1].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[1][1].xaxis.get_label()
+    ylab = ax[1][1].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][1].spines['right'].set_color((.8, .8, .8))
+    ax[1][1].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 16
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[1][2].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[1][2].set_title(r"Optimal policy $\pi^{*}, t=16$", fontsize=fontsize)
+    ax[1][2].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[1][2].grid('on')
+
+    ax[1][2].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[1][2].xaxis.get_label()
+    ylab = ax[1][2].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][2].spines['right'].set_color((.8, .8, .8))
+    ax[1][2].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 17
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[2][0].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[2][0].set_title(r"Optimal policy $\pi^{*}, t=17$", fontsize=fontsize)
+    ax[2][0].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[2][0].grid('on')
+
+    ax[2][0].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[2][0].xaxis.get_label()
+    ylab = ax[2][0].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][0].spines['right'].set_color((.8, .8, .8))
+    ax[2][0].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 18
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[2][1].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[2][1].set_title(r"Optimal policy $\pi^{*}, t=18$", fontsize=fontsize)
+    ax[2][1].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[2][1].grid('on')
+
+    ax[2][1].set_xlim(-1, 1)
+
+    # tweak the axis labels
+    xlab = ax[2][1].xaxis.get_label()
+    ylab = ax[2][1].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][1].spines['right'].set_color((.8, .8, .8))
+    ax[2][1].spines['top'].set_color((.8, .8, .8))
+
+    x = []
+    y = []
+    t = 19
+    print("thresh:{}".format(thresholds[t]))
+    for i in np.arange(-10, constants.DP.MAX_TTC, 0.05):
+        x.append(i)
+        if i < thresholds[t]:
+            y.append(1)
+        else:
+            y.append(0)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax[2][2].plot(x[0:],
+                  y[0:], label=r"$\pi_{\theta}$ simulation",
+                  ls='-', color=colors[0])
+
+    ax[2][2].set_title(r"Optimal policy $\pi^{*}, t=19$", fontsize=fontsize)
+    ax[2][2].set_xlabel(r"TTC $c$", fontsize=labelsize)
+    ax[2][2].grid('on')
+
+    ax[2][2].set_xlim(-1, 3)
+
+    # tweak the axis labels
+    xlab = ax[2][2].xaxis.get_label()
+    ylab = ax[2][2].yaxis.get_label()
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][2].spines['right'].set_color((.8, .8, .8))
+    ax[2][2].spines['top'].set_color((.8, .8, .8))
+
+
+    fig.tight_layout()
+    plt.show()
+    # plt.subplots_adjust(wspace=0, hspace=0)
+    # fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
+    # fig.savefig("threshold_alerts" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    # plt.close(fig)
+
+
+
 if __name__ == '__main__':
-    plot_thresholds()
+    policy_plot_2()
+    # plot_thresholds()
     # plot_policy(t=0)
     # plot_policy(t=1)
     # plot_policy(t=2)

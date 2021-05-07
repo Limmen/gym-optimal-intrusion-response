@@ -6,8 +6,8 @@ class DP:
     # MAX_TTC = 200
     MAX_TTC = 20
     MIN_TTC = 0
-    SERVICE_REWARD = 3
-    ATTACK_REWARD = -10
+    SERVICE_REWARD = 10
+    ATTACK_REWARD = -65
     EARLY_STOPPING_REWARD = -10
 
 

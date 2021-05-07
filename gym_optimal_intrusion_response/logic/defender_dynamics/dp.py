@@ -295,19 +295,7 @@ class DP:
             return hp * constants.DP.ATTACK_REWARD
         else:
             if action == constants.ACTIONS.STOPPING_ACTION:
-                # print("hp:{}, stopping reward:{}".format(hp, hp * (100) + (1 - hp) * (-100)))
-                # return hp * (math.pow(x1, 2))  + (1 - hp) * (-math.pow((constants.DP.MAX_TIMESTEPS + 1 - t1), 2))
-                # return hp * (math.pow(x1, 2)) + (1 - hp) * (( t1/2 - constants.DP.MAX_TIMESTEPS))
-                # return hp * (math.pow(x1, 2))*50 + (1 - hp) * ((-constants.DP.MAX_TIMESTEPS))
-                # return hp * ((math.pow(x1, 1)) +(t1-100)) + (1 - hp) * (t1-100)
-                # return hp * (100*(math.pow(x1, 1))) + (1 - hp) * (t1 - 100)
-                # return hp * ((math.pow(x1, 1))) + (1 - hp) * (t1 - 100)
-                # return 100*hp * (math.pow(x1, 2)) + (1 - hp) * (10*(t1 - constants.DP.MAX_TIMESTEPS))
-                p1 = hp * 100 * (math.pow(x1, 1))
-                p2 = (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
-                r = hp * 100 * (math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
-                if r > 0:
-                    print("positive stopping r:{}, {}, hp:{}, p1:{}, p2:{}".format(r, (t1, x1), hp, p1, p2))
+                r = hp * 50 * (max(math.pow(x1, 1), 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
                 return r
             else:
                 return hp * constants.DP.ATTACK_REWARD + (1 - hp) * (constants.DP.SERVICE_REWARD)

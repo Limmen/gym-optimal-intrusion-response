@@ -62,14 +62,14 @@ class TransitionOperator:
                 return 0,0
         else:
             state_id = env_state.dp_setup.state_to_id[(env_state.t, env_state.defender_observation_state.ttc)]
-            print("hp:{}".format(env_state.dp_setup.HP[state_id]))
+            # print("hp:{}".format(env_state.dp_setup.HP[state_id]))
             r = env_state.dp_setup.R[state_id][defender_action]
-            if defender_action == 1:
-                for i in range(env_state.dp_setup.R.shape[0]):
-                    if env_state.dp_setup.R[i][1] > 10:
-                        print(env_state.dp_setup.R[i][1])
-                        (t5, x5) = env_state.dp_setup.id_to_state[i]
-                        print("t:{}, x:{}".format(t5, x5))
-            if r > 0 and defender_action == 1:
-                print("r:{}, a:{}, obs:{}".format(r, defender_action, (env_state.t, env_state.defender_observation_state.ttc)))
+            # if defender_action == 1:
+                # for i in range(env_state.dp_setup.R.shape[0]):
+                    # if env_state.dp_setup.R[i][1] > 10:
+                    #     print(env_state.dp_setup.R[i][1])
+                    #     (t5, x5) = env_state.dp_setup.id_to_state[i]
+                    #     # print("t:{}, x:{}".format(t5, x5))
+            # if r > 0 and defender_action == 1:
+            #     print("r:{}, a:{}, obs:{}".format(r, defender_action, (env_state.t, env_state.defender_observation_state.ttc)))
             return 0, r
