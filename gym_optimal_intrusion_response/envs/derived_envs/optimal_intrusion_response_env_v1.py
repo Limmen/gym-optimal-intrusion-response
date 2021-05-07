@@ -45,6 +45,6 @@ class OptimalIntrusionResponseEnvV1(OptimalIntrusionResponseEnv):
                                attacker_intrusion_prevented_reward=-1,
                                target_id=3,
                                dp=True,
-                               dp_load=True
+                               dp_load=False
                                )
         super().__init__(env_config=env_config)

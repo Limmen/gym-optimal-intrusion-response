@@ -289,7 +289,7 @@ def plot_thresholds():
     ax.set_title(r"Stopping thresholds $\alpha_t$", fontsize=12.5)
     ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
     # ax.set_ylabel(r"TTC $c$", fontsize=12)
-    ax.set_xlim(0, 92)
+    #ax.set_xlim(0, 92)
     #ax.set_ylim(-40, 100)
     # ax.set_ylim((0,5))
 

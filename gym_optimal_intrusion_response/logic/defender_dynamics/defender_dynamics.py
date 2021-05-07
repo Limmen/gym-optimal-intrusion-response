@@ -36,7 +36,9 @@ class DefenderDynamics:
         # hp = math.log((25 - ttc_1)/25)
         # hp = (1/math.pow(ttc_1, 2))
         hp = (1 / math.pow(ttc_1, 1))
-        hp = (1 / math.pow(0.5*ttc_1 + 0.5*(constants.DP.MAX_TIMESTEPS- t), 1))
+        # hp = (1 / math.pow(0.55*ttc_1 + 0.45*(constants.DP.MAX_TIMESTEPS/2.2- t/2.2), 1))
+        # hp = (1 / (0.9 * max(1, ttc_1) + 0.1 * max(1, ((constants.DP.MAX_TIMESTEPS) - (t)))))
+        hp = (1 / (0.995 * math.pow(max(1, ttc_1),2) + 0.005 * math.pow(max(1, ((constants.DP.MAX_TIMESTEPS) - (t))), 2)))
         # hp = (25 - ttc_1)/25
         return hp
 

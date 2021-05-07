@@ -57,9 +57,13 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
         info = {}
 
-        if not done:
+        if not done and not self.env_config.dp:
             attacker_reward, defender_reward_2, done, info = self.step_attacker(attack_action_id)
             defender_reward = defender_reward + defender_reward_2
+
+        d3 = TransitionOperator.update_defender_state(self.env_state)
+        if not done:
+            done = d3
 
         # Merge infos
         if info is None:

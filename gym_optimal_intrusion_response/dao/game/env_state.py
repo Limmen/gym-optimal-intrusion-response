@@ -50,6 +50,7 @@ class EnvState:
         self.initialize_nodes()
         self.stopped = False
         self.caught = False
+        self.defender_observation_state.reset()
         self.t=0
 
     def initialize_nodes(self):

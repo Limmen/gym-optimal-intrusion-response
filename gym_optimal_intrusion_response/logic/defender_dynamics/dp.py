@@ -31,7 +31,7 @@ class DP:
                 R[i][1] = 0
             else:
                 t1, x1 = s1
-                hp = DefenderDynamics.hack_prob(x1)
+                hp = DefenderDynamics.hack_prob(x1, t1)
                 HP[i] = hp
                 for j in range(n_actions):
                     r = DP.reward_fun(i, j, id_to_state)
@@ -141,33 +141,34 @@ class DP:
                                             else:
                                                 print("total miss")
                     if sum(T[i][0]) == 0:
-                        print("sum is zero")
                         # t1, x1 = s1
-                        new_state = (t1+1,x1-1)
-                        s_prime_id = state_to_id[new_state]
-                        T[i][0][s_prime_id] = 1
-                    else:
-                        print("sum is not zero")
-
-            # print("len T[i][0] != 0, {}".format(len(list(filter(lambda x: x > 0, T[i][0])))))
-            if sum(T[i][0]) != 0:
-                pass
+                        new_state1 = (t1 + 1, x1 - 1)
+                        s_prime_id1 = state_to_id[new_state1]
+                        s_prime_id2 = None
+                        if x1 > 5:
+                            new_state2 = (t1 + 1, x1 - 5)
+                            s_prime_id2 = state_to_id[new_state2]
+                        elif x1 > 4:
+                            new_state2 = (t1 + 1, x1 - 4)
+                            s_prime_id2 = state_to_id[new_state2]
+                        elif x1 > 3:
+                            new_state2 = (t1 + 1, x1 - 3)
+                            s_prime_id2 = state_to_id[new_state2]
+                        elif x1 > 2:
+                            new_state2 = (t1 + 1, x1 - 2)
+                            s_prime_id2 = state_to_id[new_state2]
+                        if s_prime_id2 is not None:
+                            hp = HP[i]
+                            T[i][0][s_prime_id1] = 1 - hp
+                            T[i][0][s_prime_id2] = hp
+                        else:
+                            T[i][0][s_prime_id1] = 1
             if sum(T[i][0]) != 0:
                 T[i][0] = T[i][0] / sum(T[i][0])
             if sum(T[i][1]) != 0:
                 T[i][1] = T[i][1] / sum(T[i][1])
-            # if sum(T[i][0]) > 1.0:
-            #     print("0")
-            #     print(sum(T[i][0]))
-            # if sum(T[i][1]) > 1.0:
-            #     print("1")
-            #     print(sum(T[i][1]))
-            # assert sum(T[i][0]) == 1.0
-            # assert sum(T[i][1]) == 1.0
-            # print("after norm:{}".format(sum(T[i][0])))
-            # print("after norm:{}".format(sum(T[i][1])))
+
         DP.save_transition_kernel(T)
-        # load_transition_kernel()
         return T
 
     @staticmethod
@@ -289,13 +290,12 @@ class DP:
         s1 = id_to_state[state]
         t1, x1 = s1
         # ttc = DefenderDynamics.ttc(x1, y1, constants.DP.MAX_ALERTS)
-        hp = DefenderDynamics.hack_prob(x1)
+        hp = DefenderDynamics.hack_prob(x1, t1)
         if t1 == constants.DP.MAX_TIMESTEPS and action != constants.ACTIONS.STOPPING_ACTION:
             return hp * constants.DP.ATTACK_REWARD
         else:
             if action == constants.ACTIONS.STOPPING_ACTION:
-                # print("hp:{}, stopping reward:{}".format(hp, hp * (100) + (1 - hp) * (-100)))
-                return hp * (math.pow(x1, 2)) * 5 + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
+                return hp * (math.pow(x1, 1)) + (1 - hp) * (constants.DP.EARLY_STOPPING_REWARD)
             else:
                 return hp * constants.DP.ATTACK_REWARD + (1 - hp) * (constants.DP.SERVICE_REWARD)
 

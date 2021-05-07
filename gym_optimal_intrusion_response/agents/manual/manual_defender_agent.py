@@ -24,7 +24,7 @@ class ManualDefenderAgent:
             raw_input = input(">")
             raw_input = raw_input.strip()
             legal_actions = list(
-                filter(lambda x: env.is_attack_action_legal(x), actions))
+                filter(lambda x: env.is_defense_action_legal(x), actions))
             if raw_input == "help":
                 print("Enter an action id to execute the action, "
                       "press R to reset, press S to print the state, press A to print the actions, "

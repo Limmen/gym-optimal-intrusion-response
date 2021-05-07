@@ -11,12 +11,18 @@ class DefenderObservationState:
         self.env_config = env_config
         self.num_alerts = 0
         self.num_failed_logins = 0
-        self.ttc = constants.DP.MAX_TTC-1
-        # self.ttc = 10
+        self.ttc = constants.DP.MAX_TTC - 1
         self.f1_a = DefenderDynamics.f1_a()
         self.f1_b = DefenderDynamics.f1_b()
         self.f2_a = DefenderDynamics.f2_a()
         self.f2_b = DefenderDynamics.f2_b()
+        self.reset()
+
+
+    def reset(self):
+        self.num_alerts = 0
+        self.num_failed_logins = 0
+        self.ttc = constants.DP.MAX_TTC - 1
 
     def get_defender_observation(self, t, dp_setup: DPSetup = None):
         if not self.env_config.dp:
@@ -44,15 +50,19 @@ class DefenderObservationState:
                 self.num_alerts = min(constants.DP.MAX_ALERTS, self.num_alerts)
                 self.num_failed_logins = min(constants.DP.MAX_LOGINS, self.num_failed_logins)
         else:
-            print("updating TTC")
             state = (t, self.ttc)
             state_id = dp_setup.state_to_id[state]
             next_state_id = np.random.choice(dp_setup.state_ids, p=dp_setup.T[state_id][0])
             next_state = dp_setup.id_to_state[next_state_id]
-            (t2, ttc2) = next_state
-            print("old ttc:{}, new ttc:{}, state id:{}, new state id:{}, prob:{}".format(
-                self.ttc, ttc2, state_id, next_state_id, dp_setup.T[state_id][0][next_state_id]))
-            self.ttc = ttc2
+            done = False
+            if next_state == "terminal":
+                done = True
+            else:
+                (t2, ttc2) = next_state
+                # print("t1:{}, t2:{} old ttc:{}, new ttc:{}, state id:{}, new state id:{}, prob:{}".format(t, t2,
+                #     self.ttc, ttc2, state_id, next_state_id, dp_setup.T[state_id][0][next_state_id]))
+                self.ttc = ttc2
+            return done
 
 
     def probability_of_intrusion(self, t: int):
