@@ -29,7 +29,6 @@ class TransitionOperator:
             s.stopped = True
         attacker_reward, defender_reward = TransitionOperator.defender_reward_fun(env_state, env_config)
         done = s.stopped
-        print("Probability of intrusion:{}".format(s.defender_observation_state.probability_of_intrusion(s.t)))
         s.t+=1
         return s, attacker_reward, defender_reward, done
 
@@ -43,7 +42,8 @@ class TransitionOperator:
     @staticmethod
     def update_defender_state(env_state: EnvState):
         intrusion_in_progress = any(list(map(lambda x: x.compromised, env_state.nodes)))
-        env_state.defender_observation_state.update_state(intrusion_in_progress=intrusion_in_progress)
+        env_state.defender_observation_state.update_state(env_state.t, intrusion_in_progress=intrusion_in_progress,
+                                                          dp_setup=env_state.dp_setup)
 
     @staticmethod
     def defender_reward_fun(env_state: EnvState, env_config: EnvConfig) -> Tuple[int, int]:

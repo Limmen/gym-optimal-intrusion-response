@@ -20,3 +20,4 @@ class AttackerObservationState:
                 obs[i][self.env_config.num_attributes] = 0
             obs[i][self.env_config.num_attributes+1] = int(nodes[i].compromised)
         return np.array(obs)
+

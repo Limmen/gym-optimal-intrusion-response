@@ -290,8 +290,8 @@ def plot_hp_2():
 
 if __name__ == '__main__':
     #test()
-    plot_ttc()
-    # plot_hp_2()
+    # plot_ttc()
+    plot_hp_2()
     # plot_hp()
     # plot_alers_logins_distributions()
     # plot_intrusion_dist()

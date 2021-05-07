@@ -77,4 +77,6 @@ def _quick_eval_helper(env, attacker_model, defender_model,
             train_log_dto.eval_attacker_action_alerts.append(_info["attacker_alerts"])
             train_log_dto.eval_attacker_action_alerts_norm.append(_info["attacker_alerts_norm"])
 
+            obs = env.envs[i].reset()
+
     return train_log_dto

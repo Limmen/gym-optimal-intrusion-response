@@ -38,7 +38,7 @@ class ManualAttackerAgent:
                 latest_obs = env.reset()
                 cumulative_reward = 0
             elif raw_input == "S":
-                print(str(env.env_state.attacker_obs_state))
+                print(env.env_state)
             elif raw_input == "L":
                 print(legal_actions)
             elif raw_input == "x":

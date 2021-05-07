@@ -18,7 +18,7 @@ def default_config() -> ClientConfig:
                                num_iterations=1000,
                                gif_dir=experiments_util.default_output_dir() + "/results/gifs",
                                save_dir=experiments_util.default_output_dir() + "/results/data",
-                               checkpoint_freq=25, input_dim=(1 + (20)*33),
+                               checkpoint_freq=25, input_dim=2,
                                output_dim=2,
                                pi_hidden_dim=64, pi_hidden_layers=1,
                                vf_hidden_dim=64, vf_hidden_layers=1,

@@ -35,3 +35,7 @@ class Node:
         for i in range(self.num_attributes):
             self.attack_attributes[i] = self.initial_attack_attributes[i]
             self.defense_attributes[i] = self.initial_defense_attributes[i]
+
+    def __str__(self):
+        return "attack attributes:{},defense attributes:{},compromised:{},recon_done:{},target:{}\n".format(
+            self.attack_attributes, self.defense_attributes, self.compromised, self.recon_done, self.target_component)

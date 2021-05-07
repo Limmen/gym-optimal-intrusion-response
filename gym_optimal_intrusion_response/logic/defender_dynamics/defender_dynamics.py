@@ -34,7 +34,8 @@ class DefenderDynamics:
         # ttc_1 = min(25, ttc_val)
         ttc_1 = max(1, ttc_val)
         # hp = math.log((25 - ttc_1)/25)
-        hp = (1/math.pow(ttc_1, 2))
+        # hp = (1/math.pow(ttc_1, 2))
+        hp = (1 / math.pow(ttc_1, 1))
         # hp = (25 - ttc_1)/25
         return hp
 

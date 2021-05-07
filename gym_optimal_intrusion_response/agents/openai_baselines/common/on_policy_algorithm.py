@@ -134,6 +134,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         n_steps = 0
 
         attacker_rollout_buffer.reset()
+        defender_rollout_buffer.reset()
 
         # Avg metrics
         rollout_data_dto = RolloutDataDTO()

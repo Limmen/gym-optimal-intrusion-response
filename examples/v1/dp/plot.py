@@ -213,15 +213,18 @@ def plot_thresholds():
         s = id_to_state[i]
         if s != "terminal":
             t1, x1 = s
-            if t1 in ts_to_thresholds:
-                ts_to_thresholds[t1] = ts_to_thresholds[t1] + [thresholds[i]]
-            else:
-                ts_to_thresholds[t1] = [thresholds[i]]
+            if x1 > 0.0:
+                if t1 in ts_to_thresholds:
+                    ts_to_thresholds[t1] = ts_to_thresholds[t1] + [thresholds[i]]
+                else:
+                    ts_to_thresholds[t1] = [thresholds[i]]
     x = []
     y = []
     for i in range(constants.DP.MAX_TIMESTEPS):
         # print(ts_to_thresholds[i])
         avg_threshold = np.mean(np.array(ts_to_thresholds[i]))
+        if i == constants.DP.MAX_TIMESTEPS-1:
+            print(ts_to_thresholds[i])
         x.append(i)
         y.append(avg_threshold)
 
@@ -242,8 +245,8 @@ def plot_thresholds():
 
     # Plot Avg Eval rewards Gensim
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
-    ax.plot(x,
-            y, label=r"$\pi_{\theta}$ simulation",
+    ax.plot(x[1:],
+            y[1:], label=r"$\pi_{\theta}$ simulation",
             ls='-', color=colors[0])
     ax.fill_between(x, y, np.zeros(len(y)),
                     alpha=0.35, color=colors[0])
@@ -259,7 +262,7 @@ def plot_thresholds():
     # ax.set_ylabel(r"TTC $c$", fontsize=12)
     # ax.set_xlim(0, len(x))
     # ax.set_ylim(0, 1.1)
-    # ax.set_xlim((0,100))
+    ax.set_ylim((0,5))
 
     labels = [item.get_text() for item in ax.get_xticklabels()]
     labels[-1] = r'$T$'

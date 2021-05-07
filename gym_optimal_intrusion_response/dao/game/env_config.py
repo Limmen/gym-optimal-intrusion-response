@@ -20,7 +20,9 @@ class EnvConfig:
                  defender_intrusion_prevented_reward : int = 1,
                  attacker_intrusion_prevented_reward: int = 1,
                  target_id : int = 4,
-                 use_state_limits : bool = True
+                 use_state_limits : bool = True,
+                 dp: bool = False,
+                 dp_load: bool = False
                  ):
         self.num_nodes = num_nodes
         self.num_attributes = num_attributes
@@ -46,4 +48,6 @@ class EnvConfig:
         self.adjacency_matrix = adjacency_matrix
         self.initial_reachable = initial_reachable
         self.use_state_limits = use_state_limits
+        self.dp = dp
+        self.dp_load = dp_load
 
