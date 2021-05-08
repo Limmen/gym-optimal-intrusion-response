@@ -71,6 +71,7 @@ class TransitionOperator:
             state_id = env_state.dp_setup.state_to_id[(env_state.t, env_state.defender_observation_state.ttc)]
             r = env_state.dp_setup.R[state_id][defender_action]
             hp = env_state.dp_setup.HP[state_id]
+            print("hp:{}".format(hp))
             if defender_action == 1:
                 if np.random.rand() < hp:
                     info["caught_attacker"] = 1
