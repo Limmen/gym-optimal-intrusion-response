@@ -1,4 +1,5 @@
 from typing import Tuple
+import numpy as np
 from gym_optimal_intrusion_response.dao.game.env_state import EnvState
 from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
 import gym_optimal_intrusion_response.constants.constants as constants
@@ -22,16 +23,18 @@ class TransitionOperator:
 
     @staticmethod
     def transition_defender(defender_action_id: int, env_state: EnvState, env_config: EnvConfig) \
-            -> Tuple[EnvState, int, int, bool]:
+            -> Tuple[EnvState, int, int, bool, dict]:
         s = env_state
         if defender_action_id == constants.ACTIONS.STOPPING_ACTION:
             s.stopped = True
-        attacker_reward, defender_reward = TransitionOperator.defender_reward_fun(s, env_config, defender_action_id)
+        attacker_reward, defender_reward, info = TransitionOperator.defender_reward_fun(s, env_config, defender_action_id)
         done = s.stopped
         s.t+=1
         if env_config.dp and s.t >= constants.DP.MAX_TIMESTEPS:
             done = True
-        return s, attacker_reward, defender_reward, done
+            if defender_action_id != 1:
+                info["successful_intrusion"]= 1
+        return s, attacker_reward, defender_reward, done, info
 
     @staticmethod
     def attacker_reward_fun(node, env_config : EnvConfig) -> Tuple[int, int]:
@@ -48,28 +51,30 @@ class TransitionOperator:
         return done
 
     @staticmethod
-    def defender_reward_fun(env_state: EnvState, env_config: EnvConfig, defender_action : int) -> Tuple[int, int]:
+    def defender_reward_fun(env_state: EnvState, env_config: EnvConfig, defender_action : int) -> Tuple[int, int, dict]:
+        info = {}
         if not env_state.env_config.dp:
             intrusion_in_progress = any(list(map(lambda x: x.compromised, env_state.nodes)))
             if intrusion_in_progress and env_state.stopped:
                 env_state.caught = True
-                return env_config.attacker_intrusion_prevention_reward, env_config.defender_intrusion_prevention_reward
+                info["caught_attacker"] = 1
+                return env_config.attacker_intrusion_prevention_reward, env_config.defender_intrusion_prevention_reward, info
             elif intrusion_in_progress and not env_state.stopped:
-                return 0,0
+                return 0,0,info
             elif not intrusion_in_progress and env_state.stopped:
-                return env_config.attacker_early_stopping_reward, env_config.defender_early_stopping_reward
+                info["early_stopped"] = 1
+                return env_config.attacker_early_stopping_reward, env_config.defender_early_stopping_reward, info
             elif not env_state.stopped and not intrusion_in_progress:
-                return 0,0
+                return 0,0,info
         else:
+            info = {}
             state_id = env_state.dp_setup.state_to_id[(env_state.t, env_state.defender_observation_state.ttc)]
-            # print("hp:{}".format(env_state.dp_setup.HP[state_id]))
             r = env_state.dp_setup.R[state_id][defender_action]
-            # if defender_action == 1:
-                # for i in range(env_state.dp_setup.R.shape[0]):
-                    # if env_state.dp_setup.R[i][1] > 10:
-                    #     print(env_state.dp_setup.R[i][1])
-                    #     (t5, x5) = env_state.dp_setup.id_to_state[i]
-                    #     # print("t:{}, x:{}".format(t5, x5))
-            # if r > 0 and defender_action == 1:
-            #     print("r:{}, a:{}, obs:{}".format(r, defender_action, (env_state.t, env_state.defender_observation_state.ttc)))
-            return 0, r
+            hp = env_state.dp_setup.HP[state_id]
+            if defender_action == 1:
+                if np.random.rand() < hp:
+                    info["caught_attacker"] = 1
+                else:
+                    info["early_stopped"] = 1
+
+            return 0, r, info

@@ -41,21 +41,21 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         defense_action_id = int(defense_action_id)
 
         attacker_reward, defender_reward, done, defender_info = self.step_defender(defense_action_id)
-        defender_info["flags"] = 0
-        defender_info["caught_attacker"] = 0
-        defender_info["early_stopped"] = 0
-        defender_info["snort_severe_baseline_reward"] = 0
-        defender_info["snort_warning_baseline_reward"] = 0
-        defender_info["snort_critical_baseline_reward"] = 0
-        defender_info["var_log_baseline_reward"] = 0
-        defender_info["successful_intrusion"] = False
-        defender_info["attacker_cost"] = 0
-        defender_info["attacker_cost_norm"] = 0
-        defender_info["attacker_alerts"] = 0
-        defender_info["attacker_alerts_norm"] = 0
-        defender_info["flags"] = 0
 
         info = {}
+        info["flags"] = 0
+        info["caught_attacker"] = 0
+        info["early_stopped"] = 0
+        info["snort_severe_baseline_reward"] = 0
+        info["snort_warning_baseline_reward"] = 0
+        info["snort_critical_baseline_reward"] = 0
+        info["var_log_baseline_reward"] = 0
+        info["successful_intrusion"] = False
+        info["attacker_cost"] = 0
+        info["attacker_cost_norm"] = 0
+        info["attacker_alerts"] = 0
+        info["attacker_alerts_norm"] = 0
+        info["flags"] = 0
 
         if not done and not self.env_config.dp:
             attacker_reward, defender_reward_2, done, info = self.step_attacker(attack_action_id)
@@ -71,8 +71,7 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         else:
             if defender_info is not None:
                 for k, v in defender_info.items():
-                    if k not in info:
-                        info[k] = v
+                    info[k] = v
 
         defender_obs = self.env_state.get_defender_observation().flatten()
         attacker_obs = self.env_state.get_attacker_observation().flatten()
@@ -81,10 +80,10 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         return (attacker_obs, defender_obs), (attacker_reward, defender_reward), done, info
 
     def step_defender(self, defender_action_id : int) -> Tuple[int, int, bool, dict]:
-        s, attacker_reward, defender_reward, done = TransitionOperator.transition_defender(
+        s, attacker_reward, defender_reward, done, info = TransitionOperator.transition_defender(
             defender_action_id=defender_action_id, env_state=self.env_state, env_config=self.env_config)
         self.env_state = s
-        return attacker_reward, defender_reward, done, {}
+        return attacker_reward, defender_reward, done, info
 
     def step_attacker(self, attacker_action_id : int) -> Tuple[int, int, bool, dict]:
         s, attacker_reward, defender_reward, done = TransitionOperator.transition_attacker(
