@@ -274,11 +274,11 @@ def plot_thresholds():
     ax.plot(x[1:],
             y[1:], label=r"$\pi_{\theta}$ simulation",
             ls='-', color=colors[0])
-    lower_bound = np.zeros(len(y))
-    lower_bound.fill(min(y))
+    lower_bound = np.zeros(len(y[1:]))
+    lower_bound.fill(min(y[1:]))
     print(min(y))
     print(lower_bound)
-    ax.fill_between(x, y, lower_bound,
+    ax.fill_between(x[1:], y[1:], lower_bound,
                     alpha=0.35, color=colors[0])
 
     # if plot_opt:
@@ -293,8 +293,8 @@ def plot_thresholds():
     ax.axhline(y=0, color='k', linewidth=0.5)
     # ax.axvline(x=0, color='k')
     # ax.set_ylabel(r"TTC $c$", fontsize=12)
-    #ax.set_xlim(0, 92)
-    #ax.set_ylim(-40, 100)
+    ax.set_xlim(x[1], len(x)-1)
+    ax.set_ylim(min(y[1:]), max(y[1:]))
     # ax.set_ylim((0,5))
 
     # labels = [item.get_text() for item in ax.get_xticklabels()]
@@ -305,8 +305,9 @@ def plot_thresholds():
     # for i in range(len(a)):
     #     print(a[i])
     #     a[i] = 35*i
-    a[-2] = r'$T$'
+    a[-1] = r'$T$'
     ax.set_xticklabels(a)
+    ax.set_xticks([1.0, 5.0, 10.0, 15.0, 19.0])
 
     # set the grid on
     ax.grid('on')
@@ -332,10 +333,10 @@ def plot_thresholds():
     ttl.set_position([.5, 1.05])
 
     fig.tight_layout()
-    plt.show()
+    # plt.show()
     # plt.subplots_adjust(wspace=0, hspace=0)
-    # fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
-    # fig.savefig("threshold_alerts" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
+    fig.savefig("threshold_alerts" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
 
@@ -678,8 +679,8 @@ def policy_plot_2():
 
 
 if __name__ == '__main__':
-    policy_plot_2()
-    # plot_thresholds()
+    # policy_plot_2()
+    plot_thresholds()
     # plot_policy(t=0)
     # plot_policy(t=1)
     # plot_policy(t=2)

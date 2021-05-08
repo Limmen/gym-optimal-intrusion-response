@@ -12,7 +12,7 @@ def plot_alers_logins_distributions():
     f2_b = DefenderDynamics.f2_b()
 
     fontsize = 6.5
-    labelsize=6
+    labelsize=10
 
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
@@ -21,25 +21,25 @@ def plot_alers_logins_distributions():
     # plt.rcParams['xtick.major.pad'] = 0.5
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 0.8
-    plt.rcParams['axes.linewidth'] = 0.1
+    plt.rcParams['axes.linewidth'] = 0.2
     plt.rcParams.update({'font.size': fontsize})
 
 
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(4.2, 1.85))
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(6, 1.85))
     x1 = np.arange(0, constants.DP.MAX_ALERTS, 1)
     x1 = np.array(list(filter(lambda k: f1_a.pmf(k) > 0.01, x1.tolist())))
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
-    ax[0].plot(x1, f1_a.pmf(x1), 'ro', ms=2.5, mec=colors[0], color=colors[0])
+    ax[0].plot(x1, f1_a.pmf(x1), 'ro', ms=5.5, mec=colors[0], color=colors[0])
     ax[0].vlines(x1, 0, f1_a.pmf(x1), label=r"$f_1^A$",
-            ls='-', color=colors[0], lw=1)
+            ls='-', color=colors[0], lw=2)
     x2 = np.arange(0, constants.DP.MAX_ALERTS, 1)
     x2 = np.array(list(filter(lambda k: f1_b.pmf(k) > 0.01, x2.tolist())))
-    ax[0].plot(x2, f1_b.pmf(x2), 'ro', ms=2.5, mec="darkred", color="darkred")
+    ax[0].plot(x2, f1_b.pmf(x2), 'ro', ms=5.5, mec="darkred", color="darkred")
     ax[0].vlines(x2, 0, f1_b.pmf(x2), label=r"$f_1^B$",
-                  ls='-', color="darkred", lw=1)
+                  ls='-', color="darkred", lw=2)
 
-    ax[0].set_title(r"Alerts PMFs $f_1^{A}(x), f_1^{B}(x)$", fontsize=fontsize)
-    ax[0].set_xlabel(r"\# Alerts $x$", fontsize=labelsize)
+    ax[0].set_title(r"Alerts PMFs $f_1^{A}(x), f_1^{B}(x)$", fontsize=11)
+    ax[0].set_xlabel(r"\# Alerts $x$", fontsize=8)
     # ax.set_ylabel(r"$\mathbb{P}[\text{stop}|w]$", fontsize=12)
     #ax.set_xlim(0, len(x))
     #ax[0].set_ylim(0, 0.3)
@@ -47,26 +47,32 @@ def plot_alers_logins_distributions():
     ax[0].grid('on')
     xlab = ax[0].xaxis.get_label()
     ylab = ax[0].yaxis.get_label()
-    xlab.set_size(labelsize)
-    ylab.set_size(labelsize)
+    xlab.set_size(11)
+    ylab.set_size(11)
     ax[0].spines['right'].set_color((.8, .8, .8))
     ax[0].spines['top'].set_color((.8, .8, .8))
     ax[0].legend(loc='right', ncol=1)
 
+    ax[0].tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
+    ax[0].tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
+
     x3 = np.arange(0, constants.DP.MAX_LOGINS, 1)
     x3 = np.array(list(filter(lambda k: f2_a.pmf(k) > 0.01, x3.tolist())))
-    ax[1].plot(x3, f2_a.pmf(x3), 'ro', ms=2.5, mec=colors[0], color=colors[0])
+    ax[1].plot(x3, f2_a.pmf(x3), 'ro', ms=5.5, mec=colors[0], color=colors[0])
     ax[1].vlines(x3, 0, f2_a.pmf(x3), label=r"$f_2^A$",
-                 ls='-', color=colors[0], lw=1)
+                 ls='-', color=colors[0], lw=2)
 
     x4 = np.arange(0, constants.DP.MAX_LOGINS, 1)
     x4 = np.array(list(filter(lambda k: f2_b.pmf(k) > 0.01, x4.tolist())))
-    ax[1].plot(x4, f2_b.pmf(x4), 'ro', ms=2.5, mec="darkred", color="darkred")
+    ax[1].plot(x4, f2_b.pmf(x4), 'ro', ms=5.5, mec="darkred", color="darkred")
     ax[1].vlines(x4, 0, f2_b.pmf(x4), label=r"$f_2^B$",
-                 ls='-', color="darkred", lw=1)
+                 ls='-', color="darkred", lw=2)
 
-    ax[1].set_title(r"Login Attempts PMFs $f_2^{A}(y), f_2^{B}(y)$", fontsize=fontsize)
-    ax[1].set_xlabel(r"\# Login attempts $y$", fontsize=labelsize)
+    ax[1].set_title(r"Login Attempts PMFs $f_2^{A}(y), f_2^{B}(y)$", fontsize=11)
+    ax[1].set_xlabel(r"\# Login attempts $y$", fontsize=8)
+
+    ax[1].tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
+    ax[1].tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
     # ax.set_ylabel(r"$\mathbb{P}[\text{stop}|w]$", fontsize=12)
     # ax.set_xlim(0, len(x))
     #ax[1].set_ylim(0, 1.1)
@@ -74,8 +80,8 @@ def plot_alers_logins_distributions():
     ax[1].grid('on')
     xlab = ax[1].xaxis.get_label()
     ylab = ax[1].yaxis.get_label()
-    xlab.set_size(labelsize)
-    ylab.set_size(labelsize)
+    xlab.set_size(11)
+    ylab.set_size(11)
     ax[1].spines['right'].set_color((.8, .8, .8))
     ax[1].spines['top'].set_color((.8, .8, .8))
     ax[1].legend(loc='right', ncol=1)
@@ -93,7 +99,7 @@ def plot_alers_logins_distributions():
 
     fig.tight_layout()
     # plt.show()
-    plt.subplots_adjust(wspace=0.18)
+    plt.subplots_adjust(wspace=0.10)
     fig.savefig("alerts_logins_distributions" + ".png", format="png", dpi=600)
     fig.savefig("alerts_logins_distributions" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
@@ -135,37 +141,37 @@ def plot_ttc():
     plt.rcParams['axes.titlepad'] = 15
     plt.rcParams['xtick.major.pad'] = 0.05
     plt.rcParams['ytick.major.pad'] = 0.05
-    plt.rcParams['axes.labelpad'] = 0.2
-    plt.rcParams['axes.linewidth'] = 0.1
+    plt.rcParams['axes.labelpad'] = 0.05
+    plt.rcParams['axes.linewidth'] = 0.2
     plt.rcParams.update({'font.size': 6.5})
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
     plt.rcParams['font.family'] = ['serif']
     plt.rcParams['font.serif'] = ['Times New Roman']
     plt.rcParams.update({'font.size': 10})
-    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'})
-    ax.plot_surface(x, y, z, cmap='viridis_r', linewidth=0.3,
-                    alpha=0.8, edgecolor='k')
+    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(3.85, 2.7))
+    ax.plot_surface(x, y, z, cmap='viridis_r', linewidth=0.1,
+                    alpha=0.8, edgecolor='k', rstride=2, cstride=2)
 
-    ax.set_title(r"$TTC(x,y," + str(constants.DP.MAX_ALERTS) + ")$", fontsize=14)
+    ax.set_title(r"$TTC(x,y)$", fontsize=11)
     ax.set_xlabel(r"IDS alerts $x$")
     ax.set_ylabel(r"Login attempts $y$")
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(12)
-    ylab.set_size(12)
-    # ax.tick_params(axis='both', which='major', labelsize=10, length=2.2, width=0.6)
-    # ax.tick_params(axis='both', which='minor', labelsize=10, length=2.2, width=0.6)
+    xlab.set_size(8)
+    ylab.set_size(8)
+    ax.tick_params(axis='both', which='major', labelsize=7, length=3.2, width=0.1)
+    ax.tick_params(axis='both', which='minor', labelsize=7, length=3.2, width=0.1)
     #ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0])
     #ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     #plt.yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     # plt.ylim(1.0, 0.0)
     plt.ylim(constants.DP.MAX_LOGINS, 0.0)
     fig.tight_layout()
-    plt.show()
-    #plt.subplots_adjust(wspace=0, hspace=0, top=0.2)
-    # fig.savefig("ttc_alerts_logins" + ".png", format="png", dpi=600)
-    # fig.savefig("ttc_alerts_logins" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    # plt.show()
+    # plt.subplots_adjust(wspace=0, hspace=0, bottom=0.8)
+    fig.savefig("ttc_alerts_logins" + ".png", format="png", dpi=600)
+    fig.savefig("ttc_alerts_logins" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
 def plot_hp():
@@ -184,33 +190,34 @@ def plot_hp():
     plt.rcParams['xtick.major.pad'] = 0.05
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 0.2
-    plt.rcParams['axes.linewidth'] = 0.1
+    plt.rcParams['axes.linewidth'] = 0.2
     plt.rcParams.update({'font.size': 6.5})
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
     plt.rcParams['font.family'] = ['serif']
     plt.rcParams['font.serif'] = ['Times New Roman']
     plt.rcParams.update({'font.size': 10})
-    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'})
-    ax.plot_surface(x2, y2, z2, cmap='viridis_r', linewidth=0.3,
-                    alpha=0.8, edgecolor='k')
+    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'},  figsize=(3.85, 2.7))
+    ax.plot_surface(x2, y2, z2, cmap='viridis_r', linewidth=0.1,
+                    alpha=0.8, edgecolor='k', rstride=2, cstride=2)
 
-    ax.set_title(r"Probability of intrusion $\phi(x_t, y_t, t)$", fontsize=14)
+    ax.set_title(r"Probability of intrusion $\phi(x_t, y_t, t)$", fontsize=11)
     ax.set_xlabel(r"$TTC(x_t, y_t)$")
     ax.set_ylabel(r"Time $t$")
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(12)
-    ylab.set_size(12)
-    # ax.tick_params(axis='both', which='major', labelsize=10, length=2.2, width=0.6)
-    # ax.tick_params(axis='both', which='minor', labelsize=10, length=2.2, width=0.6)
+    xlab.set_size(8)
+    ylab.set_size(8)
+    ax.tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
     #ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0])
     #ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     #plt.yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     #plt.ylim(1.0, 0.0)
-    plt.xlim(constants.DP.MAX_TTC, 0.0)
+    # plt.xlim(constants.DP.MAX_TTC, 0.0)
+    # plt.ylim(constants.DP.MAX_TIMESTEPS, 0.0)
     fig.tight_layout()
-    #plt.show()
+    # plt.show()
     #plt.subplots_adjust(wspace=0, hspace=0, top=0.2)
     fig.savefig("intrusion_prob" + ".png", format="png", dpi=600)
     fig.savefig("intrusion_prob" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
@@ -219,7 +226,7 @@ def plot_hp():
 
 def plot_hp_2():
     x = np.arange(1, constants.DP.MAX_TTC, 1)
-    y = list(map(lambda g: DefenderDynamics.hack_prob(g), x))
+    y = list(map(lambda g: DefenderDynamics.hack_prob(g, 10), x))
 
 
     plt.rc('text', usetex=True)
@@ -290,8 +297,8 @@ def plot_hp_2():
 
 if __name__ == '__main__':
     #test()
-    # plot_ttc()
-    plot_hp_2()
-    # plot_hp()
-    # plot_alers_logins_distributions()
+    plot_ttc()
+    # plot_hp_2()
+    plot_hp()
+    plot_alers_logins_distributions()
     # plot_intrusion_dist()

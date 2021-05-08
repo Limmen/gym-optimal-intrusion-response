@@ -1,0 +1,7 @@
+*.png
+*.pdf
+*.npy
+*.json
+*.pickle
+results_backup
+results_backup2

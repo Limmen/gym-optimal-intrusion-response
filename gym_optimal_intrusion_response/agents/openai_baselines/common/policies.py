@@ -391,20 +391,23 @@ class ActorCriticPolicy(BasePolicy):
         # Setup optimizer with initial learning rate
         self.optimizer = self.optimizer_class(self.parameters(), lr=self.lr, **self.optimizer_kwargs)
 
-    def forward(self, obs: th.Tensor, deterministic: bool = False, attacker: bool = True, env = None) \
+    def forward(self, obs: th.Tensor, deterministic: bool = False, attacker: bool = True, env = None,
+                filter_illegal: bool = True) \
             -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         latent_pi, latent_vf = self._get_latent(obs)
         values = self.value_net(latent_vf)
-        env = env.envs[0]
-
-        actions = list(range(self.agent_config.output_dim))
-        if attacker:
-            non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_attack_action_legal(
-                a_id=action, env_config=env.env_config, env_state=env.env_state), actions))
+        if filter_illegal:
+            env = env.envs[0]
+            actions = list(range(self.agent_config.output_dim))
+            if attacker:
+                non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_attack_action_legal(
+                    a_id=action, env_config=env.env_config, env_state=env.env_state), actions))
+            else:
+                non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_defense_action_legal(
+                    d_id=action), actions))
+            non_legal_actions = [non_legal_actions]
         else:
-            non_legal_actions = list(filter(lambda action: not OptimalIntrusionResponseEnv.is_defense_action_legal(
-                d_id=action), actions))
-        non_legal_actions = [non_legal_actions]
+            non_legal_actions = []
 
         distribution = self._get_action_dist_from_latent(latent_pi, non_legal_actions=non_legal_actions)
         actions = distribution.get_actions(deterministic=deterministic)

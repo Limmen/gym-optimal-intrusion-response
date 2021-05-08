@@ -1,7 +1,7 @@
 
 class DP:
-    MAX_ALERTS = 100
-    MAX_LOGINS = 100
+    MAX_ALERTS = 20
+    MAX_LOGINS = 20
     MAX_TIMESTEPS = 20
     # MAX_TTC = 200
     MAX_TTC = 20

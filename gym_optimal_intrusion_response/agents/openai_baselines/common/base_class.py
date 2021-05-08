@@ -65,8 +65,11 @@ class BaseAlgorithm(ABC):
     ):
         self.attacker_agent_config = attacker_agent_config
         self.defender_agent_config = defender_agent_config
-        self.tensorboard_writer = SummaryWriter(self.attacker_agent_config.tensorboard_dir)
-        self.tensorboard_writer.add_hparams(self.attacker_agent_config.hparams_dict(), {})
+        try:
+            self.tensorboard_writer = SummaryWriter(self.attacker_agent_config.tensorboard_dir)
+            self.tensorboard_writer.add_hparams(self.attacker_agent_config.hparams_dict(), {})
+        except:
+            print("error creating tensorboard writer")
         # try:
         #     self.tensorboard_writer = SummaryWriter(self.attacker_agent_config.tensorboard_dir)
         #     self.tensorboard_writer.add_hparams(self.attacker_agent_config.hparams_dict(), {})
@@ -374,14 +377,9 @@ class BaseAlgorithm(ABC):
                 f"Stored kwargs: {data['policy_kwargs']}, specified kwargs: {kwargs['policy_kwargs']}"
             )
 
-        if "observation_space" not in data or "action_space" not in data:
-            raise KeyError("The observation_space and action_space were not given, can't verify new environments")
-
         if env is not None:
             # Wrap first if needed
-            env = cls._wrap_env(env, data["verbose"])
-            # Check if given env is valid
-            check_for_correct_spaces(env, data["observation_space"], data["action_space"])
+            env = cls._wrap_env(env)
         else:
             # Use stored env, if one exists. If not, continue as is (can be used for predict)
             if "env" in data:
@@ -389,7 +387,8 @@ class BaseAlgorithm(ABC):
 
         # noinspection PyArgumentList
         model = cls(  # pytype: disable=not-instantiable,wrong-keyword-args
-            policy=data["policy_class"],
+            attacker_policy=data["attacker_policy_class"],
+            defender_policy=data["defender_policy_class"],
             env=env,
             device=device,
             _init_setup_model=False,  # pytype: disable=not-instantiable,wrong-keyword-args
@@ -410,10 +409,6 @@ class BaseAlgorithm(ABC):
                 # See https://github.com/DLR-RM/stable-baselines3/issues/391
                 recursive_setattr(model, name + ".data", pytorch_variables[name].data)
 
-        # Sample gSDE exploration matrix, so it uses the right device
-        # see issue #44
-        if model.use_sde:
-            model.attacker_policy.reset_noise()  # pytype: disable=attribute-error
         return model
 
     def get_parameters(self) -> Dict[str, Dict]:
