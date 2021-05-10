@@ -34,6 +34,10 @@ class TransitionOperator:
             done = True
             if defender_action_id != 1:
                 info["successful_intrusion"]= 1
+        if env_config.traces and s.t >= constants.TRACES.MAX_TIMESTEPS:
+            done = True
+            if defender_action_id != 1:
+                info["successful_intrusion"]= 1
         return s, attacker_reward, defender_reward, done, info
 
     @staticmethod
@@ -44,16 +48,17 @@ class TransitionOperator:
             return 0,0
 
     @staticmethod
-    def update_defender_state(env_state: EnvState) -> bool:
+    def update_defender_state(env_state: EnvState, attacker_action) -> bool:
         intrusion_in_progress = any(list(map(lambda x: x.compromised, env_state.nodes)))
         done = env_state.defender_observation_state.update_state(env_state.t, intrusion_in_progress=intrusion_in_progress,
-                                                          dp_setup=env_state.dp_setup)
+                                                          dp_setup=env_state.dp_setup, attacker_action=attacker_action,
+                                                                 defender_dynamics_model=env_state.dynamics_model)
         return done
 
     @staticmethod
     def defender_reward_fun(env_state: EnvState, env_config: EnvConfig, defender_action : int) -> Tuple[int, int, dict]:
         info = {}
-        if not env_state.env_config.dp:
+        if not env_state.env_config.dp and not env_state.env_config.traces:
             intrusion_in_progress = any(list(map(lambda x: x.compromised, env_state.nodes)))
             if intrusion_in_progress and env_state.stopped:
                 env_state.caught = True
@@ -66,7 +71,7 @@ class TransitionOperator:
                 return env_config.attacker_early_stopping_reward, env_config.defender_early_stopping_reward, info
             elif not env_state.stopped and not intrusion_in_progress:
                 return 0,0,info
-        else:
+        elif env_state.env_config.dp:
             info = {}
             state_id = env_state.dp_setup.state_to_id[(env_state.t, env_state.defender_observation_state.ttc)]
             r = env_state.dp_setup.R[state_id][defender_action]
@@ -77,5 +82,17 @@ class TransitionOperator:
                     info["caught_attacker"] = 1
                 else:
                     info["early_stopped"] = 1
-
             return 0, r, info
+        elif env_config.traces:
+            intrusion_in_progress = env_state.intrusion_in_progress
+            if intrusion_in_progress and env_state.stopped:
+                env_state.caught = True
+                info["caught_attacker"] = 1
+                return env_config.attacker_intrusion_prevention_reward, env_config.defender_intrusion_prevention_reward, info
+            elif intrusion_in_progress and not env_state.stopped:
+                return 0, 0, info
+            elif not intrusion_in_progress and env_state.stopped:
+                info["early_stopped"] = 1
+                return env_config.attacker_early_stopping_reward, env_config.defender_early_stopping_reward, info
+            elif not env_state.stopped and not intrusion_in_progress:
+                return 0, 0, info

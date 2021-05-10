@@ -22,7 +22,12 @@ class EnvConfig:
                  target_id : int = 4,
                  use_state_limits : bool = True,
                  dp: bool = False,
-                 dp_load: bool = False
+                 dp_load: bool = False,
+                 traces: bool = False,
+                 save_dynamics_model_dir = None,
+                 dynamics_model_name = None,
+                 action_to_state = None,
+                 attack_idx_to_id = None
                  ):
         self.num_nodes = num_nodes
         self.num_attributes = num_attributes
@@ -50,4 +55,9 @@ class EnvConfig:
         self.use_state_limits = use_state_limits
         self.dp = dp
         self.dp_load = dp_load
+        self.traces = traces
+        self.save_dynamics_model_dir = save_dynamics_model_dir
+        self.dynamics_model_name = dynamics_model_name
+        self.action_to_state=action_to_state
+        self.attack_idx_to_id = attack_idx_to_id
 

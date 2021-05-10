@@ -32,7 +32,7 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
         attack_action_id, defense_action_id = action_id
         if attack_action_id is None:
-            attack_action_id = self.env_config.attacker_static_opponent.action(env=self)
+            attack_action_id = self.env_config.attacker_static_opponent.action(env=self, t=self.env_state.t)
 
         if defense_action_id is None:
             defense_action_id = self.env_config.defender_static_opponent.action(env=self)
@@ -57,11 +57,19 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         info["attacker_alerts_norm"] = 0
         info["flags"] = 0
 
-        if not done and not self.env_config.dp:
+        if not done and not self.env_config.dp and not self.env_config.traces:
             attacker_reward, defender_reward_2, done, info = self.step_attacker(attack_action_id)
             defender_reward = defender_reward + defender_reward_2
+        elif self.env_config.traces:
+            logged_in_ips_str, done2, intrusion_in_progress = self.env_config.action_to_state[(attack_action_id,
+                                                                                              self.env_state.t)]
+            self.env_state.intrusion_in_progress = intrusion_in_progress
+            if done2:
+                self.env_state.target_compromised = True
+                done = True
+                defender_reward = self.env_config.defender_target_compromised_reward
 
-        d3 = TransitionOperator.update_defender_state(self.env_state)
+        d3 = TransitionOperator.update_defender_state(self.env_state, attacker_action=attack_action_id)
         if not done:
             done = d3
 

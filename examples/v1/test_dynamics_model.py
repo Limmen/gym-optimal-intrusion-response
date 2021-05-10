@@ -20,16 +20,17 @@ def test_env(env_name : str, num_steps : int):
                                    server_username="kim")
     # emulation_config = EmulationConfig(agent_ip="172.18.9.191", agent_username="agent", agent_pw="agent",
     #                                  server_connection=False)
-    save_dynamics_model_dir = "/home/kim/storage/workspace/pycr/python-envs/minigames/network_intrusion/ctf/" \
-                                               "gym-pycr-ctf/examples/difficulty_level_9/hello_world/"
+    # save_dynamics_model_dir = "/home/kim/storage/workspace/pycr/python-envs/minigames/network_intrusion/ctf/" \
+    #                                            "gym-pycr-ctf/examples/difficulty_level_9/hello_world/"
+    save_dynamics_model_dir = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v1/"
     #env = gym.make(env_name, env_config=None, emulation_config=emulation_config)
 
     defender_dynamics_model = DefenderDynamicsModel()
     new_model = DefenderDynamicsModel()
     if save_dynamics_model_dir is not None:
         print("loading dynamics model")
-        defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="defender_dynamics_model.json")
-        new_model.read_model(save_dynamics_model_dir, model_name="defender_dynamics_model.json")
+        defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model.json")
+        new_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model.json")
         print("model loaded")
         # if os.path.exists(load_dir):
         #     env.env_config.network_conf = \
@@ -67,9 +68,9 @@ def test_env(env_name : str, num_steps : int):
 
     # env.reset()
     # env.close()
-    d = new_model.to_dict()
-    with open("new_defender_dynamics_model.json", 'w') as fp:
-        json.dump(d, fp)
+    # d = new_model.to_dict()
+    # with open("new_defender_dynamics_model.json", 'w') as fp:
+    #     json.dump(d, fp)
 
 
 def test_all():

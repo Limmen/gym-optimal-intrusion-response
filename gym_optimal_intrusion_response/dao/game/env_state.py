@@ -6,6 +6,7 @@ from gym_optimal_intrusion_response.dao.obs.defender_obs_state import DefenderOb
 from gym_optimal_intrusion_response.dao.game.node import Node
 from gym_optimal_intrusion_response.logic.defender_dynamics.dp import DP
 from gym_optimal_intrusion_response.dao.dp.dp_setup import DPSetup
+from gym_pycr_ctf.dao.defender_dynamics.defender_dynamics_model import DefenderDynamicsModel
 
 
 class EnvState:
@@ -23,10 +24,15 @@ class EnvState:
         self.initialize_nodes()
         self.stopped = False
         self.caught = False
+        self.intrusion_in_progress = False
+        self.target_compromised = False
         self.t=0
         self.dp_setup = None
+        self.dynamics_model = None
         if self.env_config.dp:
             self.dp_setup = self.setup_dp()
+        elif self.env_config.traces:
+            self.dynamics_model = self.setup_dynamics_model()
 
     def setup_spaces(self, env_config: EnvConfig):
         self.attacker_observation_space = gym.spaces.Box(
@@ -50,6 +56,8 @@ class EnvState:
         self.initialize_nodes()
         self.stopped = False
         self.caught = False
+        self.intrusion_in_progress = False
+        self.target_compromised = False
         self.defender_observation_state.reset()
         self.t=0
 
@@ -75,6 +83,19 @@ class EnvState:
                 if self.env_config.adjacency_matrix[i][node_id] == 1:
                     return True
         return False
+
+    def setup_dynamics_model(self):
+        if self.env_config.traces:
+            defender_dynamics_model = DefenderDynamicsModel()
+            new_model = DefenderDynamicsModel()
+            if self.env_config.save_dynamics_model_dir is not None:
+                print("loading dynamics model")
+                defender_dynamics_model.read_model(self.env_config.save_dynamics_model_dir,
+                                                   model_name=self.env_config.dynamics_model_name)
+                defender_dynamics_model.normalize()
+                print("model loaded")
+                return defender_dynamics_model
+        return None
 
     def setup_dp(self) -> DPSetup:
         print("Setup DP")
@@ -110,4 +131,5 @@ class EnvState:
 
     def __str__(self):
         return ",".join(list(map(lambda x: str(x), self.nodes)))
+
 

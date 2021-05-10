@@ -1,3 +1,4 @@
+from typing import List
 from abc import ABC, abstractmethod
 import numpy as np
 
@@ -9,5 +10,5 @@ class StaticAttacker(ABC):
         self.actions = np.array(list(range(num_actions)))
 
     @abstractmethod
-    def action(self, env) -> int:
-        pass
+    def action(self, env, t=None) -> int:
+        return self.strategy[t]

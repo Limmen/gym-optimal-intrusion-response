@@ -69,11 +69,20 @@ class ManualDefenderAgent:
                             cumulative_reward += defender_rew
                             history.append(a)
                             if done:
-                                target_compromised = list(filter(lambda x: x.target_component, env.env_state.nodes))[0].compromised
-                                print("done:{}, attacker_caught:{}, stopped:{}, target_compromised:{} rew:{}".format(
-                                    done, env.env_state.caught,
-                                    env.env_state.stopped,
-                                    target_compromised, latest_rew
-                                ))
+                                if not env.env_config.traces:
+                                    target_compromised = list(filter(lambda x: x.target_component, env.env_state.nodes))[0].compromised
+                                    print("done:{}, attacker_caught:{}, stopped:{}, target_compromised:{} rew:{}".format(
+                                        done, env.env_state.caught,
+                                        env.env_state.stopped,
+                                        target_compromised, latest_rew
+                                    ))
+                                else:
+                                    target_compromised = env.env_state.target_compromised
+                                    print(
+                                        "done:{}, attacker_caught:{}, stopped:{}, target_compromised:{} rew:{}".format(
+                                            done, env.env_state.caught,
+                                            env.env_state.stopped,
+                                            target_compromised, latest_rew
+                                        ))
                         else:
                             print("action:{} is illegal".format(a))
