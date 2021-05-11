@@ -27,13 +27,13 @@ def initialize_model(env, load_path, device, agent_config) -> None:
 def plot_alerts_threshold():
     env = gym.make("optimal-intrusion-response-v3")
     # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736795.3647537_0_200_policy_network.zip"
+    load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/backup_results/data/1620736795.3647537_0_200_policy_network.zip"
     # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620749768.5217767_0_100_policy_network.zip"
-    load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
-    load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751929.7410731_0_200_policy_network.zip"
-    load_path = load_path_2
+    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
+    load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620752333.0477703_0_275_policy_network.zip"
+    # load_path = load_path_2
     model = initialize_model(env, load_path, "cuda:0", None)
-    # model2 = initialize_model(env, load_path_2, "cuda:0", None)
+    model2 = initialize_model(env, load_path_2, "cuda:0", None)
     num_alerts = np.arange(0, 400, 1)
     x = []
     y = []
@@ -53,14 +53,14 @@ def plot_alerts_threshold():
         x.append(i*2)
         y.append(val)
 
-        # actions, values, log_prob = model2.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
-        #                                                           deterministic=False,
-        #                                                           attacker=True, env=env, filter_illegal=False)
-        # if actions.item() == 1:
-        #     val = math.exp(log_prob.item())
-        # else:
-        #     val = 1 - math.exp(log_prob.item())
-        # y2.append(val)
+        actions, values, log_prob = model2.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+                                                                  deterministic=False,
+                                                                  attacker=True, env=env, filter_illegal=False)
+        if actions.item() == 1:
+            val = math.exp(log_prob.item())
+        else:
+            val = 1 - math.exp(log_prob.item())
+        y2.append(val)
 
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
@@ -79,10 +79,16 @@ def plot_alerts_threshold():
     # Plot Avg Eval rewards Gensim
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
     ax.plot(x,
-            y, label=r"$\pi_{\theta}$ simulation",
+            y, label=r"$\pi_{\theta}$ vs $B_1$",
             ls='-', color=colors[0])
-    ax.fill_between(x, y, np.zeros(len(y)),
+    ax.fill_between(x, y, y2,
                     alpha=0.35, color=colors[0])
+
+    ax.plot(x,
+            y2, label=r"$\pi_{\theta}$ vs $B_2$",
+            ls='-', color="r")
+    ax.fill_between(x, y2, np.zeros(len(y2)),
+                    alpha=0.35, color="r")
 
     # if plot_opt:
     ax.plot(x,
@@ -90,7 +96,7 @@ def plot_alerts_threshold():
             color="black",
             linestyle="dashed")
 
-    ax.set_title(r"$\pi_{\theta^D}(\text{stop}|a)$", fontsize=12.5)
+    ax.set_title(r"$\pi_{\theta}(\text{stop}|a)$", fontsize=12.5)
     ax.set_xlabel(r"\# Alerts $a$", fontsize=11.5)
     # ax.set_ylabel(r"$\mathbb{P}[\text{stop}|w]$", fontsize=12)
     ax.set_xlim(0, len(x)*2)
@@ -111,9 +117,9 @@ def plot_alerts_threshold():
     ax.spines['right'].set_color((.8, .8, .8))
     ax.spines['top'].set_color((.8, .8, .8))
 
-    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
-    #           ncol=2, fancybox=True, shadow=True)
-    # ax.legend(loc="lower right")
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
+              ncol=2, fancybox=True, shadow=True)
+    ax.legend(loc="lower right")
     # ax.xaxis.label.set_size(13.5)
     # ax.yaxis.label.set_size(13.5)
 
@@ -128,13 +134,24 @@ def plot_alerts_threshold():
     # plt.close(fig)
 
 
-def plot_3d(model):
+def plot_3d():
+    env = gym.make("optimal-intrusion-response-v3")
+    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
+    load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/backup_results/data/1620736795.3647537_0_200_policy_network.zip"
+    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620749768.5217767_0_100_policy_network.zip"
+    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
+    load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620752333.0477703_0_275_policy_network.zip"
+    # load_path = load_path_2
+    model = initialize_model(env, load_path, "cuda:0", None)
+    model2 = initialize_model(env, load_path_2, "cuda:0", None)
+
+
     # num_severe_alerts_recent = np.arange(0, 200, 1)
     num_severe_alerts_recent = np.arange(200, 0, -1)
     num_severe_alerts_total = np.arange(0, 200, 1)
     # num_severe_alerts_total = np.arange(200, 0, -1)
     sev, warn = np.meshgrid(num_severe_alerts_recent, num_severe_alerts_total)
-    action_val = action_pred_core_state_severe_warning(sev, warn, model)
+    action_val = action_pred_core_state_severe_warning(sev, warn, model, env)
 
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
@@ -183,7 +200,7 @@ def plot_3d(model):
 
 
 
-def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model):
+def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model, env):
     z = []
     for i in range(len(severe_alerts)):
         z1 = []
@@ -206,5 +223,5 @@ if __name__ == '__main__':
     # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
     # # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_backup2/data/1620469740.5786622_0_1850_policy_network.zip"
     # model = initialize_model(env, load_path, "cuda:0", None)
-    # plot_3d(model)
-    plot_alerts_threshold()
+    plot_3d()
+    # plot_alerts_threshold()
