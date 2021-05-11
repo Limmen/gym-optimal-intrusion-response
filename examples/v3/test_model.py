@@ -27,32 +27,17 @@ def initialize_model(env, load_path, device, agent_config) -> None:
 def plot_alerts_threshold():
     env = gym.make("optimal-intrusion-response-v3")
     # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
-    load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736795.3647537_0_200_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_backup2/data/1620469740.5786622_0_1850_policy_network.zip"
+    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736795.3647537_0_200_policy_network.zip"
+    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620749768.5217767_0_100_policy_network.zip"
+    load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
+    load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751929.7410731_0_200_policy_network.zip"
+    load_path = load_path_2
     model = initialize_model(env, load_path, "cuda:0", None)
     # model2 = initialize_model(env, load_path_2, "cuda:0", None)
-    num_alerts = np.arange(0, 200, 1)
+    num_alerts = np.arange(0, 400, 1)
     x = []
     y = []
-    vals = []
-    # for i in range(200):
-    #     print("{}/{}".format(i, 200))
-    #     for j in range(25):
-    #         for k in range(25):
-    #             actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([[i,j,k]])).to("cuda:0"),
-    #                                                                       deterministic=False,
-    #                                                                       attacker=False, env=env, filter_illegal=False)
-    #             if actions.item() == 1:
-    #                 val = math.exp(log_prob.item())
-    #             else:
-    #                 val = 1 - math.exp(log_prob.item())
-    #             if val > 0.5:
-    #                 print("val:{}, alerts:{}, t:{}, logins:{}".format(val, i, j, k))
-    #             vals.append(val)
-    #
-    # print("max val:{}".format(max(vals)))
-
-
+    y2 = []
 
     for i in range(len(num_alerts)):
         # state = np.array([num_alerts[i], 0])
@@ -67,6 +52,15 @@ def plot_alerts_threshold():
             val = 1 - math.exp(log_prob.item())
         x.append(i*2)
         y.append(val)
+
+        # actions, values, log_prob = model2.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        #                                                           deterministic=False,
+        #                                                           attacker=True, env=env, filter_illegal=False)
+        # if actions.item() == 1:
+        #     val = math.exp(log_prob.item())
+        # else:
+        #     val = 1 - math.exp(log_prob.item())
+        # y2.append(val)
 
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')

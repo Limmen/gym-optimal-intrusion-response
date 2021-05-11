@@ -29,8 +29,8 @@ def test_env(env_name : str, num_steps : int):
     new_model = DefenderDynamicsModel()
     if save_dynamics_model_dir is not None:
         print("loading dynamics model")
-        defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model.json")
-        new_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model.json")
+        defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model_2.json")
+        new_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model_2.json")
         print("model loaded")
         # if os.path.exists(load_dir):
         #     env.env_config.network_conf = \
@@ -41,7 +41,6 @@ def test_env(env_name : str, num_steps : int):
         for k2,v2 in v.items():
             for k3,v3 in v2.items():
                 if int(k) == 19 and int(k3) > 0:
-                    print("k3:{}, v3:{}, k:{}, k2:{}".format(k3, v3, k, k2))
                     val = int(int(k3)/20 + np.random.randint(0, 10))
                     if str(20) not in new_model.num_new_alerts:
                         new_model.num_new_alerts[str(20)] = {}
@@ -67,27 +66,42 @@ def test_env(env_name : str, num_steps : int):
         for k2, v2 in v.items():
             # print("action:{}, state:{}".format(k, k2))
             for k3, v3 in v2.items():
-                if int(k) == 19 and int(k3) > 0:
-                    val = int(int(k3) /20 + np.random.randint(0, 10))
-                    if str(20) not in new_model.num_new_severe_alerts:
-                        new_model.num_new_severe_alerts[str(20)] = {}
-                    if k2 not in new_model.num_new_severe_alerts[str(20)]:
-                        new_model.num_new_severe_alerts[str(20)][k2] = {}
-                    new_model.num_new_severe_alerts[str(20)][k2][str(val)] = int(new_model.num_new_severe_alerts[str(19)][k2][k3])
+                if int(k) == 19:
+                    del new_model.num_new_severe_alerts[k][k2][k3]
+
+    for k, v in defender_dynamics_model.num_new_severe_alerts.items():
+        for k2, v2 in v.items():
+            # print("action:{}, state:{}".format(k, k2))
+            for k3, v3 in v2.items():
+                if int(k) == 20:
+                    # val = int(int(k3) + 0 + np.random.randint(0, 10))
+                    val = int(k3) + 200
+                    if str(19) not in new_model.num_new_severe_alerts:
+                        new_model.num_new_severe_alerts[str(19)] = {}
+                    if k2 not in new_model.num_new_severe_alerts[str(19)]:
+                        new_model.num_new_severe_alerts[str(19)][k2] = {}
+                    new_model.num_new_severe_alerts[str(19)][k2][str(val)] = int(new_model.num_new_severe_alerts[str(20)][k2][k3])
+
 
     for k, v in defender_dynamics_model.num_new_warning_alerts.items():
         for k2, v2 in v.items():
             # print("action:{}, state:{}".format(k, k2))
             for k3, v3 in v2.items():
-                if int(k) == 19 and int(k3) > 0:
-                    if k2=="172.18.9.191":
-                        print("k3:{}, v3:{}, k:{}, k2:{}".format(k3, v3, k, k2))
-                    val = int(int(k3) /20 + np.random.randint(0, 10))
-                    if str(20) not in new_model.num_new_warning_alerts:
-                        new_model.num_new_warning_alerts[str(20)] = {}
-                    if k2 not in new_model.num_new_warning_alerts[str(20)]:
-                        new_model.num_new_warning_alerts[str(20)][k2] = {}
-                    new_model.num_new_warning_alerts[str(20)][k2][str(val)] = int(new_model.num_new_warning_alerts[str(19)][k2][k3])
+                if int(k) == 19:
+                    del new_model.num_new_warning_alerts[k][k2][k3]
+
+    for k, v in defender_dynamics_model.num_new_warning_alerts.items():
+        for k2, v2 in v.items():
+            # print("action:{}, state:{}".format(k, k2))
+            for k3, v3 in v2.items():
+                if int(k) == 20:
+                    # val = int(int(k3) + 0 + np.random.randint(0, 10))
+                    val = int(k3) + 0
+                    if str(19) not in new_model.num_new_warning_alerts:
+                        new_model.num_new_warning_alerts[str(19)] = {}
+                    if k2 not in new_model.num_new_warning_alerts[str(19)]:
+                        new_model.num_new_warning_alerts[str(19)][k2] = {}
+                    new_model.num_new_warning_alerts[str(19)][k2][str(val)] = int(new_model.num_new_warning_alerts[str(20)][k2][k3])
 
     print("normalizing model counts")
     new_model.normalize()
@@ -102,6 +116,7 @@ def test_env(env_name : str, num_steps : int):
     print(new_model.norm_num_new_severe_alerts[(19, '172.18.9.191')].mean())
     print(new_model.norm_num_new_severe_alerts[(19, '172.18.9.191')].std())
     print(new_model.norm_num_new_severe_alerts[(19, '172.18.9.191')].var())
+    print("19-2:")
     print(new_model.norm_num_new_warning_alerts[(19, '172.18.9.191')].mean())
     print(new_model.norm_num_new_warning_alerts[(19, '172.18.9.191')].std())
     print(new_model.norm_num_new_warning_alerts[(19, '172.18.9.191')].var())
@@ -110,7 +125,12 @@ def test_env(env_name : str, num_steps : int):
     print(new_model.norm_num_new_severe_alerts[(20, '172.18.9.191')].mean())
     print(new_model.norm_num_new_severe_alerts[(20, '172.18.9.191')].std())
     print(new_model.norm_num_new_severe_alerts[(20, '172.18.9.191')].var())
-    #
+
+    print("20 2:")
+    print(new_model.norm_num_new_warning_alerts[(20, '172.18.9.191')].mean())
+    print(new_model.norm_num_new_warning_alerts[(20, '172.18.9.191')].std())
+    print(new_model.norm_num_new_warning_alerts[(20, '172.18.9.191')].var())
+
     print("11:")
     print(new_model.norm_num_new_severe_alerts[(11, '172.18.9.191')].mean())
     print(new_model.norm_num_new_severe_alerts[(11, '172.18.9.191')].std())
@@ -129,9 +149,9 @@ def test_env(env_name : str, num_steps : int):
 
     # env.reset()
     # env.close()
-    # d = new_model.to_dict()
-    # with open("new_defender_dynamics_model_2.json", 'w') as fp:
-    #     json.dump(d, fp)
+    d = new_model.to_dict()
+    with open("new_defender_dynamics_model_21.json", 'w') as fp:
+        json.dump(d, fp)
 
 
 def test_all():

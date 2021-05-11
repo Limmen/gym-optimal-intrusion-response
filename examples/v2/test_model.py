@@ -27,6 +27,7 @@ def initialize_model(env, load_path, device, agent_config) -> None:
 def plot_alerts_threshold():
     env = gym.make("optimal-intrusion-response-v2")
     load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620725214.4430697_0_100_policy_network.zip"
+    load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
     # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_backup2/data/1620469740.5786622_0_1850_policy_network.zip"
     model = initialize_model(env, load_path, "cuda:0", None)
     # model2 = initialize_model(env, load_path_2, "cuda:0", None)

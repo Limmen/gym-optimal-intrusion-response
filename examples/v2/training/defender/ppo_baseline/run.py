@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     # Setup
     args = experiments_util.parse_args(experiments_util.default_config_path())
-    experiment_title = "Optimal Intrusion Response V1"
+    experiment_title = "Optimal Intrusion Response V2"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
