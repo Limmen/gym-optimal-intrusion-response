@@ -30,9 +30,11 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
             print("[WARNING]: This is a multi-agent environment where the input should be "
                   "(attacker_action, defender_action)")
 
+        attack_t = self.env_state.t
         attack_action_id, defense_action_id = action_id
         if attack_action_id is None:
-            attack_action_id = self.env_config.attacker_static_opponent.action(env=self, t=self.env_state.t)
+            attack_action_id, attack_t = self.env_config.attacker_static_opponent.action(env=self, t=self.env_state.t)
+            # print("attack action:{}".format(attack_action_id))
 
         if defense_action_id is None:
             defense_action_id = self.env_config.defender_static_opponent.action(env=self)
@@ -61,15 +63,17 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
             attacker_reward, defender_reward_2, done, info = self.step_attacker(attack_action_id)
             defender_reward = defender_reward + defender_reward_2
         elif self.env_config.traces:
-            logged_in_ips_str, done2, intrusion_in_progress = self.env_config.action_to_state[(attack_action_id,
-                                                                                              self.env_state.t)]
-            self.env_state.intrusion_in_progress = intrusion_in_progress
+            key = (attack_action_id, attack_t)
+            logged_in_ips_str, done2, intrusion_in_progress = self.env_config.action_to_state[(attack_action_id, attack_t)]
+            if not self.env_state.intrusion_in_progress:
+                self.env_state.intrusion_in_progress = intrusion_in_progress
+                self.env_state.intrusion_t = self.env_state.t
             if done2:
                 self.env_state.target_compromised = True
                 done = True
                 defender_reward = self.env_config.defender_target_compromised_reward
 
-        d3 = TransitionOperator.update_defender_state(self.env_state, attacker_action=attack_action_id)
+        d3 = TransitionOperator.update_defender_state(self.env_state, attacker_action=attack_action_id, t=attack_t)
         if not done:
             done = d3
 

@@ -26,6 +26,7 @@ class EnvState:
         self.caught = False
         self.intrusion_in_progress = False
         self.target_compromised = False
+        self.intrusion_t = 0
         self.t=0
         self.dp_setup = None
         self.dynamics_model = None
@@ -40,6 +41,11 @@ class EnvState:
         if self.env_config.dp:
             self.defender_observation_space = gym.spaces.Box(
                 low=0, high=1000, dtype=np.float32, shape=(2,))
+        elif not self.env_config.dp and self.env_config.traces:
+            self.defender_observation_space = gym.spaces.Box(
+                low=0, high=1000, dtype=np.float32, shape=(3,))
+            # self.defender_observation_space = gym.spaces.Box(
+            #     low=0, high=1000, dtype=np.float32, shape=(5,))
         else:
             self.defender_observation_space = gym.spaces.Box(
                 low=0, high=1000, dtype=np.float32, shape=(3,))
@@ -60,6 +66,7 @@ class EnvState:
         self.target_compromised = False
         self.defender_observation_state.reset()
         self.t=0
+        self.intrusion_t = -1
 
     def initialize_nodes(self):
         nodes = []

@@ -35,12 +35,12 @@ def default_config() -> ClientConfig:
                                filter_illegal_actions=True,
                                running_avg=50,  eval_deterministic=False
                                )
-    env_name = "optimal-intrusion-response-v2"
+    env_name = "optimal-intrusion-response-v3"
 
     client_config = ClientConfig(env_name=env_name, defender_agent_config=agent_config,
                                  agent_type=AgentType.PPO_BASELINE.value,
                                  output_dir=experiments_util.default_output_dir(),
-                                 title="Optimal Intrusion Response V2",
+                                 title="Optimal Intrusion Response V3",
                                  run_many=True, random_seeds=[0, 999, 299],
                                  random_seed=299,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,

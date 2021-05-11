@@ -48,9 +48,9 @@ class TransitionOperator:
             return 0,0
 
     @staticmethod
-    def update_defender_state(env_state: EnvState, attacker_action) -> bool:
+    def update_defender_state(env_state: EnvState, attacker_action, t) -> bool:
         intrusion_in_progress = any(list(map(lambda x: x.compromised, env_state.nodes)))
-        done = env_state.defender_observation_state.update_state(env_state.t, intrusion_in_progress=intrusion_in_progress,
+        done = env_state.defender_observation_state.update_state(t, intrusion_in_progress=intrusion_in_progress,
                                                           dp_setup=env_state.dp_setup, attacker_action=attacker_action,
                                                                  defender_dynamics_model=env_state.dynamics_model)
         return done
@@ -88,7 +88,9 @@ class TransitionOperator:
             if intrusion_in_progress and env_state.stopped:
                 env_state.caught = True
                 info["caught_attacker"] = 1
-                return env_config.attacker_intrusion_prevention_reward, env_config.defender_intrusion_prevention_reward, info
+                r = env_config.defender_intrusion_prevention_reward/(1 + env_state.t - env_state.intrusion_t)
+                # print("r:{}, t:{}, t1:{}".format(r, env_state.t, env_state.intrusion_t))
+                return env_config.attacker_intrusion_prevention_reward, r, info
             elif intrusion_in_progress and not env_state.stopped:
                 return 0, 0, info
             elif not intrusion_in_progress and env_state.stopped:

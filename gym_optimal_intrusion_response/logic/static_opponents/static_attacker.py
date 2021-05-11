@@ -11,4 +11,4 @@ class StaticAttacker(ABC):
 
     @abstractmethod
     def action(self, env, t=None) -> int:
-        return self.strategy[t]
+        pass

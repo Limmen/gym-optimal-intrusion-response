@@ -12,6 +12,10 @@ class DefenderObservationState:
         self.env_config = env_config
         self.num_alerts = 0
         self.num_failed_logins = 0
+        self.num_severe_alerts = 0
+        self.num_warning_alerts = 0
+        self.num_alert_priority = 0
+
         self.ttc = constants.DP.MAX_TTC - 1
         self.f1_a = DefenderDynamics.f1_a()
         self.f1_b = DefenderDynamics.f1_b()
@@ -23,18 +27,34 @@ class DefenderObservationState:
     def reset(self):
         self.num_alerts = 0
         self.num_failed_logins = 0
+        self.num_severe_alerts = 0
+        self.num_warning_alerts = 0
+        self.num_alert_priority = 0
         self.ttc = constants.DP.MAX_TTC - 1
 
     def get_defender_observation(self, t, dp_setup: DPSetup = None):
-        if not self.env_config.dp:
+        if not self.env_config.dp and not self.env_config.traces:
             obs = np.zeros(3).tolist()
             obs[0] = t
             obs[1] = self.num_alerts
             obs[2] = self.num_failed_logins
-        else:
+        elif self.env_config.dp:
             obs = np.zeros(2).tolist()
             obs[0] = t
             obs[1] = self.ttc
+        else:
+            obs = np.zeros(3).tolist()
+            obs[0] = self.num_severe_alerts
+            obs[1] = self.num_warning_alerts
+            obs[2] = self.num_failed_logins
+
+            # obs = np.zeros(5).tolist()
+            # obs[0] = self.num_alerts
+            # obs[1] = self.num_severe_alerts
+            # obs[2] = self.num_warning_alerts
+            # obs[3] = self.num_alert_priority
+            # obs[4] = self.num_failed_logins
+
         return np.array(obs)
 
     def update_state(self, t, intrusion_in_progress: bool = False, dp_setup: DPSetup = None,
@@ -69,6 +89,7 @@ class DefenderObservationState:
             num_new_alerts = 0
             num_new_severe_alerts = 0
             num_new_warning_alerts = 0
+            num_new_priority = 0
             logged_in_ips_str, done, intrusion_in_progress = self.env_config.action_to_state[(attacker_action, t)]
             attacker_action_id = self.env_config.attack_idx_to_id[attacker_action]
 
@@ -83,7 +104,13 @@ class DefenderObservationState:
                 num_new_warning_alerts = \
                     defender_dynamics_model.norm_num_new_warning_alerts[(attacker_action_id, logged_in_ips_str)].rvs()
 
-            num_new_alerts = num_new_severe_alerts + num_new_warning_alerts
+            if (attacker_action_id, logged_in_ips_str) in \
+                    defender_dynamics_model.norm_num_new_warning_alerts:
+                num_new_priority = \
+                    defender_dynamics_model.norm_num_new_priority[(attacker_action_id, logged_in_ips_str)].rvs()
+
+            # num_new_alerts = num_new_severe_alerts + num_new_warning_alerts
+            num_new_alerts = num_new_severe_alerts
             num_new_failed_login_attempts = 0
             for k,v in defender_dynamics_model.machines_dynamics_model.items():
                 ip = k
@@ -92,7 +119,10 @@ class DefenderObservationState:
                     num_new_failed_login_attempts = m_dynamics.norm_num_new_failed_login_attempts[
                         (attacker_action_id, logged_in_ips_str)].rvs()
             self.num_alerts = self.num_alerts + num_new_alerts
+            self.num_severe_alerts = self.num_severe_alerts + num_new_severe_alerts
+            self.num_warning_alerts = self.num_warning_alerts + num_new_warning_alerts
             self.num_failed_logins = self.num_failed_logins + num_new_failed_login_attempts
+            self.num_alert_priority = self.num_alert_priority + num_new_priority
             return done
 
 

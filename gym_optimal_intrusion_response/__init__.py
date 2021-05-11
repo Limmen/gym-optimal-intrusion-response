@@ -17,3 +17,10 @@ register(
     entry_point='gym_optimal_intrusion_response.envs.derived_envs.optimal_intrusion_response_env_v2:OptimalIntrusionResponseEnvV2',
     kwargs={}
 )
+
+# -------- Difficulty Version: V3 ------------
+register(
+    id='optimal-intrusion-response-v3',
+    entry_point='gym_optimal_intrusion_response.envs.derived_envs.optimal_intrusion_response_env_v3:OptimalIntrusionResponseEnvV3',
+    kwargs={}
+)
