@@ -8,8 +8,9 @@ from gym_optimal_intrusion_response.util.plots import plotting_util_defender
 def parse_data(base_path: str, suffix: str, ips = None, eval_ips = None):
     ppo_v1_df_0 = pd.read_csv(glob.glob(base_path + "299/*_train.csv")[0])
     ppo_v1_df_10120 = pd.read_csv(glob.glob(base_path + "899/*_train.csv")[0])
+    ppo_v1_df_8799 = pd.read_csv(glob.glob(base_path + "8799/*_train.csv")[0])
     # ppo_v1_df_18910 = pd.read_csv(glob.glob(base_path + "18910/*_train.csv")[0])
-    ppo_dfs_v1 = [ppo_v1_df_0, ppo_v1_df_10120]
+    ppo_dfs_v1 = [ppo_v1_df_0, ppo_v1_df_10120, ppo_v1_df_8799]
     max_len = min(list(map(lambda x: len(x), ppo_dfs_v1)))
 
     running_avg = 10

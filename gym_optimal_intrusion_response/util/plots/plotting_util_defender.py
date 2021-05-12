@@ -231,8 +231,6 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         eval_only=False, plot_opt = False, iterations_per_step : int = 1, optimal_int = 1.0,
         optimal_flag = 1.0, file_name = "test", markersize=5, bottom=0.02):
 
-    print("std:{}".format(avg_train_rewards_stds_v1))
-
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
     plt.rcParams['font.family'] = ['serif']
@@ -249,23 +247,24 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
 
     # Plot flags
 
-    ax[0].plot(np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-            avg_train_rewards_means_v1[::sample_step], label=r"$\pi_{\theta}$ simulation",
-            marker="s", ls='-', color="r", markevery=markevery, markersize=markersize, lw=lw)
-    ax[0].fill_between(
-        np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-        avg_train_rewards_means_v1[::sample_step] - avg_train_rewards_stds_v1[::sample_step],
-        avg_train_rewards_means_v1[::sample_step] + avg_train_rewards_stds_v1[::sample_step],
-        alpha=0.35, color="r", lw=lw)
-
     ax[0].plot(
         np.array(list(range(len(avg_train_rewards_means_v2[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_rewards_means_v2[::sample_step], label=r"$\pi_{\theta}$ simulation",
-        marker="s", ls='-', color="#599ad3", markevery=markevery, markersize=markersize, lw=lw)
+        marker="s", ls='-', color="r", markevery=markevery, markersize=markersize, lw=lw)
     ax[0].fill_between(
         np.array(list(range(len(avg_train_rewards_means_v2[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_rewards_means_v2[::sample_step] - avg_train_rewards_stds_v2[::sample_step],
         avg_train_rewards_means_v2[::sample_step] + avg_train_rewards_stds_v2[::sample_step],
+        alpha=0.35, color="r", lw=lw)
+
+    ax[0].plot(
+        np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_rewards_means_v1[::sample_step], label=r"$\pi_{\theta}$ simulation",
+        marker="s", ls='-', color="#599ad3", markevery=markevery, markersize=markersize, lw=lw)
+    ax[0].fill_between(
+        np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_rewards_means_v1[::sample_step] - avg_train_rewards_stds_v1[::sample_step],
+        avg_train_rewards_means_v1[::sample_step] + avg_train_rewards_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3", lw=lw)
 
 
@@ -313,23 +312,24 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     #     avg_train_caught_frac_means_v1[::sample_step] + avg_train_rewards_stds_v1[::sample_step],
     #     alpha=0.35, color="#599ad3")
 
-    ax[1].plot(np.array(list(range(len(avg_train_steps_means_v1[::sample_step]))))*sample_step* iterations_per_step,
-            avg_train_steps_means_v1[::sample_step], label=r"$\mathbb{P}[detected]$ $\pi_{\theta}$ simulation",
-            marker="s", ls='-', color="r",
-            markevery=markevery, markersize=markersize, lw=lw)
-    ax[1].fill_between(np.array(list(range(len(avg_train_steps_means_v1[::sample_step]))))*sample_step* iterations_per_step,
-                    avg_train_steps_means_v1[::sample_step] - avg_train_steps_stds_v1[::sample_step],
-                    avg_train_steps_means_v1[::sample_step] + avg_train_steps_stds_v1[::sample_step],
-                    alpha=0.35, color="r")
-
     ax[1].plot(np.array(list(range(len(avg_train_steps_means_v2[::sample_step])))) * sample_step * iterations_per_step,
                avg_train_steps_means_v2[::sample_step], label=r"$\mathbb{P}[detected]$ $\pi_{\theta}$ simulation",
-               marker="s", ls='-', color="#599ad3",
+               marker="s", ls='-', color="r",
                markevery=markevery, markersize=markersize, lw=lw)
     ax[1].fill_between(
         np.array(list(range(len(avg_train_steps_means_v2[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_steps_means_v2[::sample_step] - avg_train_steps_stds_v2[::sample_step],
         avg_train_steps_means_v2[::sample_step] + avg_train_steps_stds_v2[::sample_step],
+        alpha=0.35, color="r")
+
+    ax[1].plot(np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+               avg_train_steps_means_v1[::sample_step], label=r"$\mathbb{P}[detected]$ $\pi_{\theta}$ simulation",
+               marker="s", ls='-', color="#599ad3",
+               markevery=markevery, markersize=markersize, lw=lw)
+    ax[1].fill_between(
+        np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_steps_means_v1[::sample_step] - avg_train_steps_stds_v1[::sample_step],
+        avg_train_steps_means_v1[::sample_step] + avg_train_steps_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
 
     # ax[1].plot(np.array(list(range(len(avg_train_rewards_means_v1))))[::sample_step] * iterations_per_step,
@@ -353,25 +353,26 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     ax[1].set_xlim(0, len(avg_train_rewards_means_v1[::sample_step]) * sample_step * iterations_per_step)
     ax[1].set_title(r"Episode length (steps)", fontsize=fontsize)
 
-    ax[2].plot(np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-            avg_train_caught_frac_means_v1[::sample_step], label=r"Learned $\pi_{\theta}$",
-            marker="s", ls='-', color="r",
-            markevery=markevery, markersize=markersize, lw=lw)
-    ax[2].fill_between(
-        np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-        avg_train_caught_frac_means_v1[::sample_step] - avg_train_caught_frac_stds_v1[::sample_step],
-        avg_train_caught_frac_means_v1[::sample_step] + avg_train_caught_frac_stds_v1[::sample_step],
-        alpha=0.35, color="r")
-
     ax[2].plot(
         np.array(list(range(len(avg_train_caught_frac_means_v2[::sample_step])))) * sample_step * iterations_per_step,
-        avg_train_caught_frac_means_v2[::sample_step], label=r"Learned $\pi_{\theta}$",
-        marker="s", ls='-', color="#599ad3",
+        avg_train_caught_frac_means_v2[::sample_step], label=r"Learned $\pi_{\theta}$ vs \textsc{NoisyAttacker}",
+        marker="s", ls='-', color="r",
         markevery=markevery, markersize=markersize, lw=lw)
     ax[2].fill_between(
         np.array(list(range(len(avg_train_caught_frac_means_v2[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_caught_frac_means_v2[::sample_step] - avg_train_caught_frac_stds_v2[::sample_step],
         avg_train_caught_frac_means_v2[::sample_step] + avg_train_caught_frac_stds_v2[::sample_step],
+        alpha=0.35, color="r")
+
+    ax[2].plot(
+        np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_caught_frac_means_v1[::sample_step], label=r"Learned $\pi_{\theta}$ vs vs \textsc{StealthyAttacker}",
+        marker="s", ls='-', color="#599ad3",
+        markevery=markevery, markersize=markersize, lw=lw)
+    ax[2].fill_between(
+        np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_caught_frac_means_v1[::sample_step] - avg_train_caught_frac_stds_v1[::sample_step],
+        avg_train_caught_frac_means_v1[::sample_step] + avg_train_caught_frac_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
 
     ax[2].grid('on')
@@ -401,27 +402,29 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     #            color="#f9a65a", markersize=markersize, lw=lw, markevery=markevery, marker="h")
 
     ax[3].plot(
-        np.array(list(range(len(avg_train_early_stopping_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-        avg_train_early_stopping_means_v1[::sample_step], label=r"Defender $\pi_{\theta^D}$ simulation",
-        marker="s", ls='-', color="r",
-        markevery=markevery, markersize=markersize, lw=lw)
-    ax[3].fill_between(
-        np.array(list(range(len(avg_train_early_stopping_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-        avg_train_early_stopping_means_v1[::sample_step] - avg_train_early_stopping_stds_v1[::sample_step],
-        avg_train_early_stopping_means_v1[::sample_step] + avg_train_early_stopping_stds_v1[::sample_step],
-        alpha=0.35, color="r")
-
-    ax[3].plot(
         np.array(
             list(range(len(avg_train_early_stopping_means_v2[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_early_stopping_means_v2[::sample_step], label=r"Defender $\pi_{\theta^D}$ simulation",
-        marker="s", ls='-', color="#599ad3",
+        marker="s", ls='-', color="r",
         markevery=markevery, markersize=markersize, lw=lw)
     ax[3].fill_between(
         np.array(
             list(range(len(avg_train_early_stopping_means_v2[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_early_stopping_means_v2[::sample_step] - avg_train_early_stopping_stds_v2[::sample_step],
         avg_train_early_stopping_means_v2[::sample_step] + avg_train_early_stopping_stds_v2[::sample_step],
+        alpha=0.35, color="r")
+
+    ax[3].plot(
+        np.array(
+            list(range(len(avg_train_early_stopping_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_early_stopping_means_v1[::sample_step], label=r"Defender $\pi_{\theta^D}$ simulation",
+        marker="s", ls='-', color="#599ad3",
+        markevery=markevery, markersize=markersize, lw=lw)
+    ax[3].fill_between(
+        np.array(
+            list(range(len(avg_train_early_stopping_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        avg_train_early_stopping_means_v1[::sample_step] - avg_train_early_stopping_stds_v1[::sample_step],
+        avg_train_early_stopping_means_v1[::sample_step] + avg_train_early_stopping_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
 
     # ax[3].plot(np.array(list(range(len(avg_train_rewards_means_v1))))[::sample_step] * iterations_per_step,

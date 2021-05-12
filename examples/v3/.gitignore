@@ -16,3 +16,5 @@ backup_results
 v2_results
 v3
 v3_results
+*.png
+*.pdf
