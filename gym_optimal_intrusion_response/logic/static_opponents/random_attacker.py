@@ -14,5 +14,5 @@ class RandomAttacker(StaticAttacker):
             print("stopped:{}, caught:{}".format(env.env_state.stopped, env.env_state.caught))
             print("nodes: {}".format(str(env.env_state)))
         action = np.random.choice(legal_actions)
-        return action
+        return action, t
 
