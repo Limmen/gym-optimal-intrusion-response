@@ -21,8 +21,12 @@ class Runner:
     def train(config: ClientConfig) -> Tuple[ExperimentResult, ExperimentResult]:
         env = Runner.regular_env_creation(config=config)
         if config.agent_type == AgentType.PPO_BASELINE.value:
+            if config.defender_agent_config is not None:
+                config.defender_agent_config.random_seed = config.random_seed
+            if config.attacker_agent_config is not None:
+                config.attacker_agent_config.random_seed = config.random_seed
             agent = PPOBaselineAgent(env,
-                                     attacker_agent_config=config.attacker_agent_config,
+                                     attacker_agent_config=config.defender_agent_config,
                                      defender_agent_config=config.defender_agent_config,
                                      train_mode=TrainMode(config.train_mode))
         else:

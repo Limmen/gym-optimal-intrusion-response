@@ -1,13 +1,10 @@
-from gym_pycr_ctf.envs.derived_envs.level1.simulation.pycr_ctf_level1_sim_env import PyCRCTFLevel1Sim1Env
-from gym_pycr_ctf.envs.derived_envs.level1.emulation.pycr_ctf_level1_emulation_env import PyCRCTFLevel1Emulation1Env
 from gym_pycr_ctf.dao.network.emulation_config import EmulationConfig
-from gym_pycr_ctf.dao.defender_dynamics.defender_dynamics_model import DefenderDynamicsModel
-import gym_pycr_ctf.constants.constants as constants
-import gym
-import time
-import numpy as np
-import os
 import json
+
+import numpy as np
+from gym_pycr_ctf.dao.defender_dynamics.defender_dynamics_model import DefenderDynamicsModel
+from gym_pycr_ctf.dao.network.emulation_config import EmulationConfig
+
 
 def test_env(env_name : str, num_steps : int):
     # emulation_config = EmulationConfig(server_ip="172.31.212.91", agent_ip="172.18.4.191",
@@ -22,20 +19,19 @@ def test_env(env_name : str, num_steps : int):
     #                                  server_connection=False)
     # save_dynamics_model_dir = "/home/kim/storage/workspace/pycr/python-envs/minigames/network_intrusion/ctf/" \
     #                                            "gym-pycr-ctf/examples/difficulty_level_9/hello_world/"
-    save_dynamics_model_dir = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2"
+    save_dynamics_model_dir = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v2/"
     #env = gym.make(env_name, env_config=None, emulation_config=emulation_config)
 
     defender_dynamics_model = DefenderDynamicsModel()
     new_model = DefenderDynamicsModel()
     if save_dynamics_model_dir is not None:
         print("loading dynamics model")
-        defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model_2.json")
-        new_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model_2.json")
+        defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model_21.json")
+        new_model.read_model(save_dynamics_model_dir, model_name="new_defender_dynamics_model_21.json")
         print("model loaded")
         # if os.path.exists(load_dir):
         #     env.env_config.network_conf = \
         #         env.env_config.network_conf.load(load_dir)
-
 
     for k,v in defender_dynamics_model.num_new_alerts.items():
         for k2,v2 in v.items():
@@ -50,17 +46,18 @@ def test_env(env_name : str, num_steps : int):
                     # if k3 < 150:
                     #     new_model.num_new_alerts[str(19)][k2][str(val)] = int(new_model.num_new_alerts[str(19)][k2][k3])
 
-    for k, v in defender_dynamics_model.num_new_priority.items():
-        for k2, v2 in v.items():
-            # print("action:{}, state:{}".format(k, k2))
-            for k3, v3 in v2.items():
-                if int(k) == 19 and int(k3) > 0:
-                    val = int(int(k3) /20 + np.random.randint(0, 10))
-                    if str(20) not in new_model.num_new_priority:
-                        new_model.num_new_priority[str(20)] = {}
-                    if k2 not in new_model.num_new_priority[str(20)]:
-                        new_model.num_new_priority[str(20)][k2] = {}
-                    new_model.num_new_priority[str(20)][k2][str(val)] = int(new_model.num_new_priority[str(19)][k2][k3])
+
+    # for k, v in defender_dynamics_model.num_new_priority.items():
+    #     for k2, v2 in v.items():
+    #         # print("action:{}, state:{}".format(k, k2))
+    #         for k3, v3 in v2.items():
+    #             if int(k) == 19 and int(k3) > 0:
+    #                 val = int(int(k3) /20 + np.random.randint(0, 10))
+    #                 if str(20) not in new_model.num_new_priority:
+    #                     new_model.num_new_priority[str(20)] = {}
+    #                 if k2 not in new_model.num_new_priority[str(20)]:
+    #                     new_model.num_new_priority[str(20)][k2] = {}
+    #                 new_model.num_new_priority[str(20)][k2][str(val)] = int(new_model.num_new_priority[str(19)][k2][k3])
 
     for k, v in defender_dynamics_model.num_new_severe_alerts.items():
         for k2, v2 in v.items():
@@ -69,9 +66,10 @@ def test_env(env_name : str, num_steps : int):
                 if int(k) == 19:
                     del new_model.num_new_severe_alerts[k][k2][k3]
 
+
     for k, v in defender_dynamics_model.num_new_severe_alerts.items():
         for k2, v2 in v.items():
-            # print("action:{}, state:{}".format(k, k2))
+            print("action:{}, state:{}".format(k, k2))
             for k3, v3 in v2.items():
                 if int(k) == 20:
                     # val = int(int(k3) + 0 + np.random.randint(0, 10))
@@ -80,6 +78,7 @@ def test_env(env_name : str, num_steps : int):
                         new_model.num_new_severe_alerts[str(19)] = {}
                     if k2 not in new_model.num_new_severe_alerts[str(19)]:
                         new_model.num_new_severe_alerts[str(19)][k2] = {}
+                    print("added")
                     new_model.num_new_severe_alerts[str(19)][k2][str(val)] = int(new_model.num_new_severe_alerts[str(20)][k2][k3])
 
 
@@ -150,7 +149,7 @@ def test_env(env_name : str, num_steps : int):
     # env.reset()
     # env.close()
     d = new_model.to_dict()
-    with open("new_defender_dynamics_model_21.json", 'w') as fp:
+    with open("new_defender_dynamics_model_22.json", 'w') as fp:
         json.dump(d, fp)
 
 

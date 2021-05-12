@@ -36,6 +36,7 @@ class TrainAgent(ABC):
         random.seed(self.attacker_config.random_seed)
         np.random.seed(self.attacker_config.random_seed)
         torch.manual_seed(self.attacker_config.random_seed)
+        print("Seeed:{}".format(self.attacker_config.random_seed))
 
     @abstractmethod
     def train(self) -> ExperimentResult:

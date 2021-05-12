@@ -123,7 +123,7 @@ class OptimalIntrusionResponseEnvV2(OptimalIntrusionResponseEnv):
                                traces=True,
                                action_to_state=action_to_state,
                                attack_idx_to_id=attack_idx_to_id,
-                               save_dynamics_model_dir = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/",
-                               dynamics_model_name = "new_defender_dynamics_model_21.json"
+                               save_dynamics_model_dir = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v2/",
+                               dynamics_model_name = "new_defender_dynamics_model_22.json"
                                )
         super().__init__(env_config=env_config)
