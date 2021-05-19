@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='gym_optimal_intrusion_response',
-      version='0.0.1',
+      version='1.0.0',
       install_requires=['gym', 'pyglet', 'numpy', 'torch', 'stable_baselines3',
                         'jsonpickle'],
       author='Kim Hammar',
