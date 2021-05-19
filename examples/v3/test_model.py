@@ -1,6 +1,9 @@
+"""
+Utility scripts for plotting
+"""
+
 from gym_optimal_intrusion_response.envs.derived_envs.optimal_intrusion_response_env_v1 import \
     OptimalIntrusionResponseEnvV1
-import gym
 from gym_optimal_intrusion_response.agents.policy_gradient.ppo_baseline.impl.ppo.ppo import PPO
 import torch
 import numpy as np
@@ -9,8 +12,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
-import gym_optimal_intrusion_response.constants.constants as constants
-from gym_optimal_intrusion_response.logic.defender_dynamics.dp import DP
 import os
 
 
@@ -26,17 +27,16 @@ def initialize_model(env, load_path, device, agent_config) -> None:
     return model
 
 
-def plot_alerts_threshold():
+def plot_alerts_threshold() -> None:
+    """
+    Plots alerts thresholds
+
+    :return: None
+    """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-    # matplotlib.use('Qt5Agg')
     env = gym.make("optimal-intrusion-response-v3")
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
-    # v3_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/backup_results/data/1620736795.3647537_0_200_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620749768.5217767_0_100_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
     v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
     v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
-    # load_path = load_path_2
     model = initialize_model(env, v3_load_path, "cpu", None)
     model2 = initialize_model(env, v2_load_path, "cpu", None)
     num_alerts = np.arange(0, 200, 1)
@@ -45,8 +45,6 @@ def plot_alerts_threshold():
     y2 = []
 
     for i in range(len(num_alerts)):
-        # state = np.array([num_alerts[i], 0])
-        # state = np.array([num_alerts[i], num_alerts[i], num_alerts[i], num_alerts[i]*2 ,0])
         state = np.array([num_alerts[i], num_alerts[i], 0])
         actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                  deterministic=False,
@@ -102,11 +100,9 @@ def plot_alerts_threshold():
             linestyle="dashed")
 
     ax.set_title(r"$\pi_{\theta}(\text{stop}|a)$", fontsize=11)
-    ax.set_xlabel(r"\# Alerts $a$", fontsize=8)
-    # ax.set_ylabel(r"$\mathbb{P}[\text{stop}|w]$", fontsize=12)
+    ax.set_xlabel(r"\# Alerts $a$", fontsize=10)
     ax.set_xlim(0, len(x)*2)
     ax.set_ylim(0, 1.1)
-    # ax.set_ylim(ylim_rew)
 
     # set the grid on
     ax.grid('on')
@@ -125,44 +121,33 @@ def plot_alerts_threshold():
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
               ncol=2, fancybox=True, shadow=True, fontsize=8)
     ax.legend(loc="lower right")
-    # ax.xaxis.label.set_size(13.5)
-    # ax.yaxis.label.set_size(13.5)
 
     ttl = ax.title
     ttl.set_position([.5, 1.05])
 
     fig.tight_layout()
     # plt.show()
-    # plt.subplots_adjust(wspace=0, hspace=0)
-    # fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
+    plt.subplots_adjust(wspace=0, hspace=0, bottom=0.2)
+    fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
     fig.savefig("threshold_alerts_22" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
 
-def plot_3d():
+def plot_3d() -> None:
+    """
+    3d plot of empirical thresholds
+
+    :return: None
+    """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
     env = gym.make("optimal-intrusion-response-v3")
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620749768.5217767_0_100_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
-    # load_path = load_path_2
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/backup_results/data/1620736795.3647537_0_200_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620752333.0477703_0_275_policy_network.zip"
     v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
     v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
-    # load_path = load_path_2
     model = initialize_model(env, v3_load_path, "cpu", None)
-    model2 = initialize_model(env, v2_load_path, "cpu", None)
-
-
-    # num_severe_alerts_recent = np.arange(0, 200, 1)
     num_severe_alerts_recent = np.arange(200, 0, -1)
     num_severe_alerts_total = np.arange(0, 200, 1)
-    # num_severe_alerts_total = np.arange(200, 0, -1)
     sev, warn = np.meshgrid(num_severe_alerts_recent, num_severe_alerts_total)
     action_val = action_pred_core_state_severe_warning(sev, warn, model, env)
-    # action_val_2 = action_pred_core_state_severe_warning(sev, warn, model2, env)
-
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
     plt.rcParams['font.family'] = ['serif']
@@ -175,20 +160,9 @@ def plot_3d():
     plt.rcParams['font.serif'] = ['Times New Roman']
     plt.rcParams.update({'font.size': 8})
     plt.rcParams.update({'figure.autolayout': True})
-
-    #
-    #fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(8, 5))
-    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(3.92, 2.7))
-
-    # ax.plot_surface(sev, warn, action_val, rstride=12, cstride=12,
-    #                 cmap='cividis')
-
+    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(4.15, 2.9))
     ax.plot_surface(sev, warn, action_val, cmap='Blues', linewidth=0.3,
-                    alpha=0.8, edgecolor='k')
-    # ax.plot_surface(sev, warn, action_val_2, cmap='Reds', linewidth=0.3,
-    #                 alpha=0.8, edgecolor='k')
-
-    # ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$", fontsize=12.5)
+                    alpha=0.8, edgecolor='k', rstride=12, cstride=12)
     ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{StealthyAttacker}", fontsize=11)
     ax.set_xlabel(r"warn alerts $w_a$")
     ax.set_ylabel(r"sev alerts $s_a$")
@@ -198,46 +172,30 @@ def plot_3d():
     ax.set_yticks(np.arange(0, 200+1, 50))
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(8)
-    ylab.set_size(8)
+    xlab.set_size(10)
+    ylab.set_size(10)
     ax.tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
     ax.tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
-    # ax.set_ylim(200, 0)
-    # ax.set_xlim(150, 0)
-    # ax.set_ylim(0, 150)
-    #plt.subplots_adjust(wspace=150, hspace=150, top=200, bottom=0.0)
     fig.tight_layout()
-    #plt.subplots_adjust(wspace=150, hspace=150, top=200, bottom=0.0)
-    # fig.subplots_adjust(bottom=0.9)
-    #plt.autoscale()
-    #plt.subplots_adjust(bottom=0.55)
+    plt.subplots_adjust(bottom=0.55)
     # plt.show()
     # fig.savefig("alerts_stopping" + ".png", format="png", dpi=600)
     fig.savefig("alerts_stopping" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
 
-def plot_3d_2():
+def plot_3d_2() -> None:
+    """
+    3d plot of empirical thresholds
+
+    :return: None
+    """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
     env = gym.make("optimal-intrusion-response-v3")
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620749768.5217767_0_100_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620751383.982535_0_100_policy_network.zip"
-    # load_path = load_path_2
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/backup_results/data/1620736795.3647537_0_200_policy_network.zip"
-    # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v2/training/defender/ppo_baseline/results/data/1620752333.0477703_0_275_policy_network.zip"
-    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
     v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
-    # load_path = load_path_2
-    model = initialize_model(env, v3_load_path, "cpu", None)
     model2 = initialize_model(env, v2_load_path, "cpu", None)
-
-
-    # num_severe_alerts_recent = np.arange(0, 200, 1)
     num_severe_alerts_recent = np.arange(200, 0, -1)
     num_severe_alerts_total = np.arange(0, 200, 1)
-    # num_severe_alerts_total = np.arange(200, 0, -1)
     sev, warn = np.meshgrid(num_severe_alerts_recent, num_severe_alerts_total)
-    # action_val = action_pred_core_state_severe_warning(sev, warn, model, env)
     action_val_2 = action_pred_core_state_severe_warning(sev, warn, model2, env)
 
     plt.rc('text', usetex=True)
@@ -252,20 +210,9 @@ def plot_3d_2():
     plt.rcParams['font.serif'] = ['Times New Roman']
     plt.rcParams.update({'font.size': 10})
     plt.rcParams.update({'figure.autolayout': True})
-
-    #
-    #fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(8, 5))
-    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(3.92, 2.7))
-
-    # ax.plot_surface(sev, warn, action_val, rstride=12, cstride=12,
-    #                 cmap='cividis')
-
-    # ax.plot_surface(sev, warn, action_val, cmap='Blues', linewidth=0.3,
-    #                 alpha=0.8, edgecolor='k')
+    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(4.15, 2.9))
     ax.plot_surface(sev, warn, action_val_2, cmap='Reds', linewidth=0.3,
-                    alpha=0.8, edgecolor='k')
-
-    # ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$", fontsize=12.5)
+                    alpha=0.8, edgecolor='k', rstride=12, cstride=12)
     ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{NoisyAttacker}", fontsize=11)
     ax.set_xlabel(r"warn alerts $w_a$")
     ax.set_ylabel(r"sev alerts $s_a$")
@@ -275,27 +222,25 @@ def plot_3d_2():
     ax.set_yticks(np.arange(0, 200+1, 50))
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(8)
-    ylab.set_size(8)
+    xlab.set_size(10)
+    ylab.set_size(10)
     ax.tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
     ax.tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
-    # ax.set_ylim(200, 0)
-    # ax.set_xlim(150, 0)
-    # ax.set_ylim(0, 150)
-    #plt.subplots_adjust(wspace=150, hspace=150, top=200, bottom=0.0)
     fig.tight_layout()
-    #plt.subplots_adjust(wspace=150, hspace=150, top=200, bottom=0.0)
-    fig.subplots_adjust(bottom=0.9)
-    #plt.autoscale()
-    #plt.subplots_adjust(bottom=0.55)
-    # plt.show()
-    # fig.savefig("alerts_stopping" + ".png", format="png", dpi=600)
-    print("savefig")
+    fig.subplots_adjust(bottom=0.55)
     fig.savefig("alerts_stopping_2" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
 
-
 def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model, env):
+    """
+    Utility function for empirical threshold plots
+
+    :param severe_alerts: number of severe alerts
+    :param warning_alerts: number of warning alerts
+    :param model: model to predict with
+    :param env: the env
+    :return: the predicted thresholds
+    """
     z = []
     for i in range(len(severe_alerts)):
         z1 = []
@@ -313,11 +258,9 @@ def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model, 
     z = np.array(z)
     return z
 
+# script entrypoint
 if __name__ == '__main__':
-    # env = gym.make("optimal-intrusion-response-v3")
-    # load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/defender/ppo_baseline/results/data/1620736046.5410578_0_50_policy_network.zip"
-    # # load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_backup2/data/1620469740.5786622_0_1850_policy_network.zip"
     # model = initialize_model(env, load_path, "cuda:0", None)
-    # plot_3d()
+    plot_3d()
     # plot_3d_2()
-    plot_alerts_threshold()
+    # plot_alerts_threshold()

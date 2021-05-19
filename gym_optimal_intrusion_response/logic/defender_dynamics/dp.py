@@ -1,3 +1,4 @@
+from typing import Tuple
 import math
 from gym_optimal_intrusion_response.logic.defender_dynamics.defender_dynamics import DefenderDynamics
 import json
@@ -8,19 +9,36 @@ import numpy as np
 class DP:
 
     @staticmethod
-    def num_states():
+    def num_states() -> int:
+        """
+        :return: the number of states
+        """
         return constants.DP.MAX_TTC * constants.DP.MAX_TIMESTEPS + 1
 
     @staticmethod
-    def num_actions():
+    def num_actions() -> int:
+        """
+        :return: the number of actions
+        """
         return 2
 
     @staticmethod
-    def actions():
+    def actions() -> dict:
+        """
+        :return: action lookup dictp
+        """
         return {"continue": 0, "stop": 1}
 
     @staticmethod
-    def hp_and_ttc_and_r(n_states, n_actions, id_to_state):
+    def hp_and_ttc_and_r(n_states: int, n_actions: int, id_to_state: dict) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Pre-computes the HP, TTC, and R
+
+        :param n_states: number of states
+        :param n_actions: number of actions
+        :param id_to_state: lookup dict to convert between ids and states
+        :return: the hack probability matrix and the reward matrix
+        """
         HP = np.zeros(n_states)
         R = np.zeros((n_states, n_actions))
         for i in range(n_states):
@@ -36,12 +54,17 @@ class DP:
                 for j in range(n_actions):
                     r = DP.reward_fun(i, j, id_to_state)
                     R[i][j] = r
-        DP.save_hp_table(HP)
-        DP.save_R_table(R)
+        DP.save_numpy(HP, "hp_table.npy")
+        DP.save_numpy(R, "reward_fun.npy")
         return HP, R
 
     @staticmethod
-    def ttc_to_alerts_table():
+    def ttc_to_alerts_table() -> Tuple[dict, dict]:
+        """
+        Utility function for computing a lookup table between TTC and alerts
+
+        :return: (ttc->alerts/logins,alerts/logins->ttc)
+        """
         alerts_logins_to_ttc = {}
         ttc_to_alerts_logins = {}
         for i in range(constants.DP.MAX_ALERTS):
@@ -67,19 +90,34 @@ class DP:
                 else:
                     print("total miss")
 
-        DP.save_tcc_to_alerts_logins(avg_ttc_to_alerts_logins, alerts_logins_to_ttc)
+        DP.save_pickle(avg_ttc_to_alerts_logins, "ttc_to_alerts_logins.pkl")
+        DP.save_pickle(alerts_logins_to_ttc, "logins_alerts_to_tcc.pkl")
         return avg_ttc_to_alerts_logins, alerts_logins_to_ttc
 
     @staticmethod
-    def transition_kernel(id_to_state, num_states, num_actions, HP, ttc_to_alerts_logins, alerts_logins_to_ttc,
-                          state_to_id):
+    def transition_kernel(id_to_state: dict, num_states: int, num_actions: int, HP: np.ndarray,
+                          ttc_to_alerts_logins: dict,
+                          alerts_logins_to_ttc: dict, state_to_id: dict) \
+            -> np.ndarray:
+        """
+
+        Precomputes the transition kernel
+
+        :param id_to_state: dict to convert between ids and states
+        :param num_states: the number of states
+        :param num_actions: the number of actions
+        :param HP: the hack probability
+        :param ttc_to_alerts_logins: a lookup dict between TTC and alerts and logins
+        :param alerts_logins_to_ttc: a lookup dict between alerts/logins and TTC
+        :param state_to_id: state to id dict
+        :return: the transition kernel
+        """
         f1_a = DefenderDynamics.f1_a()
         f1_b = DefenderDynamics.f1_b()
         f2_a = DefenderDynamics.f2_a()
         f2_b = DefenderDynamics.f2_b()
         T = np.zeros((num_states, num_actions, num_states))
         state_ids = list(range(num_states))
-        # sorted_state_ids = sorted(state_ids[1:], key=lambda x: id_to_state[x][0], reverse=False)
         sorted_state_ids = state_ids
 
         for i in range(num_states):
@@ -167,110 +205,16 @@ class DP:
                 T[i][0] = T[i][0] / sum(T[i][0])
             if sum(T[i][1]) != 0:
                 T[i][1] = T[i][1] / sum(T[i][1])
-
-        DP.save_transition_kernel(T)
+        DP.save_numpy(T, "transition_kernel.npy")
         return T
 
     @staticmethod
-    def save_hp_table(HP):
-        print("saving HP table...")
-        np.save('hp_table.npy', HP)
-        print("HP table saved")
+    def state_to_id_dict() -> Tuple[dict, dict]:
+        """
+        Utility function for creating a lookup dict to convert between state ids and states and back
 
-    @staticmethod
-    def save_ttc_table(TTC):
-        print("saving TTC table...")
-        np.save('ttc_table.npy', TTC)
-        print("TTC table saved")
-
-    @staticmethod
-    def save_R_table(R):
-        print("saving R table...")
-        np.save('reward_fun.npy', R)
-        print("R table saved")
-
-    @staticmethod
-    def save_transition_kernel(T):
-        print("saving transition kernel..")
-        np.save('transition_kernel.npy', T)
-        print("kernel saved")
-
-    @staticmethod
-    def save_value_function(V):
-        print("saving value function..")
-        np.save('value_fun.npy', V)
-        print("value function saved")
-
-    @staticmethod
-    def save_policy(policy):
-        print("saving policy...")
-        np.save('policy.npy', policy)
-        print("policy saved")
-
-    @staticmethod
-    def save_thresholds(thresholds):
-        print("saving thresholds...")
-        np.save('thresholds.npy', thresholds)
-        print("thresholds saved")
-
-    @staticmethod
-    def load_transition_kernel():
-        print("loading transition kernel..")
-        with open('transition_kernel.npy', 'rb') as f:
-            T = np.load(f)
-            print("kernel loaded:{}".format(T.shape))
-            return T
-
-    @staticmethod
-    def load_value_fun():
-        print("loading value function..")
-        with open('value_fun.npy', 'rb') as f:
-            V = np.load(f)
-            print("value function loaded:{}".format(V.shape))
-            return V
-
-    @staticmethod
-    def load_policy():
-        print("loading policy..")
-        with open('policy.npy', 'rb') as f:
-            policy = np.load(f)
-            print("policy loaded:{}".format(policy.shape))
-            return policy
-
-    @staticmethod
-    def load_thresholds():
-        print("loading thresholds..")
-        with open('thresholds.npy', 'rb') as f:
-            thresholds = np.load(f)
-            print("thresholds loaded:{}".format(thresholds.shape))
-            return thresholds
-
-    @staticmethod
-    def load_HP_table():
-        print("loading HP table..")
-        with open('hp_table.npy', 'rb') as f:
-            HP = np.load(f)
-            print("hp table loaded:{}".format(HP.shape))
-            return HP
-
-    @staticmethod
-    def load_TTC_table():
-        print("loading TTC table..")
-        with open('ttc_table.npy', 'rb') as f:
-            TTC = np.load(f)
-            print("TTC table loaded:{}".format(TTC.shape))
-            return TTC
-
-    @staticmethod
-    def load_R_table():
-        print("loading R table..")
-        with open('reward_fun.npy', 'rb') as f:
-            R = np.load(f)
-            print("R table loaded:{}".format(R.shape))
-            return R
-
-    @staticmethod
-    def state_to_id_dict():
+        :return: (state_to_id lookup, id_to_state lookup)
+        """
         state_to_id = {}
         id_to_state = {}
         id = 1
@@ -281,15 +225,22 @@ class DP:
                 state_to_id[(t, x)] = id
                 id_to_state[id] = (t, x)
                 id += 1
-        DP.save_state_to_id(state_to_id)
-        DP.save_id_to_state(id_to_state)
+        DP.save_pickle(state_to_id, "state_to_id.pkl")
+        DP.save_pickle(id_to_state, "id_to_state.pkl")
         return state_to_id, id_to_state
 
     @staticmethod
-    def reward_fun(state, action, id_to_state):
+    def reward_fun(state: np.ndarray, action: int, id_to_state: dict) -> float:
+        """
+        The reward function
+
+        :param state: the current state
+        :param action: the current action
+        :param id_to_state: the id to state lookup dict
+        :return: the reward
+        """
         s1 = id_to_state[state]
         t1, x1 = s1
-        # ttc = DefenderDynamics.ttc(x1, y1, constants.DP.MAX_ALERTS)
         hp = DefenderDynamics.hack_prob(x1, t1)
         if t1 == constants.DP.MAX_TIMESTEPS and action != constants.ACTIONS.STOPPING_ACTION:
             return hp * constants.DP.ATTACK_REWARD
@@ -301,7 +252,22 @@ class DP:
                 return hp * constants.DP.ATTACK_REWARD + (1 - hp) * (constants.DP.SERVICE_REWARD)
 
     @staticmethod
-    def one_step_lookahead(state, V, num_actions, num_states, T, discount_factor, R, next_state_lookahead, id_to_state):
+    def one_step_lookahead(state, V, num_actions, num_states, T, discount_factor, R, next_state_lookahead, id_to_state) \
+            -> np.ndarray:
+        """
+        Performs a one-step lookahead for value iteration
+
+        :param state: the current state
+        :param V: the current value function
+        :param num_actions: the number of actions
+        :param num_states: the number of states
+        :param T: the transition kernel
+        :param discount_factor: the discount factor
+        :param R: the table with rewards
+        :param next_state_lookahead: the next state lookahead table
+        :param id_to_state: the id to state lookeahead table
+        :return: an array with lookahead values
+        """
         A = np.zeros(num_actions)
         for a in range(num_actions):
             for next_state in next_state_lookahead[str(state)]:
@@ -311,7 +277,16 @@ class DP:
         return A
 
     @staticmethod
-    def next_states_lookahead_table(n_states, n_actions, T, id_to_state):
+    def next_states_lookahead_table(n_states: int, n_actions: int, T: np.ndarray, id_to_state: dict) -> dict:
+        """
+        Precomputes a table with lookeahead values
+
+        :param n_states: the number of states
+        :param n_actions: the number of actions
+        :param T: the transition kernel
+        :param id_to_state: the id to state lookup table
+        :return: a dict with next state lookups
+        """
         next_state_lookahead = {}
         for i in range(n_states):
             next_states = []
@@ -323,82 +298,29 @@ class DP:
             if len(next_states) == 0:
                 print("state:{}, {}, has no next state".format(i, id_to_state[i]))
             next_state_lookahead[i] = next_states
-        DP.save_next_states_lookahead_table(next_state_lookahead)
+        DP.save_json(next_state_lookahead, "next_state_lookahead.json")
         return next_state_lookahead
 
     @staticmethod
-    def save_next_states_lookahead_table(next_state_lookahead):
-        print("Saving next state lookahead table")
-        with open("next_state_lookahead.json", 'w') as fp:
-            json.dump(next_state_lookahead, fp)
-        print("Next state lookahead saved")
+    def value_iteration(T: np.ndarray, num_states: int, num_actions: int, state_to_id: dict,
+                        id_to_state: dict, HP: np.ndarray, R: np.ndarray,
+                        next_state_lookahead: dict,
+                        theta=0.0001, discount_factor=1.0) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        An implementation of the Value Iteration algorithm
 
-    @staticmethod
-    def save_state_to_id(state_to_id):
-        print("Saving state_to_id table")
-        with open("state_to_id.json", 'wb') as fp:
-            pickle.dump(state_to_id, fp)
-        print("state_to_id dict saved")
-
-    @staticmethod
-    def save_id_to_state(id_to_state):
-        print("Saving id_to_state table")
-        with open("id_to_state.json", 'wb') as fp:
-            pickle.dump(id_to_state, fp)
-        print("id_to_state dict saved")
-
-    @staticmethod
-    def save_tcc_to_alerts_logins(ttc_to_alerts_logins, logins_alerts_to_tcc):
-        print("Saving ttc_to_alerts_logins table")
-        with open("ttc_to_alerts_logins.json", 'wb') as fp:
-            pickle.dump(ttc_to_alerts_logins, fp)
-        print("ttc_to_alerts_logins dict saved")
-
-        print("Saving logins_alerts_to_tcc table")
-        with open("logins_alerts_to_tcc.json", 'wb') as fp:
-            pickle.dump(logins_alerts_to_tcc, fp)
-        print("logins_alerts_to_tcc dict saved")
-
-    @staticmethod
-    def load_tcc_to_alerts_logins():
-        print("Loading ttc_to_alerts_logins table")
-        with open("ttc_to_alerts_logins.json", 'rb') as fp:
-            ttc_to_alerts_logins = pickle.load(fp)
-        print("ttc_to_alerts_logins dict loaded")
-
-        print("Loading logins_alerts_to_tcc table")
-        with open("logins_alerts_to_tcc.json", 'rb') as fp:
-            logins_alerts_to_tcc = pickle.load(fp)
-        print("logins_alerts_to_tcc dict loaded")
-        return ttc_to_alerts_logins, logins_alerts_to_tcc
-
-    @staticmethod
-    def load_next_states_lookahead_table():
-        print("Loading next state lookahead table")
-        with open("next_state_lookahead.json", 'r') as fp:
-            next_state_lookahead = json.load(fp)
-        print("Next state lookahead loaded:{}".format(len(next_state_lookahead)))
-        return next_state_lookahead
-
-    @staticmethod
-    def load_state_to_id():
-        print("Loading state_to_id table")
-        with open("state_to_id.json", 'rb') as fp:
-            state_to_id = pickle.load(fp)
-        print("state_to_id loaded:{}".format(len(state_to_id)))
-        return state_to_id
-
-    @staticmethod
-    def load_id_to_state():
-        print("Loading id_to_state table")
-        with open("id_to_state.json", 'rb') as fp:
-            id_to_state = pickle.load(fp)
-        print("id_to_state loaded:{}".format(len(id_to_state)))
-        return id_to_state
-
-    @staticmethod
-    def value_iteration(T, num_states, num_actions, state_to_id, id_to_state, HP, R, next_state_lookahead,
-                        theta=0.0001, discount_factor=1.0):
+        :param T: the transition kernel T
+        :param num_states: the number of states
+        :param num_actions: the number of actions
+        :param state_to_id: the state-to-id lookup table
+        :param id_to_state: the id-to-state lookup table
+        :param HP: the table with hack probabilities
+        :param R: the table with rewards
+        :param next_state_lookahead: the next-state-lookahead table
+        :param theta: convergence threshold
+        :param discount_factor: the discount factor
+        :return: (greedy policy, value function)
+        """
         V = np.zeros(num_states)
 
         while True:
@@ -406,7 +328,6 @@ class DP:
             delta = 0
             # Update each state...
             for s in range(num_states):
-                # print("{}/{}".format(s, num_states))
                 # Do a one-step lookahead to find the best action
                 A = DP.one_step_lookahead(s, V, num_actions, num_states, T, discount_factor, R, next_state_lookahead,
                                        id_to_state)
@@ -433,19 +354,121 @@ class DP:
             policy[s][2] = A[0]
             policy[s][3] = A[1]
 
-        DP.save_value_function(V)
-        DP.save_policy(policy)
+        DP.save_numpy(V, "value_fun.npy")
+        DP.save_numpy(policy, "policy.npy")
         return policy, V
 
-    @staticmethod
-    def compute_thresholds(V, T, R, n_states, next_state_lookahead):
+    def compute_thresholds(V: np.ndarray, T: np.ndarray, R: np.ndarray, n_states: int, next_state_lookahead: dict,
+                           id_to_state: dict, HP: np.ndarray) -> np.ndarray:
+        """
+        Utility function for computing stopping thresholds
+
+        :param V: the value function
+        :param T: the transiton kernel
+        :param R: the reward function
+        :param n_states: the number of states
+        :param next_state_lookahead: the lookup table for the next state
+        :param id_to_state: the id-to-state lookup table
+        :param HP: the hack probabilities
+        :return: the computed thresholds
+        """
         thresholds = np.zeros(n_states)
         for i in range(n_states):
+            s1 = id_to_state[i]
             w = 0
+            hp = HP[i]
+            w = R[i][0]
             for next_state in next_state_lookahead[str(i)]:
                 prob = T[i][0][next_state]
                 w = w + prob * V[next_state]
-            alpha = math.sqrt((10) / (w + 5))
+            if s1 != "terminal":
+                (t1, x1) = s1
+                alpha = -(w + 10 - 10 * hp) / (50 * hp)
+            else:
+                alpha = 0
             thresholds[i] = alpha
-        DP.save_thresholds(thresholds)
+        DP.save_numpy(thresholds, "thresholds.npy")
         return thresholds
+
+    @staticmethod
+    def save_numpy(arr: np.ndarray, filename: str) -> None:
+        """
+        Utility function for saving a numpy array
+
+        :param arr: the HP table to save
+        :return: None
+        """
+        print("saving {}...".format(filename))
+        np.save(filename, arr)
+        print("{} saved".format(filename))
+
+
+    @staticmethod
+    def load_numpy(filename) -> np.ndarray:
+        """
+        Utility function for loading a numpy array
+
+        :param filename: the name of the file to load
+        :return: the loaded array
+        """
+        print("loading {}..".format(filename))
+        with open(filename, 'rb') as f:
+            arr = np.load(f)
+            print("{} loaded:{}".format(filename, arr.shape))
+            return arr
+
+    @staticmethod
+    def save_json(d: dict, file_name: str) -> None:
+        """
+        Utility function for saving a dict into json format
+
+        :param d:
+        :return: None
+        """
+        print("Saving {}".format(file_name))
+        with open(file_name, 'w') as fp:
+            json.dump(d, fp)
+        print("{} saved".format(file_name))
+
+    @staticmethod
+    def save_pickle(obj, filename) -> None:
+        """
+        Utility function for saving an object with pickle
+
+        :param obj: the obj to save
+        :param filename: the name of the file to save
+        :return: None
+        """
+        print("Saving {} table".format(filename))
+        with open(filename, 'wb') as fp:
+            pickle.dump(obj, fp)
+        print("{} saved".format(filename))
+
+    @staticmethod
+    def load_pickle(filename) -> object:
+        """
+        Utility function for loading an object saved as pickle
+
+        :param filename: the filename to load
+        :return: the loaded object
+        """
+        print("Loading {}".format(filename))
+        with open(filename, 'rb') as fp:
+            obj = pickle.load(fp)
+        print("{} loaded".format(filename))
+
+        return obj
+
+    @staticmethod
+    def load_json(filename) -> dict:
+        """
+        Loads a dict saved as json
+
+        :param filename: name of the file to load
+        :return: the loaded file
+        """
+        print("Loading {}".format(filename))
+        with open(filename, 'r') as fp:
+            d = json.load(fp)
+        print("{} loaded:{}".format(filename, len(d)))
+        return d

@@ -1,6 +1,9 @@
+"""
+Plotting functions
+"""
+
 from gym_optimal_intrusion_response.envs.derived_envs.optimal_intrusion_response_env_v1 import \
     OptimalIntrusionResponseEnvV1
-import gym
 from gym_optimal_intrusion_response.agents.policy_gradient.ppo_baseline.impl.ppo.ppo import PPO
 import torch
 import numpy as np
@@ -24,16 +27,23 @@ def initialize_model(env, load_path, device, agent_config) -> None:
     return model
 
 
-def plot_policy():
+def plot_policy() -> None:
+    """
+    Plots the policy
+
+    :return: None
+    """
     env = gym.make("optimal-intrusion-response-v1")
     load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_backup/data/1620424642.9181776_0_3075_policy_network.zip"
     load_path_2 = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_backup2/data/1620469740.5786622_0_1850_policy_network.zip"
     model = initialize_model(env, load_path, "cuda:0", None)
     model2 = initialize_model(env, load_path_2, "cuda:0", None)
 
-    thresholds = DP.load_thresholds()
-    id_to_state = DP.load_id_to_state()
-    policy = DP.load_policy()
+    thresholds = DP.load_numpy("thresholds.npy")
+    V = DP.load_numpy("value_fun.npy")
+    state_to_id = DP.load_pickle("state_to_id.pkl")
+    id_to_state = DP.load_pickle("id_to_state.pkl")
+    policy = DP.load_numpy("policy.npy")
 
     ts_to_thresholds = {}
     for i in range(len(thresholds)):
@@ -118,9 +128,6 @@ def plot_policy():
     ax[0][0].set_xlim(-10, 10)
 
     ax[0][0].set_title(r"$t=11$", fontsize=fontsize)
-    # ax[0][0].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[0][0].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[0][0].xaxis.get_label()
@@ -179,9 +186,6 @@ def plot_policy():
     ax[0][1].set_xlim(-10, 10)
 
     ax[0][1].set_title(r"$t=12$", fontsize=fontsize)
-    # ax[0][1].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[0][1].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[0][1].xaxis.get_label()
@@ -230,9 +234,6 @@ def plot_policy():
     ax[0][2].set_xlim(-10, 10)
 
     ax[0][2].set_title(r"$t=13$", fontsize=fontsize)
-    # ax[0][2].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[0][2].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[0][2].xaxis.get_label()
@@ -291,9 +292,6 @@ def plot_policy():
     ax[1][0].set_xlim(-10, 10)
 
     ax[1][0].set_title(r"$t=14$", fontsize=fontsize)
-    # ax[1][0].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[1][0].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[1][0].xaxis.get_label()
@@ -352,9 +350,6 @@ def plot_policy():
     ax[1][1].set_xlim(-10, 10)
 
     ax[1][1].set_title(r"$t=15$", fontsize=fontsize)
-    # ax[1][1].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[1][1].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[1][1].xaxis.get_label()
@@ -413,9 +408,6 @@ def plot_policy():
     ax[1][2].set_xlim(-10, 10)
 
     ax[1][2].set_title(r"$t=16$", fontsize=fontsize)
-    # ax[1][2].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[1][2].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[1][2].xaxis.get_label()
@@ -536,8 +528,6 @@ def plot_policy():
 
     ax[2][1].set_title(r"$t=18$", fontsize=fontsize)
     ax[2][1].set_xlabel(r"TTC $c$", fontsize=labelsize)
-    # ax[2][1].grid('on')
-    # ax[0][0].set_xlim(-1, 1)
 
     # tweak the axis labels
     xlab = ax[2][1].xaxis.get_label()
@@ -642,6 +632,6 @@ def plot_policy():
     fig.savefig("opt_learned_policies" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
-
+# Script entrypoint
 if __name__ == '__main__':
     plot_policy()

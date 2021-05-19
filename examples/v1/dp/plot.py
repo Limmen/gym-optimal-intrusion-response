@@ -1,13 +1,26 @@
-import numpy as np
-from scipy.stats import multivariate_normal
+"""
+Plotting functions
+"""
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pickle
 import gym_optimal_intrusion_response.constants.constants as constants
+from gym_optimal_intrusion_response.logic.defender_dynamics.dp import DP
 
 
-def Q_helper(ttcs, ts, policy, state_to_id, action):
+def Q_helper(ttcs : np.ndarray, ts : np.ndarray, policy: np.ndarray, state_to_id: dict, action : int) -> np.ndarray:
+    """
+    Helper function for plotting the Q values
+
+    :param ttcs: the TTTcs
+    :param ts: the time-steps
+    :param policy: the policy
+    :param state_to_id: the state-to-id lookup dict
+    :param action: the action
+    :return: the q values
+    """
     z = []
     for i in range(len(ttcs)):
         z1 = []
@@ -19,7 +32,17 @@ def Q_helper(ttcs, ts, policy, state_to_id, action):
     z = np.array(z)
     return z
 
-def action_helper(ttcs, ts, policy, state_to_id):
+
+def action_helper(ttcs : np.ndarray, ts : np.ndarray, policy : np.ndarray, state_to_id : dict) -> np.ndarray:
+    """
+    Helper function for computing the actions
+
+    :param ttcs: the ttcs
+    :param ts: the time-steps
+    :param policy: the policy
+    :param state_to_id: the state-to-id dict
+    :return: the actions
+    """
     z = []
     for i in range(len(ttcs)):
         z1 = []
@@ -34,7 +57,17 @@ def action_helper(ttcs, ts, policy, state_to_id):
     z = np.array(z)
     return z
 
-def value_fun_helper(ttcs, ts, V, state_to_id):
+
+def value_fun_helper(ttcs : np.ndarray, ts : np.ndarray, V : np.ndarray, state_to_id : dict) -> np.ndarray:
+    """
+    Helper function for computing the state values
+
+    :param ttcs: the ttcs
+    :param ts: the time-steps
+    :param V: the value function
+    :param state_to_id: the lookup dict for state to id
+    :return: the state values
+    """
     z = []
     for i in range(len(ttcs)):
         z1 = []
@@ -46,53 +79,17 @@ def value_fun_helper(ttcs, ts, V, state_to_id):
     z = np.array(z)
     return z
 
-def load_state_to_id():
-    print("Loading state_to_id table")
-    with open("state_to_id.json", 'rb') as fp:
-        state_to_id = pickle.load(fp)
-    print("state_to_id loaded:{}".format(len(state_to_id)))
-    return state_to_id
+def plot_value_fun_3d(t : int = 0) -> None:
+    """
+    Plots the value function in 3D
 
-def load_id_to_state():
-    print("Loading id_to_state table")
-    with open("id_to_state.json", 'rb') as fp:
-        id_to_state = pickle.load(fp)
-    print("id_to_state loaded:{}".format(len(id_to_state)))
-    return id_to_state
-
-def load_value_fun():
-    print("loading value function..")
-    with open('value_fun.npy', 'rb') as f:
-        V = np.load(f)
-        print("value function loaded:{}".format(V.shape))
-        return V
-
-def load_policy():
-    print("loading policy..")
-    with open('policy.npy', 'rb') as f:
-        policy = np.load(f)
-        print("policy loaded:{}".format(policy.shape))
-        return policy
-
-def load_thresholds():
-    print("loading thresholds..")
-    with open('thresholds.npy', 'rb') as f:
-        thresholds = np.load(f)
-        print("thresholds loaded:{}".format(thresholds.shape))
-        return thresholds
-
-def load_TTC_table():
-    print("loading TTC table..")
-    with open('ttc_table.npy', 'rb') as f:
-        TTC = np.load(f)
-        print("TTC table loaded:{}".format(TTC.shape))
-        return TTC
-
-def plot_value_fun_3d(t : int = 0):
-    V = load_value_fun()
-    state_to_id = load_state_to_id()
-    id_to_state = load_id_to_state()
-    policy = load_policy()
+    :param t: the time-step to compute the value fun
+    :return: None
+    """
+    V = DP.load_numpy("value_fun.npy")
+    state_to_id = DP.load_pickle("state_to_id.pkl")
+    id_to_state = DP.load_pickle("id_to_state.pkl")
+    policy = DP.load_numpy("policy.npy")
 
     ttcs = np.arange(1, constants.DP.MAX_TTC, 1)
     ts = np.arange(1, constants.DP.MAX_TIMESTEPS, 1)
@@ -124,24 +121,24 @@ def plot_value_fun_3d(t : int = 0):
     ylab = ax.yaxis.get_label()
     xlab.set_size(12)
     ylab.set_size(12)
-    # ax.tick_params(axis='both', which='major', labelsize=10, length=2.2, width=0.6)
-    # ax.tick_params(axis='both', which='minor', labelsize=10, length=2.2, width=0.6)
-    # ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0])
-    # ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    # plt.yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    # plt.ylim(1.0, 0.0)
-    #plt.ylim(constants.DP.MAX_LOGINS, 0.0)
     fig.tight_layout()
     plt.show()
-    # plt.subplots_adjust(wspace=0, hspace=0, top=0.2)
     # fig.savefig("value_fun_3d_t_" +str(t) + ".png", format="png", dpi=600)
     # fig.savefig("value_fun_3d_t_" +str(t) + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
-def plot_policy(t=0):
-    policy = load_policy()
-    state_to_id = load_state_to_id()
-    id_to_state = load_id_to_state()
+def plot_policy(t=0) -> None:
+    """
+    Plots the policy
+
+    :param t: the time-step to compute the policy
+    :return: None
+    """
+    thresholds = DP.load_numpy("thresholds.npy")
+    V = DP.load_numpy("value_fun.npy")
+    state_to_id = DP.load_pickle("state_to_id.pkl")
+    id_to_state = DP.load_pickle("id_to_state.pkl")
+    policy = DP.load_numpy("policy.npy")
 
     ttcs = np.arange(1, constants.DP.MAX_TTC, 1)
     ts = np.arange(1, constants.DP.MAX_TIMESTEPS, 1)
@@ -178,33 +175,20 @@ def plot_policy(t=0):
     ylab = ax.yaxis.get_label()
     xlab.set_size(12)
     ylab.set_size(12)
-    # ax.tick_params(axis='both', which='major', labelsize=10, length=2.2, width=0.6)
-    # ax.tick_params(axis='both', which='minor', labelsize=10, length=2.2, width=0.6)
-    # ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0])
-    # ax.set_yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    # plt.yticks([1, 0.8, 0.6, 0.4, 0.2, 0.0], [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    # plt.ylim(1.0, 0.0)
-    # plt.ylim(constants.DP.MAX_LOGINS, 0.0)
     fig.tight_layout()
     plt.show()
-    # plt.subplots_adjust(wspace=0, hspace=0, top=0.2)
-    # fig.savefig("policy_fun_3d_t_" + str(t) + ".png", format="png", dpi=600)
-    # fig.savefig("policy_fun_3d_t_" + str(t) + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
-    # plt.close(fig)
-    # stopping_times = []
-    # for i in range(policy.shape[0]):
-    #     s = id_to_state[i]
-    #     if s != "terminal":
-    #         t1, x1, y1 = s
-    #         if policy[i][1] == 1:
-    #             stopping_times.append(t1)
-    # print(stopping_times)
 
-def plot_thresholds():
-    # TTC = load_TTC_table()
-    thresholds = load_thresholds()
-    id_to_state = load_id_to_state()
-    policy = load_policy()
+def plot_thresholds() -> None:
+    """
+    Plots the thresholds
+
+    :return: None
+    """
+    thresholds = DP.load_numpy("thresholds.npy")
+    V = DP.load_numpy("value_fun.npy")
+    state_to_id = DP.load_pickle("state_to_id.pkl")
+    id_to_state = DP.load_pickle("id_to_state.pkl")
+    policy = DP.load_numpy("policy.npy")
 
     # for i in range(len(thresholds[1:])):
     #     pass
@@ -228,32 +212,11 @@ def plot_thresholds():
     x = []
     y = []
     for i in range(constants.DP.MAX_TIMESTEPS):
-        # print(ts_to_thresholds[i])
-        # avg_threshold = np.mean(np.array(ts_to_thresholds[i]))
-        # avg_threshold = max(min_threshold, np.max(np.array(ts_to_thresholds[i])))
         avg_threshold = np.max(np.array(ts_to_thresholds[i]))
-        # if i in ts_to_thresholds:
-        #     avg_threshold = max(min_threshold, np.max(np.array(ts_to_thresholds[i])))
-        # else:
-        #     avg_threshold =min_threshold
         if i == constants.DP.MAX_TIMESTEPS-1:
             print(ts_to_thresholds[i])
         x.append(i)
         y.append(avg_threshold)
-    print("len:{}".format(len(y)))
-    # print(y[-1])
-    # print(y[-2])
-    # print(y[-3])
-    # y[-2] = y[-3] + (y[-1] - y[-3])/1.2
-    # y[-2] = 90
-
-    print(y[-1])
-    print(y[-2])
-    print(y[-3])
-    print(y[-4])
-    print(y[-5])
-
-
 
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
@@ -276,35 +239,16 @@ def plot_thresholds():
             ls='-', color=colors[0])
     lower_bound = np.zeros(len(y[1:]))
     lower_bound.fill(min(y[1:]))
-    print(min(y))
-    print(lower_bound)
     ax.fill_between(x[1:], y[1:], lower_bound,
                     alpha=0.35, color=colors[0])
-
-    # if plot_opt:
-    # ax.plot(x,
-    #         [0.5] * len(x), label=r"0.5",
-    #         color="black",
-    #         linestyle="dashed")
 
     ax.set_title(r"Stopping thresholds $\alpha_t$", fontsize=12.5)
     ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
 
     ax.axhline(y=0, color='k', linewidth=0.5)
-    # ax.axvline(x=0, color='k')
-    # ax.set_ylabel(r"TTC $c$", fontsize=12)
     ax.set_xlim(x[1], len(x)-1)
     ax.set_ylim(min(y[1:]), max(y[1:]))
-    # ax.set_ylim((0,5))
-
-    # labels = [item.get_text() for item in ax.get_xticklabels()]
-    # labels[-1] = r'$T$'
-
     a = ax.get_xticks().tolist()
-    # a[-2] = r'$T$'
-    # for i in range(len(a)):
-    #     print(a[i])
-    #     a[i] = 35*i
     a[-1] = r'$T$'
     ax.set_xticklabels(a)
     ax.set_xticks([1.0, 5.0, 10.0, 15.0, 19.0])
@@ -323,12 +267,6 @@ def plot_thresholds():
     ax.spines['right'].set_color((.8, .8, .8))
     ax.spines['top'].set_color((.8, .8, .8))
 
-    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
-    #           ncol=2, fancybox=True, shadow=True)
-    # ax.legend(loc="lower right")
-    # ax.xaxis.label.set_size(13.5)
-    # ax.yaxis.label.set_size(13.5)
-
     ttl = ax.title
     ttl.set_position([.5, 1.05])
 
@@ -341,10 +279,11 @@ def plot_thresholds():
 
 
 def policy_plot_2():
-    # TTC = load_TTC_table()
-    thresholds = load_thresholds()
-    id_to_state = load_id_to_state()
-    policy = load_policy()
+    thresholds = DP.load_numpy("thresholds.npy")
+    V = DP.load_numpy("value_fun.npy")
+    state_to_id = DP.load_pickle("state_to_id.pkl")
+    id_to_state = DP.load_pickle("id_to_state.pkl")
+    policy = DP.load_numpy("policy.npy")
 
     ts_to_thresholds = {}
     for i in range(len(thresholds)):
@@ -671,7 +610,6 @@ def policy_plot_2():
 
     fig.tight_layout()
     plt.show()
-    # plt.subplots_adjust(wspace=0, hspace=0)
     # fig.savefig("threshold_alerts" + ".png", format="png", dpi=600)
     # fig.savefig("threshold_alerts" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)

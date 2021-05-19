@@ -5,11 +5,16 @@ import random
 from gym_optimal_intrusion_response.util import util
 from gym_optimal_intrusion_response.util.plots import plotting_util_defender
 
-def parse_data(base_path: str, suffix: str, ips = None, eval_ips = None):
+def parse_data(base_path: str):
+    """
+    Parses the data
+
+    :param base_path: the path to parse from
+    :return: the parsed data
+    """
     ppo_v1_df_0 = pd.read_csv(glob.glob(base_path + "299/*_train.csv")[0])
     ppo_v1_df_10120 = pd.read_csv(glob.glob(base_path + "899/*_train.csv")[0])
     ppo_v1_df_8799 = pd.read_csv(glob.glob(base_path + "8799/*_train.csv")[0])
-    # ppo_v1_df_18910 = pd.read_csv(glob.glob(base_path + "18910/*_train.csv")[0])
     ppo_dfs_v1 = [ppo_v1_df_0, ppo_v1_df_10120, ppo_v1_df_8799]
     max_len = min(list(map(lambda x: len(x), ppo_dfs_v1)))
 
@@ -49,16 +54,36 @@ def parse_data(base_path: str, suffix: str, ips = None, eval_ips = None):
            avg_train_early_stopping_stds_v1, avg_train_intrusion_frac_data_v1, avg_train_intrusion_means_v1, \
            avg_train_intrusion_stds_v1
 
-def plot_train(avg_train_rewards_data_v1, avg_train_rewards_means_v1, avg_train_rewards_stds_v1,
-           avg_train_steps_data_v1, avg_train_steps_means_v1, avg_train_steps_stds_v1,
-           avg_train_caught_frac_data_v1, avg_train_caught_frac_means_v1, avg_train_caught_frac_stds_v1,
-           avg_train_early_stopping_frac_data_v1, avg_train_early_stopping_means_v1,
-           avg_train_early_stopping_stds_v1, avg_train_intrusion_frac_data_v1, avg_train_intrusion_means_v1,
-           avg_train_intrusion_stds_v1
-               ):
-    print("plot")
-    suffix = "gensim"
-    ylim_rew = (-300, 170)
+def plot_train(
+        avg_train_rewards_data_v1 : np.ndarray, avg_train_rewards_means_v1: np.ndarray,
+        avg_train_rewards_stds_v1: np.ndarray,
+        avg_train_steps_data_v1: np.ndarray, avg_train_steps_means_v1: np.ndarray,
+        avg_train_steps_stds_v1: np.ndarray,
+        avg_train_caught_frac_data_v1: np.ndarray, avg_train_caught_frac_means_v1: np.ndarray,
+        avg_train_caught_frac_stds_v1: np.ndarray,
+        avg_train_early_stopping_frac_data_v1: np.ndarray, avg_train_early_stopping_means_v1: np.ndarray,
+        avg_train_early_stopping_stds_v1: np.ndarray, avg_train_intrusion_frac_data_v1: np.ndarray,
+        avg_train_intrusion_means_v1: np.ndarray, avg_train_intrusion_stds_v1: np.ndarray) -> None:
+    """
+    Plots the training results
+
+    :param avg_train_rewards_data_v1: train rewards
+    :param avg_train_rewards_means_v1:  train reward means
+    :param avg_train_rewards_stds_v1: train reward stds
+    :param avg_train_steps_data_v1: train steps
+    :param avg_train_steps_means_v1: train steps means
+    :param avg_train_steps_stds_v1: train steps stds
+    :param avg_train_caught_frac_data_v1: train caught frac
+    :param avg_train_caught_frac_means_v1: train caught frac means
+    :param avg_train_caught_frac_stds_v1: train caught frac stds
+    :param avg_train_early_stopping_frac_data_v1: train early stopping
+    :param avg_train_early_stopping_means_v1: train early stopping means
+    :param avg_train_early_stopping_stds_v1: train early stopping stds
+    :param avg_train_intrusion_frac_data_v1: train intrusion frac
+    :param avg_train_intrusion_means_v1: train intrusion frac means
+    :param avg_train_intrusion_stds_v1: train intrusion frac stds
+    :return: None
+    """
     print(len(avg_train_rewards_data_v1[0]))
     max_iter = 3700-1
 
@@ -79,6 +104,7 @@ def plot_train(avg_train_rewards_data_v1, avg_train_rewards_means_v1, avg_train_
     )
 
 
+# Script entrypoint
 if __name__ == '__main__':
     base_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v1/training/defender/results_1/data/"
     avg_train_rewards_data_v1, avg_train_rewards_means_v1, avg_train_rewards_stds_v1, \
@@ -86,7 +112,7 @@ if __name__ == '__main__':
     avg_train_caught_frac_data_v1, avg_train_caught_frac_means_v1, avg_train_caught_frac_stds_v1, \
     avg_train_early_stopping_frac_data_v1, avg_train_early_stopping_means_v1, \
     avg_train_early_stopping_stds_v1, avg_train_intrusion_frac_data_v1, avg_train_intrusion_means_v1, \
-    avg_train_intrusion_stds_v1 = parse_data(base_path=base_path, suffix="gensim")
+    avg_train_intrusion_stds_v1 = parse_data(base_path=base_path)
 
     plot_train(avg_train_rewards_data_v1, avg_train_rewards_means_v1, avg_train_rewards_stds_v1,
     avg_train_steps_data_v1, avg_train_steps_means_v1, avg_train_steps_stds_v1,
