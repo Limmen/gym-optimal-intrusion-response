@@ -1,5 +1,10 @@
+
 import numpy as np
+
 class DPSetup:
+    """
+    DTO with information for setting up D.P env
+    """
 
     def __init__(self, HP, R, T, next_state_lookahead, state_to_id, id_to_state):
         self.HP = HP

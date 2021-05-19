@@ -6,6 +6,9 @@ from gym_optimal_intrusion_response.logic.static_opponents.custom_attacker impor
 
 
 class OptimalIntrusionResponseEnvV3(OptimalIntrusionResponseEnv):
+    """
+    Version 3 of the optimal intrusion response environment.
+    """
 
     def __init__(self):
         num_nodes = 4

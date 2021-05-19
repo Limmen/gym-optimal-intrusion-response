@@ -7,8 +7,16 @@ from gym_pycr_ctf.dao.defender_dynamics.defender_dynamics_model import DefenderD
 
 
 class DefenderObservationState:
+    """
+    Represents the defender's observation
+    """
 
     def __init__(self, env_config : EnvConfig):
+        """
+        Class constructor, initializes the observation
+
+        :param env_config: the environment configuration
+        """
         self.env_config = env_config
         self.num_alerts = 0
         self.num_failed_logins = 0
@@ -24,7 +32,12 @@ class DefenderObservationState:
         self.reset()
 
 
-    def reset(self):
+    def reset(self) -> None:
+        """
+        Resets the observation
+
+        :return: None
+        """
         self.num_alerts = 0
         self.num_failed_logins = 0
         self.num_severe_alerts = 0
@@ -32,7 +45,14 @@ class DefenderObservationState:
         self.num_alert_priority = 0
         self.ttc = constants.DP.MAX_TTC - 1
 
-    def get_defender_observation(self, t, dp_setup: DPSetup = None):
+    def get_defender_observation(self, t : int, dp_setup: DPSetup = None) -> np.ndarray:
+        """
+        Funciton for computing the defender observation
+
+        :param t: the time-step
+        :param dp_setup: the dp-parameters
+        :return: the observation
+        """
         if not self.env_config.dp and not self.env_config.traces:
             obs = np.zeros(3).tolist()
             obs[0] = t
@@ -48,17 +68,20 @@ class DefenderObservationState:
             obs[1] = self.num_warning_alerts
             obs[2] = self.num_failed_logins
 
-            # obs = np.zeros(5).tolist()
-            # obs[0] = self.num_alerts
-            # obs[1] = self.num_severe_alerts
-            # obs[2] = self.num_warning_alerts
-            # obs[3] = self.num_alert_priority
-            # obs[4] = self.num_failed_logins
-
         return np.array(obs)
 
-    def update_state(self, t, intrusion_in_progress: bool = False, dp_setup: DPSetup = None,
-                     attacker_action: int = None, defender_dynamics_model : DefenderDynamicsModel = None):
+    def update_state(self, t: int, intrusion_in_progress: bool = False, dp_setup: DPSetup = None,
+                     attacker_action: int = None, defender_dynamics_model : DefenderDynamicsModel = None) -> bool:
+        """
+        Function for updating the state
+
+        :param t: the current time-step
+        :param intrusion_in_progress: Boolean flag whether an intrusion is in progress or not
+        :param dp_setup: dp parameters
+        :param attacker_action: the attackker's latest action
+        :param defender_dynamics_model: the dynamics model
+        :return: True if done otherwise False
+        """
         if not self.env_config.dp and not self.env_config.traces:
             if intrusion_in_progress:
                 new_alerts = int(round(self.f1_a.rvs(size=1)[0]))
@@ -127,8 +150,13 @@ class DefenderObservationState:
 
 
 
-    def probability_of_intrusion(self, t: int):
+    def probability_of_intrusion(self, t: int) -> float:
+        """
+        Computes the probabability of an intrusion
+
+        :param t: the current time-step
+        :return: the probability of an intrusion
+        """
         ttc = DefenderDynamics.ttc(self.num_alerts, self.num_failed_logins, constants.DP.MAX_ALERTS)
-        print("ttc:{}".format(ttc))
         hp = DefenderDynamics.hack_prob(ttc)
         return hp

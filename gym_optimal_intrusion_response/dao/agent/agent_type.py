@@ -1,6 +1,9 @@
 from enum import Enum
 
 class AgentType(Enum):
+    """
+    Different agent types
+    """
     REINFORCE = 0
     PPO_BASELINE = 1
     DQN_BASELINE = 2

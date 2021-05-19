@@ -1,6 +1,7 @@
 """
 Manual attacker agent
 """
+
 from gym_optimal_intrusion_response.envs.optimal_intrusion_response_env import OptimalIntrusionResponseEnv
 import numpy as np
 

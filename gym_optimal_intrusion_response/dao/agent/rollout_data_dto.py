@@ -1,4 +1,3 @@
-from gym_optimal_intrusion_response.agents.config.agent_config import AgentConfig
 
 class RolloutDataDTO:
     """

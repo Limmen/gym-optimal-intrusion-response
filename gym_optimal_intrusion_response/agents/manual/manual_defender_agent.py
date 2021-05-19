@@ -4,6 +4,7 @@ Manual defender agent
 from gym_optimal_intrusion_response.envs.optimal_intrusion_response_env import OptimalIntrusionResponseEnv
 import numpy as np
 
+
 class ManualDefenderAgent:
     """
     Class representing a manual defender agent

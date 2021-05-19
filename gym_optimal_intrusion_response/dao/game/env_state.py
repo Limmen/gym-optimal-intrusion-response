@@ -10,8 +10,16 @@ from gym_pycr_ctf.dao.defender_dynamics.defender_dynamics_model import DefenderD
 
 
 class EnvState:
+    """
+    DTO with the environment state
+    """
 
     def __init__(self, env_config : EnvConfig):
+        """
+        Class constructor, initializes the state
+
+        :param env_config: the environment configuration
+        """
         self.env_config = env_config
         self.attacker_observation_space = None
         self.defender_observation_space = None
@@ -35,7 +43,13 @@ class EnvState:
         elif self.env_config.traces:
             self.dynamics_model = self.setup_dynamics_model()
 
-    def setup_spaces(self, env_config: EnvConfig):
+    def setup_spaces(self, env_config: EnvConfig) -> None:
+        """
+        Setup of the action and observation spaces
+
+        :param env_config: the environment configuration
+        :return: None
+        """
         self.attacker_observation_space = gym.spaces.Box(
             low=0, high=1000, dtype=np.float32, shape=(env_config.num_nodes * (env_config.num_attributes+2),))
         if self.env_config.dp:
@@ -52,13 +66,24 @@ class EnvState:
         self.attacker_action_space = gym.spaces.Discrete(env_config.num_nodes * (env_config.num_attributes+1))
         self.defender_action_space = gym.spaces.Discrete(2)
 
-    def get_defender_observation(self):
+    def get_defender_observation(self) -> np.ndarray:
+        """
+        :return: the latest defender observation
+        """
         return self.defender_observation_state.get_defender_observation(t=self.t, dp_setup=self.dp_setup)
 
-    def get_attacker_observation(self):
+    def get_attacker_observation(self) -> np.ndarray:
+        """
+        :return: the latest attacker observation
+        """
         return self.attacker_observation_state.get_attacker_observation(self.nodes)
 
-    def reset(self):
+    def reset(self) -> None:
+        """
+        Resets the state
+
+        :return: None
+        """
         self.initialize_nodes()
         self.stopped = False
         self.caught = False
@@ -68,7 +93,12 @@ class EnvState:
         self.t=0
         self.intrusion_t = -1
 
-    def initialize_nodes(self):
+    def initialize_nodes(self) -> None:
+        """
+        Utility function for initializing the node states
+
+        :return: None
+        """
         nodes = []
         for i in range(self.env_config.num_nodes):
             target = (i == self.env_config.target_id)
@@ -80,7 +110,13 @@ class EnvState:
             nodes.append(node)
         self.nodes = nodes
 
-    def attacker_reachable(self, node_id):
+    def attacker_reachable(self, node_id) -> bool:
+        """
+        Utility function for checking if a node id is reachable for the  attacker or not
+
+        :param node_id: the id of the node to check
+        :return: True if reachable otherwise False
+        """
         if node_id >= self.env_config.num_nodes:
             return False
         if node_id in self.env_config.initial_reachable:
@@ -91,7 +127,12 @@ class EnvState:
                     return True
         return False
 
-    def setup_dynamics_model(self):
+    def setup_dynamics_model(self) -> None:
+        """
+        Utility function for loading and setting up the dynamics model based on system traces
+
+        :return: None
+        """
         if self.env_config.traces:
             defender_dynamics_model = DefenderDynamicsModel()
             new_model = DefenderDynamicsModel()
@@ -105,8 +146,11 @@ class EnvState:
         return None
 
     def setup_dp(self) -> DPSetup:
-        print("Setup DP")
-        dp_setup = None
+        """
+        Utility function for setting up the D.P parameters
+
+        :return: the DPsetup DTO
+        """
         if self.env_config.dp_load:
             HP = DP.load_HP_table()
             R = DP.load_R_table()
@@ -129,14 +173,31 @@ class EnvState:
 
     @staticmethod
     def get_attacked_node(attacker_action_id: int, env_config: EnvConfig) -> int:
+        """
+        Utility function for getting the id of the node of an attack
+
+        :param attacker_action_id: the attack id
+        :param env_config: the environment config
+        :return: the node id
+        """
         return attacker_action_id // (env_config.num_attributes + 1)
 
     @staticmethod
-    def get_attacked_attribute(attacker_action_id: int, env_config: EnvConfig):
+    def get_attacked_attribute(attacker_action_id: int, env_config: EnvConfig) -> int:
+        """
+        Utility function for getting the attribute idx of an attack
+
+        :param attacker_action_id: the attack id
+        :param env_config: the environment config
+        :return: the attribute id
+        """
         return attacker_action_id % (env_config.num_attributes + 1)
 
 
     def __str__(self):
+        """
+        :return: a string representation of the object
+        """
         return ",".join(list(map(lambda x: str(x), self.nodes)))
 
 

@@ -5,6 +5,7 @@ from gym_optimal_intrusion_response.agents.config.agent_config import AgentConfi
 from gym_optimal_intrusion_response.dao.experiment.runner_mode import RunnerMode
 from gym_optimal_intrusion_response.dao.agent.train_mode import TrainMode
 
+
 class ClientConfig:
     """
     DTO with client config for running experiments

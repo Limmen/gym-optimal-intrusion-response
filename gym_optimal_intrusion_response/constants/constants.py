@@ -1,3 +1,6 @@
+"""
+Constants for the environments
+"""
 
 class DP:
     MAX_ALERTS = 100

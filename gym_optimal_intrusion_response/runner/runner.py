@@ -7,10 +7,20 @@ from gym_optimal_intrusion_response.agents.policy_gradient.ppo_baseline.ppo_base
 from gym_optimal_intrusion_response.dao.experiment.runner_mode import RunnerMode
 from gym_optimal_intrusion_response.dao.agent.train_mode import TrainMode
 
+
 class Runner:
+    """
+    Utility class for running experiments
+    """
 
     @staticmethod
-    def run(config: ClientConfig):
+    def run(config: ClientConfig) -> Tuple[ExperimentResult, ExperimentResult]:
+        """
+        Runs an experiment with the given configuration
+
+        :param config: the client configuration
+        :return: the experiment results
+        """
         if config.mode == RunnerMode.TRAIN_ATTACKER.value or config.mode == RunnerMode.TRAIN_DEFENDER.value \
                 or config.mode == RunnerMode.SELF_PLAY.value:
             return Runner.train(config)
@@ -19,6 +29,12 @@ class Runner:
 
     @staticmethod
     def train(config: ClientConfig) -> Tuple[ExperimentResult, ExperimentResult]:
+        """
+        Starts a training process with the given configuration
+
+        :param config: the client configuration
+        :return: the training results
+        """
         env = Runner.regular_env_creation(config=config)
         if config.agent_type == AgentType.PPO_BASELINE.value:
             if config.defender_agent_config is not None:
@@ -40,5 +56,11 @@ class Runner:
 
     @staticmethod
     def regular_env_creation(config: ClientConfig):
+        """
+        Creates the environment
+
+        :param config: the client configuration
+        :return: the created env
+        """
         env = gym.make(config.env_name)
         return env

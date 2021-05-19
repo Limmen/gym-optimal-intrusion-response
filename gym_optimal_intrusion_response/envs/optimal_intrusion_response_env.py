@@ -1,15 +1,15 @@
 from typing import Tuple
 import gym
 import numpy as np
-import inspect
 from abc import ABC
 from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
 from gym_optimal_intrusion_response.dao.game.env_state import EnvState
 from gym_optimal_intrusion_response.logic.transition_operator import TransitionOperator
 
+
 class OptimalIntrusionResponseEnv(gym.Env, ABC):
     """
-    TODO
+    An MDP/Markov Game interface to the Optimal Intrusion Response environment
     """
 
     def __init__(self, env_config : EnvConfig):
@@ -24,6 +24,12 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
     # -------- API ------------
 
     def step(self, action_id: Tuple[int, int]) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[int, int], bool, dict]:
+        """
+        Takes a step in the environment
+
+        :param action_id: (attacker action id, defender action id)
+        :return: ((attacker obs, defender obs), (attacker reward, defender reward), done, info)
+        """
 
         if isinstance(action_id, int) or isinstance(action_id, np.int64):
             action_id = (action_id, None)
@@ -92,12 +98,24 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         return (attacker_obs, defender_obs), (attacker_reward, defender_reward), done, info
 
     def step_defender(self, defender_action_id : int) -> Tuple[int, int, bool, dict]:
+        """
+        Takes a step with a defender action
+
+        :param defender_action_id: the id of the defender action
+        :return: attacker reward, defender reward, done, info
+        """
         s, attacker_reward, defender_reward, done, info = TransitionOperator.transition_defender(
             defender_action_id=defender_action_id, env_state=self.env_state, env_config=self.env_config)
         self.env_state = s
         return attacker_reward, defender_reward, done, info
 
     def step_attacker(self, attacker_action_id : int) -> Tuple[int, int, bool, dict]:
+        """
+        Takes a step with an attacker action
+
+        :param attacker_action_id: the id of the attacker action
+        :return: attacker reward, defender reward, done, info
+        """
         s, attacker_reward, defender_reward, done = TransitionOperator.transition_attacker(
             attacker_action_id=attacker_action_id, env_state=self.env_state, env_config=self.env_config)
         self.env_state = s
@@ -105,6 +123,14 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
     @staticmethod
     def is_attack_action_legal(a_id: int, env_config: EnvConfig, env_state: EnvState) -> bool:
+        """
+        Utility function for checking if an attack action is legal or not
+
+        :param a_id: the id of the attack action
+        :param env_config: the environment configuration
+        :param env_state: the state of the environment
+        :return: true if legal, otherwise false
+        """
         node_id = EnvState.get_attacked_node(a_id, env_config)
         attribute_id = EnvState.get_attacked_attribute(a_id, env_config)
         if not env_state.attacker_reachable(node_id):
@@ -119,9 +145,19 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
     @staticmethod
     def is_defense_action_legal(d_id : int) -> bool:
+        """
+        Utility function for checking if a defense action is legal or not
+        :param d_id: the id of the defense action
+        :return: True if legal otherwise  false
+        """
         return True
 
     def reset(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Resets the environment
+
+        :return: Initial attacker obs, initial defender obs
+        """
         self.env_state.reset()
         defender_obs = self.env_state.get_defender_observation().flatten()
         attacker_obs = self.env_state.get_attacker_observation().flatten()
