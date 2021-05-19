@@ -51,6 +51,16 @@ env_name = "optimal-intrusion-response-v1"
 env = gym.make(env_name)
 ```
 
+## Infrastructure
+
+<p align="center">
+<img src="docs/env.png" width="600">
+</p>
+
+## Traces
+
+Alert/login traces from the emulated infrastructure are available in ([./traces](./traces)).
+
 ## Publications
 
 TODO
