@@ -33,6 +33,8 @@ class TensorboardDataDTO:
                  avg_episode_var_log_baseline_rewards: float = 0.0,
                  eval_avg_episode_snort_critical_baseline_rewards: float = 0.0,
                  eval_avg_episode_var_log_baseline_rewards: float = 0.0,
+                 avg_optimal_steps : float = 0.0,
+                 avg_optimal_reward : float = 0.0
                  ):
         self.iteration = iteration
         self.avg_episode_rewards = avg_episode_rewards
@@ -84,6 +86,8 @@ class TensorboardDataDTO:
         self.avg_episode_var_log_baseline_rewards = avg_episode_var_log_baseline_rewards
         self.eval_avg_episode_snort_critical_baseline_rewards = eval_avg_episode_snort_critical_baseline_rewards
         self.eval_avg_episode_var_log_baseline_rewards = eval_avg_episode_var_log_baseline_rewards
+        self.avg_optimal_steps = avg_optimal_steps
+        self.avg_optimal_reward = avg_optimal_reward
 
     def log_tensorboard_defender(self) -> None:
         """
@@ -135,6 +139,10 @@ class TensorboardDataDTO:
                                       self.eval_avg_episode_snort_critical_baseline_rewards, self.iteration)
         self.tensorboard_writer.add_scalar('defender/eval_avg_episode_var_log_baseline_rewards/' + train_or_eval,
                                       self.eval_avg_episode_var_log_baseline_rewards, self.iteration)
+        self.tensorboard_writer.add_scalar('defender/avg_optimal_steps/' + train_or_eval,
+                                           self.avg_optimal_steps, self.iteration)
+        self.tensorboard_writer.add_scalar('defender/avg_optimal_rewards/' + train_or_eval,
+                                           self.avg_optimal_reward, self.iteration)
         if not eval:
             self.tensorboard_writer.add_scalar('defender/lr', self.lr, self.iteration)
 
@@ -167,7 +175,7 @@ class TensorboardDataDTO:
                       "c_E:{:.2f},s_E:{:.2f},s_i_E:{:.2f}," \
                       "costs:{:.2f},costs_N:{:.2f},alerts:{:.2f}," \
                       "alerts_N:{:.2f},E_costs:{:.2f},E_costs_N:{:.2f},E_alerts:{:.2f},E_alerts_N:{:.2f},"\
-                      "tt_h:{:.2f},avg_F_T_E:{:.2f},avg_F_T_E%:{:.2f},".format(
+                      "tt_h:{:.2f},avg_F_T_E:{:.2f},avg_F_T_E%:{:.2f},opt_R:{},opt_t:{}".format(
                 self.iteration, self.avg_regret, self.avg_opt_frac, self.avg_episode_rewards, self.rolling_avg_rewards,
                 self.avg_episode_steps, self.rolling_avg_steps, self.avg_episode_loss,
                 self.lr, self.total_num_episodes, self.avg_episode_flags,
@@ -185,7 +193,9 @@ class TensorboardDataDTO:
                 self.eval_avg_episode_costs, self.eval_avg_episode_costs_norm, self.eval_avg_episode_alerts,
                 self.eval_avg_episode_alerts_norm,
                 self.training_time_hours,
-                self.eval_avg_episode_flags, self.eval_avg_episode_flags_percentage)
+                self.eval_avg_episode_flags, self.eval_avg_episode_flags_percentage,
+                self.avg_optimal_reward, self.avg_optimal_steps
+            )
         return log_str
 
     def log_str_defender(self) -> str:
@@ -222,7 +232,8 @@ class TensorboardDataDTO:
                       "avg_F_T:{:.2f},avg_F_T%:{:.2f}," \
                       "avg_F_E:{:.2f},avg_F_E%:{:.2f}" \
                       "costs:{:.2f},costs_N:{:.2f},alerts:{:.2f}," \
-                      "alerts_N:{:.2f},E_costs:{:.2f},E_costs_N:{:.2f},E_alerts:{:.2f},E_alerts_N:{:.2f}".format(
+                      "alerts_N:{:.2f},E_costs:{:.2f},E_costs_N:{:.2f},E_alerts:{:.2f},E_alerts_N:{:.2f}," \
+                      "opt_R:{:.2f},opt_t:{:.2f}".format(
                 self.iteration, self.avg_regret, self.avg_opt_frac, self.avg_episode_rewards,
                 self.rolling_avg_rewards,
                 self.avg_episode_snort_severe_baseline_rewards, self.avg_episode_snort_warning_baseline_rewards,
@@ -244,7 +255,7 @@ class TensorboardDataDTO:
                 self.avg_episode_costs, self.avg_episode_costs_norm, self.avg_episode_alerts,
                 self.avg_episode_alerts_norm,
                 self.eval_avg_episode_costs, self.eval_avg_episode_costs_norm, self.eval_avg_episode_alerts,
-                self.eval_avg_episode_alerts_norm)
+                self.eval_avg_episode_alerts_norm, self.avg_optimal_reward, self.avg_optimal_steps)
         return log_str
     
 

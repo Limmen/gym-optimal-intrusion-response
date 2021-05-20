@@ -67,7 +67,9 @@ class ManualDefenderAgent:
                             action = (attacker_action, a)
                             latest_obs, latest_rew, done, _ = self.env.step(action)
                             attacker_rew, defender_rew = latest_rew
+                            print("cumulative:{}, rew:{}".format(cumulative_reward, defender_rew))
                             cumulative_reward += defender_rew
+                            print("cumulative_prime:{}".format(cumulative_reward))
                             history.append(a)
                             if done:
                                 if not env.env_config.traces:
@@ -80,10 +82,11 @@ class ManualDefenderAgent:
                                 else:
                                     target_compromised = env.env_state.target_compromised
                                     print(
-                                        "done:{}, attacker_caught:{}, stopped:{}, target_compromised:{} rew:{}".format(
+                                        "done:{}, attacker_caught:{}, stopped:{}, target_compromised:{} "
+                                        "last rew:{}, cumulative rew:{}".format(
                                             done, env.env_state.caught,
                                             env.env_state.stopped,
-                                            target_compromised, latest_rew
+                                            target_compromised, latest_rew, cumulative_reward
                                         ))
                         else:
                             print("action:{} is illegal".format(a))

@@ -74,7 +74,9 @@ class TrainAgentLogDTO:
                  eval_2_attacker_action_costs_norm: List[float] = None,
                  eval_2_attacker_action_alerts: List[float] = None,
                  eval_2_attacker_action_alerts_norm: List[float] = None,
-                 start_time: float = 0.0
+                 start_time: float = 0.0,
+                 optimal_rewards : List[float] = None,
+                 optimal_steps: List[float] = None
                  ):
         self.iteration = iteration
         self.train_result = train_result
@@ -157,6 +159,8 @@ class TrainAgentLogDTO:
         self.eval_2_attacker_action_alerts = eval_2_attacker_action_alerts
         self.eval_2_attacker_action_alerts_norm = eval_2_attacker_action_alerts_norm
         self.start_time = start_time
+        self.optimal_rewards = optimal_rewards
+        self.optimal_steps = optimal_steps
 
 
     def initialize(self):
@@ -245,6 +249,8 @@ class TrainAgentLogDTO:
         self.eval_2_attacker_action_costs_norm = []
         self.eval_2_attacker_action_alerts = []
         self.eval_2_attacker_action_alerts_norm = []
+        self.optimal_steps = []
+        self.optimal_rewards = []
 
     def copy(self):
         c = TrainAgentLogDTO()
@@ -329,98 +335,5 @@ class TrainAgentLogDTO:
         c.eval_2_attacker_action_alerts = self.eval_2_attacker_action_alerts
         c.eval_2_attacker_action_alerts_norm = self.eval_2_attacker_action_alerts_norm
         c.start_time = self.start_time
-
-    def copy_saved_env_2(self, saved_log_dto):
-        self.attacker_eval_2_episode_rewards = saved_log_dto.attacker_eval_2_episode_rewards
-        self.defender_eval_2_episode_rewards = saved_log_dto.defender_eval_2_episode_rewards
-        self.eval_2_episode_steps = saved_log_dto.eval_2_episode_steps
-        self.eval_2_episode_flags_percentage = saved_log_dto.eval_2_episode_flags_percentage
-        self.eval_2_episode_flags = saved_log_dto.eval_2_episode_flags
-        self.eval_2_episode_caught = saved_log_dto.eval_2_episode_caught
-        self.eval_2_episode_early_stopped = saved_log_dto.eval_2_episode_early_stopped
-        self.eval_2_episode_successful_intrusion = saved_log_dto.eval_2_episode_successful_intrusion
-        self.eval_2_episode_snort_severe_baseline_rewards = saved_log_dto.eval_2_episode_snort_severe_baseline_rewards
-        self.eval_2_episode_snort_warning_baseline_rewards = saved_log_dto.eval_2_episode_snort_warning_baseline_rewards
-        self.eval_2_episode_snort_critical_baseline_rewards = saved_log_dto.eval_2_episode_snort_critical_baseline_rewards
-        self.eval_2_episode_var_log_baseline_rewards = saved_log_dto.eval_2_episode_var_log_baseline_rewards
-        self.attacker_eval_2_env_specific_rewards = saved_log_dto.attacker_eval_2_env_specific_rewards
-        self.defender_eval_2_env_specific_rewards = saved_log_dto.defender_eval_2_env_specific_rewards
-        self.eval_2_env_specific_steps = saved_log_dto.eval_2_env_specific_steps
-        self.eval_2_env_specific_flags = saved_log_dto.eval_2_env_specific_flags
-        self.eval_2_env_specific_flags_percentage = saved_log_dto.eval_2_env_specific_flags_percentage
-        self.eval_2_attacker_action_costs = saved_log_dto.eval_2_attacker_action_costs
-        self.eval_2_attacker_action_costs_norm = saved_log_dto.eval_2_attacker_action_costs_norm
-        self.eval_2_attacker_action_alerts = saved_log_dto.eval_2_attacker_action_alerts
-        self.eval_2_attacker_action_alerts_norm = saved_log_dto.eval_2_attacker_action_alerts_norm
-
-    def eval_update_env_specific_metrics(self, env_config, infos, i):
-        if env_config.emulation_config is not None:
-            agent_ip = env_config.emulation_config.agent_ip
-        else:
-            agent_ip = env_config.idx
-        num_flags = env_config.num_flags
-
-        if agent_ip not in self.attacker_eval_env_specific_rewards:
-            self.attacker_eval_env_specific_rewards[agent_ip] = [self.attacker_episode_rewards]
-        else:
-            self.attacker_eval_env_specific_rewards[agent_ip].append(self.attacker_episode_rewards)
-
-        if agent_ip not in self.defender_eval_env_specific_rewards:
-            self.defender_eval_env_specific_rewards[agent_ip] = [self.defender_episode_rewards]
-        else:
-            self.defender_eval_env_specific_rewards[agent_ip].append(self.defender_episode_rewards)
-
-        if agent_ip not in self.eval_env_specific_steps:
-            self.eval_env_specific_steps[agent_ip] = [self.episode_steps]
-        else:
-            self.eval_env_specific_steps[agent_ip].append(self.episode_steps)
-
-        if agent_ip not in self.eval_env_specific_flags:
-            self.eval_env_specific_flags[agent_ip] = [infos["flags"]]
-        else:
-            self.eval_env_specific_flags[agent_ip].append(infos["flags"])
-
-        if agent_ip not in self.eval_env_specific_flags_percentage:
-            self.eval_env_specific_flags_percentage[agent_ip] = [infos["flags"] / num_flags]
-        else:
-            self.eval_env_specific_flags_percentage[agent_ip].append(infos["flags"] / num_flags)
-
-    def eval_2_update_env_specific_metrics(self, env_config, infos, i):
-
-        if env_config.emulation_config is not None:
-            agent_ip = env_config.emulation_config.agent_ip
-        else:
-            agent_ip = env_config.idx
-        num_flags = env_config.num_flags
-
-        if agent_ip not in self.attacker_eval_2_env_specific_rewards:
-            self.attacker_eval_2_env_specific_rewards[agent_ip] = [self.attacker_episode_rewards]
-        else:
-            self.attacker_eval_2_env_specific_rewards[agent_ip].append(self.attacker_episode_rewards)
-
-        if agent_ip not in self.defender_eval_2_env_specific_rewards:
-            self.defender_eval_2_env_specific_rewards[agent_ip] = [self.defender_episode_rewards]
-        else:
-            self.defender_eval_2_env_specific_rewards[agent_ip].append(self.defender_episode_rewards)
-
-        if agent_ip not in self.eval_2_env_specific_steps:
-            self.eval_2_env_specific_steps[agent_ip] = [self.episode_steps]
-        else:
-            self.eval_2_env_specific_steps[agent_ip].append(self.episode_steps)
-
-        if agent_ip not in self.eval_2_env_specific_flags:
-            self.eval_2_env_specific_flags[agent_ip] = [infos["flags"]]
-        else:
-            self.eval_2_env_specific_flags[agent_ip].append(infos["flags"])
-
-        if agent_ip not in self.eval_2_env_specific_flags_percentage:
-            self.eval_2_env_specific_flags_percentage[agent_ip] = [infos["flags"] / num_flags]
-        else:
-            self.eval_2_env_specific_flags_percentage[agent_ip].append(infos["flags"] / num_flags)
-
-
-
-
-
-
-
+        c.optimal_steps = self.optimal_steps
+        c.optimal_rewards = self.optimal_rewards

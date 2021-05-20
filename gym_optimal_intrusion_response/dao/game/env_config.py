@@ -2,6 +2,7 @@ import numpy as np
 from gym_optimal_intrusion_response.logic.static_opponents.static_attacker import StaticAttacker
 from gym_optimal_intrusion_response.logic.static_opponents.static_defender import StaticDefender
 
+
 class EnvConfig:
     """
     DTO with the environment configuration
@@ -21,6 +22,8 @@ class EnvConfig:
                  attacker_early_stopping_reward: int = -1,
                  defender_intrusion_prevented_reward : int = 1,
                  attacker_intrusion_prevented_reward: int = 1,
+                 defender_continue_reward: int = 1,
+                 attacker_continue_reward: int = 0,
                  target_id : int = 4,
                  use_state_limits : bool = True,
                  dp: bool = False,
@@ -50,6 +53,8 @@ class EnvConfig:
         :param attacker_early_stopping_reward: the reward that the attacker gets if the defender stops early
         :param defender_intrusion_prevented_reward: the reward that the defender gets for preventing an intrusion
         :param attacker_intrusion_prevented_reward: the reward that the attacker gets for preventing an intrusion
+        :param defender_continue_reward: the reward that the defender gets for continuing
+        :param attacker_continue_reward: the reward that the attacker gets for continuing
         :param target_id: the id of the target node
         :param use_state_limits: boolean flag whether to use state limits
         :param dp: boolean flag whether to use dp
@@ -78,6 +83,8 @@ class EnvConfig:
         self.defender_early_stopping_reward = defender_early_stopping_reward
         self.defender_intrusion_prevention_reward = defender_intrusion_prevented_reward
         self.attacker_intrusion_prevention_reward = attacker_intrusion_prevented_reward
+        self.defender_continue_reward = defender_continue_reward
+        self.attacker_continue_reward = attacker_continue_reward
         self.attacker_num_actions = self.num_nodes*self.num_attributes
         self.defender_num_actions = 2
         self.target_id = target_id

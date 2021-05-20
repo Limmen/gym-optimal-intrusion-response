@@ -57,7 +57,7 @@ class EnvState:
                 low=0, high=1000, dtype=np.float32, shape=(2,))
         elif not self.env_config.dp and self.env_config.traces:
             self.defender_observation_space = gym.spaces.Box(
-                low=0, high=1000, dtype=np.float32, shape=(3,))
+                low=0, high=1000, dtype=np.float32, shape=(4,))
             # self.defender_observation_space = gym.spaces.Box(
             #     low=0, high=1000, dtype=np.float32, shape=(5,))
         else:
@@ -90,7 +90,7 @@ class EnvState:
         self.intrusion_in_progress = False
         self.target_compromised = False
         self.defender_observation_state.reset()
-        self.t=0
+        self.t=1
         self.intrusion_t = -1
 
     def initialize_nodes(self) -> None:

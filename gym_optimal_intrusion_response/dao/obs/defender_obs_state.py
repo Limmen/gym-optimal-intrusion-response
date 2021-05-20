@@ -63,10 +63,11 @@ class DefenderObservationState:
             obs[0] = t
             obs[1] = self.ttc
         else:
-            obs = np.zeros(3).tolist()
-            obs[0] = self.num_severe_alerts
-            obs[1] = self.num_warning_alerts
-            obs[2] = self.num_failed_logins
+            obs = np.zeros(4).tolist()
+            obs[0] = t
+            obs[1] = self.num_severe_alerts
+            obs[2] = self.num_warning_alerts
+            obs[3] = self.num_failed_logins
 
         return np.array(obs)
 

@@ -43,8 +43,8 @@ class OptimalIntrusionResponseEnvV2(OptimalIntrusionResponseEnv):
         attack_idx_to_id[113] = 53
 
         action_to_state = {}
-        action_to_state[(99, 1)] = ("172.18.9.191", False, False)
-        action_to_state[(100, 1)] = ("172.18.9.191", False, False)
+        action_to_state[(99, 1)] = ("172.18.9.191", False, True)
+        action_to_state[(100, 1)] = ("172.18.9.191", False, True)
         action_to_state[(33, 2)] = ("172.18.9.191", False, True)
         action_to_state[(104, 3)] = ("172.18.9.191_172.18.9.2_tools=0_backdoor=0_root=1", False, True)
         action_to_state[(105, 4)] = ("172.18.9.191_172.18.9.2_tools=0_backdoor=0_root=1", False, True)
@@ -120,13 +120,15 @@ class OptimalIntrusionResponseEnvV2(OptimalIntrusionResponseEnv):
                                attacker_early_stopping_reward=0,
                                defender_intrusion_prevented_reward=100,
                                attacker_intrusion_prevented_reward=-100,
+                               defender_continue_reward=10,
+                               attacker_continue_reward=0,
                                target_id=3,
                                dp=False,
                                dp_load=False,
                                traces=True,
                                action_to_state=action_to_state,
                                attack_idx_to_id=attack_idx_to_id,
-                               save_dynamics_model_dir = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v2/",
-                               dynamics_model_name = "new_defender_dynamics_model_22.json"
+                               save_dynamics_model_dir = "/home/kim/workspace/gym-optimal-intrusion-response/traces/",
+                               dynamics_model_name = "traces.json"
                                )
         super().__init__(env_config=env_config)

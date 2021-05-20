@@ -8,6 +8,7 @@ import numpy as np
 import pickle
 import gym_optimal_intrusion_response.constants.constants as constants
 from gym_optimal_intrusion_response.logic.defender_dynamics.dp import DP
+import math
 
 
 def Q_helper(ttcs : np.ndarray, ts : np.ndarray, policy: np.ndarray, state_to_id: dict, action : int) -> np.ndarray:
@@ -614,11 +615,111 @@ def policy_plot_2():
     # fig.savefig("threshold_alerts" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
+def plot_reward_fun() -> None:
+    """
+    Plots the thresholds
 
+    :return: None
+    """
+    times = np.arange(0, 100, 1)
+    continue_rew = 10
+    stopping_rew = 100
+    early_stopping_rew = -100
+
+    stopping_idx = 39
+    st=[]
+    ct=[]
+    stopping_time_y = []
+    temp = -135
+    for i in range(len(times)):
+        if i <= stopping_idx:
+            ct.append(continue_rew)
+            st.append(early_stopping_rew)
+        # elif i > stopping_idx:
+        #     st.append(stopping_rew)
+        #     ct.append(early_stopping_rew + continue_rew)
+        else:
+            st.append(stopping_rew/math.pow((i-stopping_idx), 1.05))
+            ct.append(early_stopping_rew + continue_rew)
+        temp = temp + 265/len(times)
+        stopping_time_y.append(temp)
+
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
+    plt.rcParams['font.family'] = ['serif']
+    plt.rcParams['axes.titlepad'] = 0.02
+    # plt.rcParams['xtick.major.pad'] = 0.5
+    plt.rcParams['ytick.major.pad'] = 0.05
+    plt.rcParams['axes.labelpad'] = 0.8
+    plt.rcParams['axes.linewidth'] = 0.8
+    plt.rcParams.update({'font.size': 10})
+
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4.5, 3.2))
+
+    # ylims = (0, 920)
+
+    # Plot Avg Eval rewards Gensim
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax.plot(times,
+            st, label=r"Stopping reward $\mathcal{R}_{s_t}^{1}$",
+            ls='-', color=colors[0], marker="s",  markevery=5, markersize=3.5)
+    ax.plot(times,
+            ct, label=r"Continue reward $\mathcal{R}_{s_t}^{0}$",
+            ls='-', color="#f9a65a",  marker="d", markevery=5, markersize=3.5)
+    print([stopping_idx]*len(times))
+    print(stopping_time_y)
+    ax.plot([stopping_idx]*len(times),
+               stopping_time_y, label=r"Intrusion started",
+               color="black", linestyle="dashed")
+    # lower_bound = np.zeros(len(y[1:]))
+    # lower_bound.fill(min(y[1:]))
+
+    # ax.fill_between(x[1:], y[1:], lower_bound,
+    #                 alpha=0.35, color=colors[0])
+
+    ax.set_title(r"Reward function $\mathcal{R}_{s_t}^{a_t}$", fontsize=12.5)
+    ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
+
+    ax.axhline(y=0, color='k', linewidth=0.5)
+    ax.set_xlim(0, len(times))
+    ax.set_ylim(-130, 130)
+    # a = ax.get_xticks().tolist()
+    # a[-1] = r'$T$'
+    # ax.set_xticklabels(a)
+    # ax.set_xticks([1.0, 5.0, 10.0, 15.0, 19.0])
+
+    # set the grid on
+    ax.grid('on')
+
+    # tweak the axis labels
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+
+    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
+    #           ncol=2, fancybox=True, shadow=True, fontsize=8)
+    ax.legend(loc="upper right")
+
+    xlab.set_size(11.5)
+    ylab.set_size(11.5)
+
+    # change the color of the top and right spines to opaque gray
+    ax.spines['right'].set_color((.8, .8, .8))
+    ax.spines['top'].set_color((.8, .8, .8))
+
+    ttl = ax.title
+    ttl.set_position([.5, 1.05])
+
+    fig.tight_layout()
+    # plt.show()
+    # plt.subplots_adjust(wspace=0, hspace=0)
+    fig.savefig("reward_fun" + ".png", format="png", dpi=600)
+    fig.savefig("reward_fun" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    # plt.close(fig)
 
 if __name__ == '__main__':
     # policy_plot_2()
-    plot_thresholds()
+    plot_reward_fun()
+    # plot_thresholds()
     # plot_policy(t=0)
     # plot_policy(t=1)
     # plot_policy(t=2)

@@ -3,6 +3,7 @@ import numpy as np
 from gym_optimal_intrusion_response.dao.game.env_state import EnvState
 from gym_optimal_intrusion_response.dao.game.env_config import EnvConfig
 import gym_optimal_intrusion_response.constants.constants as constants
+import math
 
 class TransitionOperator:
 
@@ -83,17 +84,21 @@ class TransitionOperator:
                     info["early_stopped"] = 1
             return 0, r, info
         elif env_config.traces:
+            # print("t:{}, intrusion_t:{}".format(env_state.t, env_state.intrusion_t))
             intrusion_in_progress = env_state.intrusion_in_progress
             if intrusion_in_progress and env_state.stopped:
                 env_state.caught = True
                 info["caught_attacker"] = 1
-                r = env_config.defender_intrusion_prevention_reward/(1 + env_state.t - env_state.intrusion_t)
+                r = env_config.defender_intrusion_prevention_reward / max(1, (math.pow((env_state.t - env_state.intrusion_t), 1.05)))
+                # ct.append(early_stopping_rew + continue_rew)
+                # r = env_config.defender_intrusion_prevention_reward/(1 + env_state.t - env_state.intrusion_t)
                 # print("r:{}, t:{}, t1:{}".format(r, env_state.t, env_state.intrusion_t))
                 return env_config.attacker_intrusion_prevention_reward, r, info
             elif intrusion_in_progress and not env_state.stopped:
-                return 0, 0, info
+                return env_config.attacker_target_compromised_reward, \
+                       env_config.defender_target_compromised_reward + env_config.defender_continue_reward, info
             elif not intrusion_in_progress and env_state.stopped:
                 info["early_stopped"] = 1
                 return env_config.attacker_early_stopping_reward, env_config.defender_early_stopping_reward, info
             elif not env_state.stopped and not intrusion_in_progress:
-                return 0, 0, info
+                return env_config.attacker_continue_reward, env_config.defender_continue_reward, info

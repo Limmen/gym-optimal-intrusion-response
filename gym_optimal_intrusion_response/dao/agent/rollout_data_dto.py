@@ -20,7 +20,9 @@ class RolloutDataDTO:
                  attacker_action_costs = None,
                  attacker_action_costs_norm=None,
                  attacker_action_alerts=None,
-                 attacker_action_alerts_norm=None
+                 attacker_action_alerts_norm=None,
+                 optimal_steps = None,
+                 optimal_rewards = None
                  ):
         self.attacker_episode_rewards = attacker_episode_rewards
         self.defender_episode_rewards = defender_episode_rewards
@@ -45,6 +47,8 @@ class RolloutDataDTO:
         self.attacker_action_costs_norm = attacker_action_costs_norm
         self.attacker_action_alerts = attacker_action_alerts
         self.attacker_action_alerts_norm = attacker_action_alerts_norm
+        self.optimal_steps = optimal_steps
+        self.optimal_rewards = optimal_rewards
 
     def initialize(self):
         self.attacker_episode_rewards = []
@@ -71,3 +75,5 @@ class RolloutDataDTO:
         self.attacker_action_costs_norm = []
         self.attacker_action_alerts = []
         self.attacker_action_alerts_norm = []
+        self.optimal_steps = []
+        self.optimal_rewards = []

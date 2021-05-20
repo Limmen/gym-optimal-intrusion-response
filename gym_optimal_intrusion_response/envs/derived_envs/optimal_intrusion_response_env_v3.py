@@ -120,6 +120,8 @@ class OptimalIntrusionResponseEnvV3(OptimalIntrusionResponseEnv):
                                attacker_early_stopping_reward=0,
                                defender_intrusion_prevented_reward=100,
                                attacker_intrusion_prevented_reward=-100,
+                               defender_continue_reward=10,
+                               attacker_continue_reward=0,
                                target_id=3,
                                dp=False,
                                dp_load=False,

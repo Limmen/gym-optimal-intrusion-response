@@ -11,14 +11,14 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    agent_config = AgentConfig(gamma=1, alpha=0.0005, epsilon=1, render=False,
+    agent_config = AgentConfig(gamma=1, alpha=0.0001, epsilon=1, render=False,
                                min_epsilon=0.01, eval_episodes=10, train_log_frequency=1,
                                epsilon_decay=0.9999, video=False, eval_log_frequency=1,
                                video_fps=5, video_dir=experiments_util.default_output_dir() + "/results/videos",
                                num_iterations=1000,
                                gif_dir=experiments_util.default_output_dir() + "/results/gifs",
                                save_dir=experiments_util.default_output_dir() + "/results/data",
-                               checkpoint_freq=25, input_dim=3,
+                               checkpoint_freq=25, input_dim=2,
                                output_dim=2,
                                pi_hidden_dim=64, pi_hidden_layers=1,
                                vf_hidden_dim=64, vf_hidden_layers=1,
@@ -41,8 +41,8 @@ def default_config() -> ClientConfig:
                                  agent_type=AgentType.PPO_BASELINE.value,
                                  output_dir=experiments_util.default_output_dir(),
                                  title="Optimal Intrusion Response V2",
-                                 run_many=True, random_seeds=[810, 8991, 6297],
-                                 random_seed=72899,
+                                 run_many=True, random_seeds=[1816, 1831, 4257],
+                                 random_seed=11296,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,
                                  )
     return client_config

@@ -253,6 +253,9 @@ class LogUtil:
         avg_episode_alerts = np.mean(train_log_dto.attacker_action_alerts)
         avg_episode_alerts_norm = np.mean(train_log_dto.attacker_action_alerts_norm)
 
+        avg_episode_optimal_rewards = np.mean(train_log_dto.optimal_rewards)
+        avg_episode_optimal_steps = np.mean(train_log_dto.optimal_steps)
+
         avg_episode_flags = np.mean(train_log_dto.episode_flags)
         avg_episode_flags_percentage = np.mean(train_log_dto.episode_flags_percentage)
 
@@ -431,6 +434,8 @@ class LogUtil:
             avg_flags_catched=avg_episode_flags, avg_episode_flags_percentage=avg_episode_flags_percentage,
             eval_avg_episode_flags=eval_avg_episode_flags,
             eval_avg_episode_flags_percentage=eval_avg_episode_flags_percentage,
+            avg_optimal_reward=avg_episode_optimal_rewards,
+            avg_optimal_steps=avg_episode_optimal_steps
         )
         log_str = tensorboard_data_dto.log_str_defender()
         defender_agent_config.logger.info(log_str)
@@ -481,6 +486,8 @@ class LogUtil:
             result.avg_episode_flags_percentage.append(avg_episode_flags_percentage)
             result.eval_avg_episode_flags.append(eval_avg_episode_flags)
             result.eval_avg_episode_flags_percentage.append(eval_avg_episode_flags_percentage)
+            result.optimal_rewards.append(avg_episode_optimal_rewards)
+            result.optimal_steps.append(avg_episode_optimal_steps)
 
             if not eval:
                 train_log_dto.train_result = result

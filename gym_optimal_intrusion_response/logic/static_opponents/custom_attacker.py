@@ -22,3 +22,7 @@ class CustomAttacker(StaticAttacker):
             self.t += 1
             self.startup_phase = False
             return self.strategy[self.t-1], self.t
+
+    def reset(self):
+        self.t = 0
+        self.startup_phase = True
