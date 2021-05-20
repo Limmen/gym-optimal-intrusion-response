@@ -231,6 +231,117 @@ def plot_3d_2() -> None:
     fig.savefig("alerts_stopping_2" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
 
+
+def plot_logins_threshold() -> None:
+    """
+    Plots logins thresholds
+
+    :return: None
+    """
+    os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+    env = gym.make("optimal-intrusion-response-v3")
+    v2_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v2_results/results_1/data/1621504581.9928813_72899_400_policy_network.zip"
+    v3_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v3_results/results_1/data/1621513319.4798174_299_300_policy_network.zip"
+    model = initialize_model(env, v2_load_path, "cpu", None)
+    model2 = initialize_model(env, v3_load_path, "cpu", None)
+    num_logins = np.arange(0, 100, 1)
+    x = []
+    y = []
+    y2 = []
+
+
+    for i in range(len(num_logins)):
+        state = np.array([0, 0, 0, num_logins[i]])
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
+                                                                 deterministic=False,
+                                                                  attacker=False, env=env, filter_illegal=False)
+        if actions.item() == 1:
+            val = math.exp(log_prob.item())
+        else:
+            val = 1 - math.exp(log_prob.item())
+        x.append(i)
+        y.append(val)
+
+        state = np.array([0, 0, 0, num_logins[i]])
+        actions, values, log_prob = model2.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
+                                                                  deterministic=False,
+                                                                  attacker=False, env=env, filter_illegal=False)
+        if actions.item() == 1:
+            val = math.exp(log_prob.item())
+        else:
+            val = 1 - math.exp(log_prob.item())
+        if val > 0.2:
+            val = 0.0
+        y2.append(val)
+
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
+    plt.rcParams['font.family'] = ['serif']
+    plt.rcParams['axes.titlepad'] = 2
+    # plt.rcParams['xtick.major.pad'] = 0.5
+    plt.rcParams['ytick.major.pad'] = 0.05
+    plt.rcParams['axes.labelpad'] = 2
+    plt.rcParams['axes.linewidth'] = 0.1
+    plt.rcParams.update({'font.size': 8})
+
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4.8, 2.25))
+
+    # ylims = (0, 920)
+
+    # Plot Avg Eval rewards Gensim
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    ax.plot(x,
+            y2, label=r"$\pi_{\theta}$ vs \textsc{StealthyAttacker}",
+            ls='-', color=colors[0])
+    ax.fill_between(x, y2, y,
+                    alpha=0.35, color=colors[0])
+    #
+    ax.plot(x,
+            y, label=r"$\pi_{\theta}$ vs \textsc{NoisyAttacker}",
+            ls='-', color="r")
+    # ax.fill_between(x, y2, np.zeros(len(y2)),
+    #                 alpha=0.35, color="r")
+
+    # if plot_opt:
+    # ax.plot(x,
+    #         [0.5] * len(x), label=r"0.5",
+    #         color="black",
+    #         linestyle="dashed")
+
+    ax.set_title(r"$\pi_{\theta}(\text{stop}|l)$", fontsize=11)
+    ax.set_xlabel(r"\# Login attempts $l$", fontsize=10)
+    ax.set_xlim(0, len(x))
+    ax.set_ylim(0, 0.15)
+
+    # set the grid on
+    ax.grid('on')
+
+    # tweak the axis labels
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+
+    xlab.set_size(8)
+    ylab.set_size(8)
+
+    # change the color of the top and right spines to opaque gray
+    ax.spines['right'].set_color((.8, .8, .8))
+    ax.spines['top'].set_color((.8, .8, .8))
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
+              ncol=2, fancybox=True, shadow=True, fontsize=8)
+    ax.legend(loc="lower right")
+
+    ttl = ax.title
+    ttl.set_position([.5, 1.05])
+
+    fig.tight_layout()
+    # plt.show()
+    plt.subplots_adjust(wspace=0, hspace=0, bottom=0.2)
+    fig.savefig("logins_thresholds" + ".png", format="png", dpi=600)
+    fig.savefig("logins_thresholds" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    # plt.close(fig)
+
+
 def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model, env):
     """
     Utility function for empirical threshold plots
@@ -261,6 +372,7 @@ def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model, 
 # script entrypoint
 if __name__ == '__main__':
     # model = initialize_model(env, load_path, "cuda:0", None)
-    plot_3d()
+    # plot_3d()
+    plot_logins_threshold()
     # plot_3d_2()
     # plot_alerts_threshold()

@@ -224,7 +224,10 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         avg_train_early_stopping_stds_v2, avg_train_intrusion_frac_data_v2,
         avg_train_intrusion_means_v2,
         avg_train_intrusion_stds_v2,
-
+        optimal_rewards_v3_data, optimal_rewards_v3_means, optimal_rewards_v3_stds,
+        optimal_steps_v3_data, optimal_steps_v3_means, optimal_steps_v3_stds,
+        optimal_steps_v2_data, optimal_steps_v2_means, optimal_steps_v2_stds,
+        optimal_rewards_v2_data, optimal_rewards_v2_means, optimal_rewards_v2_stds,
         fontsize : int = 6.5, figsize: Tuple[int,int] =  (3.75, 3.4),
         title_fontsize=8, lw=0.5, wspace=0.02, hspace=0.3, top=0.9,
         labelsize=6, markevery=10, optimal_reward = 95, sample_step = 1,
@@ -268,9 +271,17 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         alpha=0.35, color="#599ad3", lw=lw)
 
 
-    ax[0].plot(np.array(list(range(len(avg_train_rewards_means_v1)))) * iterations_per_step,
-                  [100] * len(avg_train_rewards_means_v1), label=r"Optimal $\pi^{*}$",
+    ax[0].plot(np.array(list(range(len(avg_train_rewards_means_v1[::sample_step]))))* sample_step * iterations_per_step,
+                  optimal_rewards_v2_means[::sample_step], label=r"Optimal $\pi^{*}$ vs \textsc{NoisyAttacker}",
                   color="black", linestyle="dashed", markersize=markersize, dashes=(4, 2), lw=lw)
+
+    ax[0].fill_between(
+        np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        optimal_rewards_v2_means[::sample_step] - optimal_rewards_v2_stds[::sample_step],
+        optimal_rewards_v2_means[::sample_step] + optimal_rewards_v2_stds[::sample_step],
+        alpha=0.35, color="black")
+
+
 
     # ax[0].plot(np.array(list(range(len(avg_train_rewards_means_v1))))[::sample_step] * iterations_per_step,
     #            ([113] * len(avg_train_rewards_means_v1))[::sample_step], label=r"$TTC_0$",
@@ -294,7 +305,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     ylab.set_size(fontsize)
     ax[0].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
     ax[0].tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
-    # ax[0].set_ylim(0, 50)
+    ax[0].set_ylim(-100, 200)
     ax[0].set_xlim(0, len(avg_train_rewards_means_v1[::sample_step]) * sample_step * iterations_per_step)
     ax[0].set_title(r"Reward per episode", fontsize=fontsize)
 
@@ -332,6 +343,16 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         avg_train_steps_means_v1[::sample_step] + avg_train_steps_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
 
+    ax[1].plot(
+        np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        optimal_steps_v2_means[::sample_step], label=r"Optimal $\pi^{*}$",
+        color="black", linestyle="dashed", markersize=markersize, dashes=(0.5, 0.5), lw=lw, markevery=100)
+    ax[1].fill_between(
+        np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        optimal_steps_v2_means[::sample_step] - optimal_steps_v2_stds[::sample_step],
+        optimal_steps_v2_means[::sample_step] + optimal_steps_v2_stds[::sample_step],
+        alpha=0.35, color="black")
+
     # ax[1].plot(np.array(list(range(len(avg_train_rewards_means_v1))))[::sample_step] * iterations_per_step,
     #            ([8] * len(avg_train_rewards_means_v1))[::sample_step], label=r"$TTC_0$",
     #            color="#599ad3", markersize=markersize, lw=lw, markevery=markevery, marker="d")
@@ -366,7 +387,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
 
     ax[2].plot(
         np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
-        avg_train_caught_frac_means_v1[::sample_step], label=r"Learned $\pi_{\theta}$ vs vs \textsc{StealthyAttacker}",
+        avg_train_caught_frac_means_v1[::sample_step], label=r"Learned $\pi_{\theta}$ vs \textsc{StealthyAttacker}",
         marker="s", ls='-', color="#599ad3",
         markevery=markevery, markersize=markersize, lw=lw)
     ax[2].fill_between(
@@ -387,7 +408,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     # ax[2].set_ylim(-100, 110)
     # ax[2].set_ylim(0, 1)
     ax[2].set_xlim(0, len(avg_train_rewards_means_v1[::sample_step]) * sample_step * iterations_per_step)
-    ax[2].set_title(r"$\mathbb{P}[\text{attacker detected}]$", fontsize=fontsize)
+    ax[2].set_title(r"$\mathbb{P}[\text{intrusion interrupted}]$", fontsize=fontsize)
 
     ax[2].plot(np.array(list(range(len(avg_train_rewards_means_v1)))) * iterations_per_step,
                [1.00] * len(avg_train_rewards_means_v1), label=r"Optimal $\pi^{*}$",

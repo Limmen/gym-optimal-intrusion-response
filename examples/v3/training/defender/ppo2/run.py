@@ -41,8 +41,8 @@ def default_config() -> ClientConfig:
                                  agent_type=AgentType.PPO_BASELINE.value,
                                  output_dir=experiments_util.default_output_dir(),
                                  title="Optimal Intrusion Response V3",
-                                 run_many=True, random_seeds=[770, 8999, 7299],
-                                 random_seed=799,
+                                 run_many=True, random_seeds=[8770, 88999, 79299],
+                                 random_seed=7899,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,
                                  )
     return client_config
