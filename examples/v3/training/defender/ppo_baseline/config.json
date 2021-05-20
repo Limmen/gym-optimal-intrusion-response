@@ -4,7 +4,7 @@
     "defender_agent_config": {
         "alpha": 0.0005,
         "ar_policy": false,
-        "batch_size": 2000,
+        "batch_size": 4000,
         "buffer_size": 1000000,
         "checkpoint_freq": 25,
         "clip_gradient": false,
@@ -34,7 +34,7 @@
         "gradient_steps": 1,
         "hidden_activation": "ReLU",
         "illegal_action_logit": -1000,
-        "input_dim": 2,
+        "input_dim": 3,
         "input_dim_2": 30,
         "learning_starts": 50000,
         "load_path": null,

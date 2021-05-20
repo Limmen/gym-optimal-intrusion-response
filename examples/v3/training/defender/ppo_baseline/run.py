@@ -18,12 +18,12 @@ def default_config() -> ClientConfig:
                                num_iterations=1000,
                                gif_dir=experiments_util.default_output_dir() + "/results/gifs",
                                save_dir=experiments_util.default_output_dir() + "/results/data",
-                               checkpoint_freq=25, input_dim=2,
+                               checkpoint_freq=25, input_dim=3,
                                output_dim=2,
                                pi_hidden_dim=64, pi_hidden_layers=1,
                                vf_hidden_dim=64, vf_hidden_layers=1,
                                shared_hidden_layers=2, shared_hidden_dim=64,
-                               batch_size=2000,
+                               batch_size=4000,
                                gpu=False, tensorboard=True,
                                tensorboard_dir=experiments_util.default_output_dir() + "/results/tensorboard",
                                optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
@@ -33,7 +33,7 @@ def default_config() -> ClientConfig:
                                eps_clip=0.2, optimization_iterations=10,
                                render_steps=100, illegal_action_logit=-1000,
                                filter_illegal_actions=True,
-                               running_avg=50,  eval_deterministic=False
+                               running_avg=50, eval_deterministic=False
                                )
     env_name = "optimal-intrusion-response-v3"
 

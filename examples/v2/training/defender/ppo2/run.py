@@ -11,7 +11,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    agent_config = AgentConfig(gamma=1, alpha=0.0001, epsilon=1, render=False,
+    agent_config = AgentConfig(gamma=1, alpha=0.0005, epsilon=1, render=False,
                                min_epsilon=0.01, eval_episodes=10, train_log_frequency=1,
                                epsilon_decay=0.9999, video=False, eval_log_frequency=1,
                                video_fps=5, video_dir=experiments_util.default_output_dir() + "/results/videos",
