@@ -47,7 +47,6 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
 
         attack_action_id = int(attack_action_id)
         defense_action_id = int(defense_action_id)
-
         attacker_reward, defender_reward, done, defender_info = self.step_defender(defense_action_id)
 
         info = {}
@@ -86,7 +85,6 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
                 self.env_state.target_compromised = True
                 done = True
                 defender_reward = self.env_config.defender_target_compromised_reward
-
         d3 = TransitionOperator.update_defender_state(self.env_state, attacker_action=attack_action_id, t=attack_t)
         if not done:
             done = d3

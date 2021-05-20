@@ -129,7 +129,7 @@ class DefenderObservationState:
                     defender_dynamics_model.norm_num_new_warning_alerts[(attacker_action_id, logged_in_ips_str)].rvs()
 
             if (attacker_action_id, logged_in_ips_str) in \
-                    defender_dynamics_model.norm_num_new_warning_alerts:
+                    defender_dynamics_model.norm_num_new_priority:
                 num_new_priority = \
                     defender_dynamics_model.norm_num_new_priority[(attacker_action_id, logged_in_ips_str)].rvs()
 

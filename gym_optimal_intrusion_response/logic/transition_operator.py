@@ -90,9 +90,6 @@ class TransitionOperator:
                 env_state.caught = True
                 info["caught_attacker"] = 1
                 r = env_config.defender_intrusion_prevention_reward / max(1, (math.pow((env_state.t - env_state.intrusion_t), 1.05)))
-                # ct.append(early_stopping_rew + continue_rew)
-                # r = env_config.defender_intrusion_prevention_reward/(1 + env_state.t - env_state.intrusion_t)
-                # print("r:{}, t:{}, t1:{}".format(r, env_state.t, env_state.intrusion_t))
                 return env_config.attacker_intrusion_prevention_reward, r, info
             elif intrusion_in_progress and not env_state.stopped:
                 return env_config.attacker_target_compromised_reward, \

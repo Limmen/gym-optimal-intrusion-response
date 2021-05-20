@@ -11,7 +11,8 @@ def test_model() -> None:
     :return: None
     """
     # save_dynamics_model_dir = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v1/"
-    save_dynamics_model_dir = "/Users/kimham/workspace/gym-optimal-intrusion-response/traces/"
+    save_dynamics_model_dir = "/home/kim/workspace/gym-optimal-intrusion-response/traces/"
+
 
     defender_dynamics_model = DefenderDynamicsModel()
     new_model = DefenderDynamicsModel()
@@ -34,6 +35,11 @@ def test_model() -> None:
     print(new_model.norm_num_new_alerts[(19, '172.18.9.191')].mean())
     print(new_model.norm_num_new_alerts[(19, '172.18.9.191')].std())
     print(new_model.norm_num_new_alerts[(19, '172.18.9.191')].var())
+
+    print("20:")
+    print(new_model.norm_num_new_alerts[(20, '172.18.9.191')].mean())
+    print(new_model.norm_num_new_alerts[(20, '172.18.9.191')].std())
+    print(new_model.norm_num_new_alerts[(20, '172.18.9.191')].var())
 
     print("11:")
     print(new_model.norm_num_new_alerts[(11, '172.18.9.191')].mean())
