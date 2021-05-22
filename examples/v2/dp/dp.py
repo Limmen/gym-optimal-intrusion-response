@@ -57,7 +57,7 @@ def reward_fun2(state: np.ndarray, action: int, id_to_state: dict) -> float:
         return hp * constants.DP2.ATTACK_REWARD
     else:
         if action == constants.ACTIONS.STOPPING_ACTION:
-            r = hp * constants.DP2.STOPPING_REWARD + (1 - hp) * (constants.DP2.EARLY_STOPPING_REWARD)
+            r = (hp * constants.DP2.STOPPING_REWARD)/(math.pow(max(1, t1-(1/hp)), 1.05)) + (1 - hp) * (constants.DP2.EARLY_STOPPING_REWARD)
             return r
         else:
             return hp * constants.DP2.ATTACK_REWARD + (1 - hp) * (constants.DP2.SERVICE_REWARD)
