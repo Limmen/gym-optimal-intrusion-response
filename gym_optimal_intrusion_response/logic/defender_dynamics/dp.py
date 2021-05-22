@@ -359,6 +359,7 @@ class DP:
         DP.save_numpy(policy, "policy.npy")
         return policy, V
 
+    @staticmethod
     def compute_thresholds(V: np.ndarray, T: np.ndarray, R: np.ndarray, n_states: int, next_state_lookahead: dict,
                            id_to_state: dict, HP: np.ndarray) -> np.ndarray:
         """
