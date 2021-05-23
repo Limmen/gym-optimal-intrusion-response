@@ -228,6 +228,17 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         optimal_steps_v3_data, optimal_steps_v3_means, optimal_steps_v3_stds,
         optimal_steps_v2_data, optimal_steps_v2_means, optimal_steps_v2_stds,
         optimal_rewards_v2_data, optimal_rewards_v2_means, optimal_rewards_v2_stds,
+
+        t_baseline_rewards_data, t_baseline_rewards_means, t_baseline_rewards_stds,
+        t_baseline_early_stopping_data, t_baseline_early_stopping_means, t_baseline_early_stopping_stds,
+        t_baseline_caught_data, t_baseline_caught_means, t_baseline_caught_stds,
+
+        a_baseline_rewards_data, a_baseline_rewards_means, a_baseline_rewards_stds,
+        a_baseline_early_stopping_data, a_baseline_early_stopping_means, a_baseline_early_stopping_stds,
+        a_baseline_caught_data, a_baseline_caught_means, a_baseline_caught_stds,
+
+        a_baseline_steps_data, a_baseline_steps_means, a_baseline_steps_stds,
+
         fontsize : int = 6.5, figsize: Tuple[int,int] =  (3.75, 3.4),
         title_fontsize=8, lw=0.5, wspace=0.02, hspace=0.3, top=0.9,
         labelsize=6, markevery=10, optimal_reward = 95, sample_step = 1,
@@ -263,12 +274,35 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     ax[0].plot(
         np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_rewards_means_v1[::sample_step], label=r"$\pi_{\theta}$ simulation",
-        marker="s", ls='-', color="#599ad3", markevery=markevery, markersize=markersize, lw=lw)
+        marker="o", ls='-', color="#599ad3", markevery=markevery, markersize=markersize, lw=lw)
     ax[0].fill_between(
         np.array(list(range(len(avg_train_rewards_means_v1[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_rewards_means_v1[::sample_step] - avg_train_rewards_stds_v1[::sample_step],
         avg_train_rewards_means_v1[::sample_step] + avg_train_rewards_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3", lw=lw)
+
+    ax[0].plot(
+        np.array(list(range(len(t_baseline_rewards_means[::sample_step])))) * sample_step * iterations_per_step,
+        t_baseline_rewards_means[::sample_step], label=r"$t=6$ baseline",
+        marker="d", ls='-', color="#f9a65a", markevery=markevery, markersize=markersize, lw=lw)
+    ax[0].fill_between(
+        np.array(list(range(len(t_baseline_rewards_means[::sample_step])))) * sample_step * iterations_per_step,
+        t_baseline_rewards_means[::sample_step] - t_baseline_rewards_stds[::sample_step],
+        t_baseline_rewards_means[::sample_step] + t_baseline_rewards_stds[::sample_step],
+        alpha=0.35, color="#f9a65a", lw=lw)
+
+    print("t:{}".format(t_baseline_rewards_means))
+    print("a:{}".format(a_baseline_rewards_means))
+
+    ax[0].plot(
+        np.array(list(range(len(a_baseline_rewards_means[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_rewards_means[::sample_step], label=r"$a=1$ baseline",
+        marker="h", ls='-', color="#E7298A", markevery=markevery, markersize=markersize, lw=lw)
+    ax[0].fill_between(
+        np.array(list(range(len(a_baseline_rewards_means[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_rewards_means[::sample_step] - a_baseline_rewards_stds[::sample_step],
+        a_baseline_rewards_means[::sample_step] + a_baseline_rewards_stds[::sample_step],
+        alpha=0.35, color="#E7298A", lw=lw)
 
 
     ax[0].plot(np.array(list(range(len(avg_train_rewards_means_v1[::sample_step]))))* sample_step * iterations_per_step,
@@ -280,7 +314,6 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         optimal_rewards_v2_means[::sample_step] - optimal_rewards_v2_stds[::sample_step],
         optimal_rewards_v2_means[::sample_step] + optimal_rewards_v2_stds[::sample_step],
         alpha=0.35, color="black")
-
 
 
     # ax[0].plot(np.array(list(range(len(avg_train_rewards_means_v1))))[::sample_step] * iterations_per_step,
@@ -305,7 +338,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     ylab.set_size(fontsize)
     ax[0].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
     ax[0].tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
-    ax[0].set_ylim(-100, 200)
+    ax[0].set_ylim(-130, 200)
     ax[0].set_xlim(0, len(avg_train_rewards_means_v1[::sample_step]) * sample_step * iterations_per_step)
     ax[0].set_title(r"Reward per episode", fontsize=fontsize)
 
@@ -335,13 +368,35 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
 
     ax[1].plot(np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
                avg_train_steps_means_v1[::sample_step], label=r"$\mathbb{P}[detected]$ $\pi_{\theta}$ simulation",
-               marker="s", ls='-', color="#599ad3",
+               marker="o", ls='-', color="#599ad3",
                markevery=markevery, markersize=markersize, lw=lw)
     ax[1].fill_between(
         np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_steps_means_v1[::sample_step] - avg_train_steps_stds_v1[::sample_step],
         avg_train_steps_means_v1[::sample_step] + avg_train_steps_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
+
+    ax[1].plot(
+        np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        [6]*len(optimal_steps_v2_means[::sample_step]), label=r"$t=6$ baseline",
+        marker="d", ls='-', color="#f9a65a", markevery=markevery, markersize=markersize, lw=lw)
+
+    ax[1].plot(np.array(list(range(len(a_baseline_steps_means[::sample_step])))) * sample_step * iterations_per_step,
+               a_baseline_steps_means[::sample_step], label=r"$a=1$ baseline",
+               marker="h", ls='-', color="#E7298A",
+               markevery=markevery, markersize=markersize, lw=lw)
+    ax[1].fill_between(
+        np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_steps_means[::sample_step] - a_baseline_steps_stds[::sample_step],
+        a_baseline_steps_means[::sample_step] + a_baseline_steps_stds[::sample_step],
+        alpha=0.35, color="#E7298A")
+
+
+    # ax[1].fill_between(
+    #     np.array(list(range(len(t_baseline_rewards_means[::sample_step])))) * sample_step * iterations_per_step,
+    #     t_baseline_rewards_means[::sample_step] - t_baseline_rewards_stds[::sample_step],
+    #     t_baseline_rewards_means[::sample_step] + t_baseline_rewards_stds[::sample_step],
+    #     alpha=0.35, color="#f9a65a", lw=lw)
 
     ax[1].plot(
         np.array(list(range(len(avg_train_steps_means_v1[::sample_step])))) * sample_step * iterations_per_step,
@@ -388,13 +443,33 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     ax[2].plot(
         np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_caught_frac_means_v1[::sample_step], label=r"Learned $\pi_{\theta}$ vs \textsc{StealthyAttacker}",
-        marker="s", ls='-', color="#599ad3",
+        marker="o", ls='-', color="#599ad3",
         markevery=markevery, markersize=markersize, lw=lw)
     ax[2].fill_between(
         np.array(list(range(len(avg_train_caught_frac_means_v1[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_caught_frac_means_v1[::sample_step] - avg_train_caught_frac_stds_v1[::sample_step],
         avg_train_caught_frac_means_v1[::sample_step] + avg_train_caught_frac_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
+
+    ax[2].plot(
+        np.array(list(range(len(t_baseline_caught_means[::sample_step])))) * sample_step * iterations_per_step,
+        t_baseline_caught_means[::sample_step], label=r"$t=6$ baseline",
+        marker="d", ls='-', color="#f9a65a", markevery=markevery, markersize=markersize, lw=lw)
+    ax[2].fill_between(
+        np.array(list(range(len(t_baseline_caught_means[::sample_step])))) * sample_step * iterations_per_step,
+        t_baseline_caught_means[::sample_step] - t_baseline_caught_stds[::sample_step],
+        t_baseline_caught_means[::sample_step] + t_baseline_caught_stds[::sample_step],
+        alpha=0.35, color="#f9a65a", lw=lw)
+
+    ax[2].plot(
+        np.array(list(range(len(a_baseline_caught_means[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_caught_means[::sample_step], label=r"$a=1$ baseline",
+        marker="h", ls='-', color="#E7298A", markevery=markevery, markersize=markersize, lw=lw)
+    ax[2].fill_between(
+        np.array(list(range(len(a_baseline_caught_means[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_caught_means[::sample_step] - a_baseline_caught_stds[::sample_step],
+        a_baseline_caught_means[::sample_step] + a_baseline_caught_stds[::sample_step],
+        alpha=0.35, color="#E7298A", lw=lw)
 
     ax[2].grid('on')
     #ax[0][2].set_ylabel(r"Reward", fontsize=labelsize)
@@ -439,7 +514,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         np.array(
             list(range(len(avg_train_early_stopping_means_v1[::sample_step])))) * sample_step * iterations_per_step,
         avg_train_early_stopping_means_v1[::sample_step], label=r"Defender $\pi_{\theta^D}$ simulation",
-        marker="s", ls='-', color="#599ad3",
+        marker="o", ls='-', color="#599ad3",
         markevery=markevery, markersize=markersize, lw=lw)
     ax[3].fill_between(
         np.array(
@@ -447,6 +522,26 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
         avg_train_early_stopping_means_v1[::sample_step] - avg_train_early_stopping_stds_v1[::sample_step],
         avg_train_early_stopping_means_v1[::sample_step] + avg_train_early_stopping_stds_v1[::sample_step],
         alpha=0.35, color="#599ad3")
+
+    ax[3].plot(
+        np.array(list(range(len(t_baseline_early_stopping_means[::sample_step])))) * sample_step * iterations_per_step,
+        t_baseline_early_stopping_means[::sample_step], label=r"$t=6$ baseline",
+        marker="d", ls='-', color="#f9a65a", markevery=markevery, markersize=markersize, lw=lw)
+    ax[3].fill_between(
+        np.array(list(range(len(t_baseline_early_stopping_means[::sample_step])))) * sample_step * iterations_per_step,
+        t_baseline_early_stopping_means[::sample_step] - t_baseline_early_stopping_stds[::sample_step],
+        t_baseline_early_stopping_means[::sample_step] + t_baseline_early_stopping_stds[::sample_step],
+        alpha=0.35, color="#f9a65a", lw=lw)
+
+    ax[3].plot(
+        np.array(list(range(len(a_baseline_early_stopping_means[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_early_stopping_means[::sample_step], label=r"$t=6$ baseline",
+        marker="h", ls='-', color="#E7298A", markevery=markevery, markersize=markersize, lw=lw)
+    ax[3].fill_between(
+        np.array(list(range(len(a_baseline_early_stopping_means[::sample_step])))) * sample_step * iterations_per_step,
+        a_baseline_early_stopping_means[::sample_step] - a_baseline_early_stopping_stds[::sample_step],
+        a_baseline_early_stopping_means[::sample_step] + a_baseline_early_stopping_stds[::sample_step],
+        alpha=0.35, color="#E7298A", lw=lw)
 
     # ax[3].plot(np.array(list(range(len(avg_train_rewards_means_v1))))[::sample_step] * iterations_per_step,
     #            ([0.4] * len(avg_train_rewards_means_v1))[::sample_step], label=r"$TTC_0$",
@@ -466,7 +561,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
     ax[3].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
     ax[3].tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
     # ax[2].set_ylim(-100, 110)
-    # ax[3].set_ylim(0, 1)
+    ax[3].set_ylim(0, 1)
     ax[3].set_xlim(0, len(avg_train_rewards_means_v1[::sample_step]) * sample_step * iterations_per_step)
     ax[3].set_title(r"$\mathbb{P}[\text{early stopping}]$", fontsize=fontsize)
 
@@ -475,7 +570,7 @@ def plot_flags_int_r_steps_costs_alerts_two_versions(
                color="black", linestyle="dashed", markersize=markersize, dashes=(4, 2), lw=lw)
 
     handles, labels = ax[2].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.52, 0.165),
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.51, 0.165),
                ncol=5, fancybox=True, shadow=True)
 
     fig.tight_layout()

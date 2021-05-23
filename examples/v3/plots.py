@@ -4,6 +4,8 @@ import glob
 import random
 from gym_optimal_intrusion_response.util import util
 from gym_optimal_intrusion_response.util.plots import plotting_util_defender
+import math
+from gym_pycr_ctf.dao.defender_dynamics.defender_dynamics_model import DefenderDynamicsModel
 
 def parse_data(base_path_1: str, base_path_2: str, suffix: str, ips = None, eval_ips = None):
     ppo_v3_df_0 = pd.read_csv(glob.glob(base_path_1 + "299/*_train.csv")[0])
@@ -117,6 +119,132 @@ def parse_data(base_path_1: str, base_path_2: str, suffix: str, ips = None, eval
            optimal_steps_v2_data, optimal_steps_v2_means, optimal_steps_v2_stds, \
            optimal_rewards_v2_data, optimal_rewards_v2_means, optimal_rewards_v2_stds
 
+def baseline(t :int = 5, optimal_rewards_v2_data = None, optimal_steps_v2_data = None):
+    save_dynamics_model_dir = "/home/kim/workspace/gym-optimal-intrusion-response/traces/"
+    defender_dynamics_model = DefenderDynamicsModel()
+    defender_dynamics_model.read_model(save_dynamics_model_dir, model_name="traces.json")
+    defender_dynamics_model.normalize()
+
+    f1B = defender_dynamics_model.norm_num_new_severe_alerts[(85, '172.18.9.191')]
+    f2B = defender_dynamics_model.norm_num_new_warning_alerts[(85, '172.18.9.191')]
+    f1A = defender_dynamics_model.norm_num_new_severe_alerts[(20, '172.18.9.191')]
+    f2A = defender_dynamics_model.norm_num_new_warning_alerts[(20, '172.18.9.191')]
+
+
+    t_baseline_rewards_data = []
+    t_baseline_early_stopping_data = []
+    t_baseline_caught_data = []
+
+    a_baseline_rewards_data = []
+    a_baseline_early_stopping_data = []
+    a_baseline_caught_data = []
+    a_baseline_steps_data = []
+    # print(optimal_rewards_v2_data)
+    for j in range(len(optimal_rewards_v2_data)):
+        # z = np.random.geometric(p=0.2, size=len(optimal_rewards_v2_data[j]))
+        t_baseline_rewards_data_i = []
+        t_baseline_early_stopping_data_i = []
+        t_baseline_caught_data_i = []
+
+        a_baseline_rewards_data_i = []
+        a_baseline_early_stopping_data_i = []
+        a_baseline_caught_data_i = []
+        a_baseline_steps_data_i = []
+        # np.random.seed(j*1512 + 1291012)
+        for i in range(len(optimal_rewards_v2_data[j])):
+            np.random.seed(j * 1512 + 1291012)
+            batch_size = 50
+            z = np.random.geometric(p=0.2, size=batch_size)
+            t_baseline_rewards_data_i_i = []
+            a_baseline_rewards_data_i_i = []
+            a_baseline_steps_data_i_i = []
+            t_baseline_early_stopping_count = 0
+            a_baseline_early_stopping_count = 0
+            for k in range(batch_size):
+                num_alerts = 0
+                r_alert_baseline = 0
+                for i in range(z[k]):
+                    num_alerts += f1B.rvs(size=1)
+                    num_alerts += f2B.rvs(size=1)
+                    if num_alerts > 0 and i < z[k]-1:
+                        r_alert_baseline = r_alert_baseline - 100
+                        a_baseline_early_stopping_count += 1
+                        a_baseline_steps_data_i_i.append(i)
+                        break
+                    elif num_alerts == 0:
+                        r_alert_baseline = r_alert_baseline + 10
+                if num_alerts == 0:
+                    r_alert_baseline = r_alert_baseline + 100
+                    a_baseline_steps_data_i_i.append(z[k])
+                a_baseline_rewards_data_i_i.append(r_alert_baseline)
+                if z[k] >= t:
+                    print("early stopping:{}".format(z[k]))
+                    r = -100+ t*10
+                    t_baseline_rewards_data_i_i.append(r)
+                    t_baseline_early_stopping_count +=1
+                elif z[k] == t+1:
+                    print("correct stopping")
+                    r = 100 + t * 10
+                    t_baseline_rewards_data_i_i.append(r)
+                else:
+                    print("late stopping")
+                    r = 100/max(1, math.pow(t - z[k], 1.05)) + t * 10 + ((t-z[k])*-100)
+                    t_baseline_rewards_data_i_i.append(r)
+            t_baseline_early_stopping_frac = t_baseline_early_stopping_count/batch_size
+            a_baseline_early_stopping_frac = a_baseline_early_stopping_count / batch_size
+            avg_r = np.mean(t_baseline_rewards_data_i_i)
+            print("avg_r:{}".format(avg_r))
+            t_baseline_rewards_data_i.append(np.mean(t_baseline_rewards_data_i_i))
+            t_baseline_early_stopping_data_i.append(t_baseline_early_stopping_frac)
+            t_baseline_caught_data_i.append(1-t_baseline_early_stopping_frac)
+
+            a_baseline_rewards_data_i.append(np.mean(a_baseline_rewards_data_i_i))
+            a_baseline_early_stopping_data_i.append(a_baseline_early_stopping_frac)
+            a_baseline_caught_data_i.append(1 - a_baseline_early_stopping_frac)
+            a_baseline_steps_data_i.append(np.mean(a_baseline_steps_data_i_i))
+
+        # print(len(t_baseline_rewards_data_i))
+        # t_baseline_rewards_data_i = util.running_average_list(t_baseline_rewards_data_i, 100)
+        # print(len(t_baseline_rewards_data_i))
+        t_baseline_rewards_data.append(t_baseline_rewards_data_i)
+        t_baseline_early_stopping_data.append(t_baseline_early_stopping_data_i)
+        t_baseline_caught_data.append(t_baseline_caught_data_i)
+
+        a_baseline_rewards_data.append(a_baseline_rewards_data_i)
+        a_baseline_early_stopping_data.append(a_baseline_early_stopping_data_i)
+        a_baseline_caught_data.append(a_baseline_caught_data_i)
+        a_baseline_steps_data.append(a_baseline_steps_data_i)
+
+    t_baseline_rewards_means = np.mean(tuple(t_baseline_rewards_data), axis=0)
+    t_baseline_rewards_stds = np.std(tuple(t_baseline_rewards_data), axis=0, ddof=1)
+
+    t_baseline_early_stopping_means = np.mean(tuple(t_baseline_early_stopping_data), axis=0)
+    t_baseline_early_stopping_stds = np.std(tuple(t_baseline_early_stopping_data), axis=0, ddof=1)
+
+    t_baseline_caught_means = np.mean(tuple(t_baseline_caught_data), axis=0)
+    t_baseline_caught_stds = np.std(tuple(t_baseline_caught_data), axis=0, ddof=1)
+
+    a_baseline_rewards_means = np.mean(tuple(a_baseline_rewards_data), axis=0)
+    a_baseline_rewards_stds = np.std(tuple(a_baseline_rewards_data), axis=0, ddof=1)
+
+    a_baseline_early_stopping_means = np.mean(tuple(a_baseline_early_stopping_data), axis=0)
+    a_baseline_early_stopping_stds = np.std(tuple(a_baseline_early_stopping_data), axis=0, ddof=1)
+
+    a_baseline_caught_means = np.mean(tuple(a_baseline_caught_data), axis=0)
+    a_baseline_caught_stds = np.std(tuple(a_baseline_caught_data), axis=0, ddof=1)
+
+    a_baseline_steps_means = np.mean(tuple(a_baseline_steps_data), axis=0)
+    a_baseline_steps_stds = np.std(tuple(a_baseline_steps_data), axis=0, ddof=1)
+
+    return t_baseline_rewards_data, t_baseline_rewards_means, t_baseline_rewards_stds, \
+           t_baseline_early_stopping_data, t_baseline_early_stopping_means, t_baseline_early_stopping_stds, \
+           t_baseline_caught_data, t_baseline_caught_means, t_baseline_caught_stds, \
+           a_baseline_rewards_data, a_baseline_rewards_means, a_baseline_rewards_stds, \
+           a_baseline_early_stopping_data, a_baseline_early_stopping_means, a_baseline_early_stopping_stds, \
+           a_baseline_caught_data, a_baseline_caught_means, a_baseline_caught_stds, \
+           a_baseline_steps_data, a_baseline_steps_means, a_baseline_steps_stds
+
+
 def plot_train(avg_train_rewards_data_v3, avg_train_rewards_means_v3, avg_train_rewards_stds_v3,
            avg_train_steps_data_v3, avg_train_steps_means_v3, avg_train_steps_stds_v3,
            avg_train_caught_frac_data_v3, avg_train_caught_frac_means_v3, avg_train_caught_frac_stds_v3,
@@ -136,6 +264,17 @@ def plot_train(avg_train_rewards_data_v3, avg_train_rewards_means_v3, avg_train_
            optimal_rewards_v2_data, optimal_rewards_v2_means, optimal_rewards_v2_stds
                ):
     print("plot")
+
+    t_baseline_rewards_data, t_baseline_rewards_means, t_baseline_rewards_stds, \
+    t_baseline_early_stopping_data, t_baseline_early_stopping_means, t_baseline_early_stopping_stds, \
+    t_baseline_caught_data, t_baseline_caught_means, t_baseline_caught_stds, \
+    a_baseline_rewards_data, a_baseline_rewards_means, a_baseline_rewards_stds, \
+    a_baseline_early_stopping_data, a_baseline_early_stopping_means, a_baseline_early_stopping_stds, \
+    a_baseline_caught_data, a_baseline_caught_means, a_baseline_caught_stds, \
+    a_baseline_steps_data, a_baseline_steps_means, a_baseline_steps_stds = baseline(
+        t=5, optimal_rewards_v2_data=optimal_rewards_v2_data,
+        optimal_steps_v2_data=optimal_steps_v2_data)
+
     suffix = "gensim"
     ylim_rew = (-300, 170)
     print(len(avg_train_rewards_data_v3[0]))
@@ -169,8 +308,18 @@ def plot_train(avg_train_rewards_data_v3, avg_train_rewards_means_v3, avg_train_
         optimal_steps_v2_data[0:max_iter], optimal_steps_v2_means[0:max_iter], optimal_steps_v2_stds[0:max_iter],
         optimal_rewards_v2_data[0:max_iter], optimal_rewards_v2_means[0:max_iter], optimal_rewards_v2_stds[0:max_iter],
 
+        t_baseline_rewards_data[0:max_iter], t_baseline_rewards_means[0:max_iter], t_baseline_rewards_stds[0:max_iter],
+        t_baseline_early_stopping_data[0:max_iter], t_baseline_early_stopping_means[0:max_iter], t_baseline_early_stopping_stds[0:max_iter],
+        t_baseline_caught_data[0:max_iter], t_baseline_caught_means[0:max_iter], t_baseline_caught_stds[0:max_iter],
+
+        a_baseline_rewards_data[0:max_iter], a_baseline_rewards_means[0:max_iter], a_baseline_rewards_stds[0:max_iter],
+        a_baseline_early_stopping_data[0:max_iter], a_baseline_early_stopping_means[0:max_iter], a_baseline_early_stopping_stds[0:max_iter],
+        a_baseline_caught_data[0:max_iter], a_baseline_caught_means[0:max_iter], a_baseline_caught_stds[0:max_iter],
+
+        a_baseline_steps_data[0:max_iter], a_baseline_steps_means[0:max_iter], a_baseline_steps_stds[0:max_iter],
+
         fontsize= 6.5, figsize= (7.5, 1.5), title_fontsize=8, lw=0.75, wspace=0.17, hspace=0.4, top=0.0,
-        bottom=0.28, labelsize=6, markevery=50, optimal_reward = 100, sample_step = 2,
+        bottom=0.28, labelsize=6, markevery=25, optimal_reward = 100, sample_step = 2,
         eval_only=False, plot_opt = False, iterations_per_step= 10, optimal_int = 1.0,
         optimal_flag = 1.0, file_name = "flags_int_steps_r_costs_alerts_defender_cnsm_21_2", markersize=2.25
     )

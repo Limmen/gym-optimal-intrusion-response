@@ -489,8 +489,8 @@ def plot_policy() -> None:
     ax[0][1].set_yticks([])
     ax[0][3].set_yticks([])
     #
-    ax[0][0].set_ylabel(r"$\mathbb{P}[\text{stop}|s_t]$", fontsize=labelsize)
-    ax[1][0].set_ylabel(r"$\mathbb{P}[\text{stop}|s_t]$", fontsize=labelsize)
+    ax[0][0].set_ylabel(r"$\mathbb{P}[\text{stop}|o_t]$", fontsize=labelsize)
+    ax[1][0].set_ylabel(r"$\mathbb{P}[\text{stop}|o_t]$", fontsize=labelsize)
     # ax[2][0].set_ylabel(r"$\mathbb{P}[\text{stop}|c]$", fontsize=labelsize)
     #
     ax[0][0].set_xticks([])
