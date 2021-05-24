@@ -44,6 +44,8 @@ def default_config() -> ClientConfig:
                                  run_many=True, random_seeds=[770, 8999, 7299],
                                  random_seed=799,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,
+                                 traces_dir="/Users/kimham/workspace/gym-optimal-intrusion-response/traces/",
+                                 traces_filename="traces.json"
                                  )
     return client_config
 
