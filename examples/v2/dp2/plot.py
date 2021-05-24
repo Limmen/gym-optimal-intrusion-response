@@ -83,6 +83,7 @@ def plot_thresholds() -> None:
     # ax.set_ylim(min(y[1:]), max(y[1:]))
     a = ax.get_xticks().tolist()
     a[-1] = r'$T$'
+    print(a)
     ax.set_xticklabels(a)
     ax.set_xticks([1.0, 5.0, 10.0, 15.0, 19.0])
 
