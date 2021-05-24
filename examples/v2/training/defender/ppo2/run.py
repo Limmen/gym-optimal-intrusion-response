@@ -18,7 +18,7 @@ def default_config() -> ClientConfig:
                                num_iterations=1000,
                                gif_dir=experiments_util.default_output_dir() + "/results/gifs",
                                save_dir=experiments_util.default_output_dir() + "/results/data",
-                               checkpoint_freq=25, input_dim=2,
+                               checkpoint_freq=25, input_dim=3,
                                output_dim=2,
                                pi_hidden_dim=64, pi_hidden_layers=1,
                                vf_hidden_dim=64, vf_hidden_layers=1,
@@ -41,9 +41,11 @@ def default_config() -> ClientConfig:
                                  agent_type=AgentType.PPO_BASELINE.value,
                                  output_dir=experiments_util.default_output_dir(),
                                  title="Optimal Intrusion Response V2",
-                                 run_many=True, random_seeds=[1816, 1831, 4257],
-                                 random_seed=11296,
+                                 run_many=True, random_seeds=[810, 8991, 6297],
+                                 random_seed=299,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,
+                                 traces_dir="/Users/kimham/workspace/gym-optimal-intrusion-response/traces/",
+                                 traces_filename="traces.json"
                                  )
     return client_config
 
