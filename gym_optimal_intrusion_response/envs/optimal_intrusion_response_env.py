@@ -65,6 +65,7 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         info["flags"] = 0
         info["optimal_step"] = 0
         info["optimal_reward"] = 0
+        info["intrusion_steps"] = 0
 
         if not done and not self.env_config.dp and not self.env_config.traces:
             attacker_reward, defender_reward_2, done, info = self.step_attacker(attack_action_id)
@@ -105,6 +106,7 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
                 info["optimal_step"] = int_t + 1
                 info["optimal_reward"] = int_t * self.env_config.defender_continue_reward + \
                                          self.env_config.defender_intrusion_prevention_reward
+
 
         # Merge infos
         if info is None:

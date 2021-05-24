@@ -183,6 +183,8 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                             infos[i]["flags"] / 1)
                         rollout_data_dto.optimal_rewards.append(infos[i]["optimal_reward"])
                         rollout_data_dto.optimal_steps.append(infos[i]["optimal_step"])
+                        if infos[i]["caught_attacker"] == 1:
+                            rollout_data_dto.intrusion_steps.append(infos[i]["intrusion_steps"])
                         # print("reset reward:{}".format(episode_reward_attacker))
                         episode_reward_attacker[i] = 0
                         episode_reward_defender[i] = 0
@@ -261,6 +263,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             train_log_dto.attacker_action_alerts_norm.extend(rollout_data_dto.attacker_action_alerts_norm)
             train_log_dto.optimal_rewards.extend(rollout_data_dto.optimal_rewards)
             train_log_dto.optimal_steps.extend(rollout_data_dto.optimal_steps)
+            train_log_dto.intrusion_steps.extend(rollout_data_dto.intrusion_steps)
 
             if continue_training is False:
                 break

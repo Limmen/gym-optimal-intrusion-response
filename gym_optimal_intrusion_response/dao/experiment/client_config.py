@@ -22,7 +22,9 @@ class ClientConfig:
                  mode: RunnerMode = RunnerMode.TRAIN_ATTACKER,
                  eval_env: bool = None,
                  n_envs : int = 1,
-                 train_mode: TrainMode = TrainMode.TRAIN_ATTACKER
+                 train_mode: TrainMode = TrainMode.TRAIN_ATTACKER,
+                 traces_dir: str = "",
+                 traces_filename = ""
                  ):
         self.env_name = env_name
         self.logger = None
@@ -40,3 +42,5 @@ class ClientConfig:
         self.eval_env = eval_env
         self.n_envs = n_envs
         self.train_mode = train_mode
+        self.traces_dir = traces_dir
+        self.traces_filename = traces_filename

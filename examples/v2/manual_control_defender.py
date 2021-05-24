@@ -13,7 +13,8 @@ def manual_control(env_name : str) -> None:
     :param env_name: the name of the environment
     :return: None
     """
-    env = gym.make(env_name)
+    env = gym.make(env_name, traces_dir="/Users/kimham/workspace/gym-optimal-intrusion-response/traces",
+                   traces_filename="traces.json")
     ManualDefenderAgent(env=env)
 
 

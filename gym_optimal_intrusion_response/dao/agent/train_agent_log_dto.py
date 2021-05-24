@@ -1,6 +1,7 @@
 from typing import List
 from gym_optimal_intrusion_response.dao.experiment.experiment_result import ExperimentResult
 
+
 class TrainAgentLogDTO:
     """
     DTO with information for logging during training
@@ -76,7 +77,8 @@ class TrainAgentLogDTO:
                  eval_2_attacker_action_alerts_norm: List[float] = None,
                  start_time: float = 0.0,
                  optimal_rewards : List[float] = None,
-                 optimal_steps: List[float] = None
+                 optimal_steps: List[float] = None,
+                 intrusion_steps: List[float] = None
                  ):
         self.iteration = iteration
         self.train_result = train_result
@@ -161,6 +163,7 @@ class TrainAgentLogDTO:
         self.start_time = start_time
         self.optimal_rewards = optimal_rewards
         self.optimal_steps = optimal_steps
+        self.intrusion_steps = intrusion_steps
 
 
     def initialize(self):
@@ -251,6 +254,7 @@ class TrainAgentLogDTO:
         self.eval_2_attacker_action_alerts_norm = []
         self.optimal_steps = []
         self.optimal_rewards = []
+        self.intrusion_steps = []
 
     def copy(self):
         c = TrainAgentLogDTO()
@@ -337,3 +341,4 @@ class TrainAgentLogDTO:
         c.start_time = self.start_time
         c.optimal_steps = self.optimal_steps
         c.optimal_rewards = self.optimal_rewards
+        c.intrusion_steps = self.intrusion_steps

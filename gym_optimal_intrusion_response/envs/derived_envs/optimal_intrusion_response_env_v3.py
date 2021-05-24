@@ -10,7 +10,7 @@ class OptimalIntrusionResponseEnvV3(OptimalIntrusionResponseEnv):
     Version 3 of the optimal intrusion response environment.
     """
 
-    def __init__(self):
+    def __init__(self, traces_dir : str = "", traces_filename : str = ""):
         num_nodes = 4
         num_attributes = 4
         # random_attacker = RandomAttacker(num_actions=(num_nodes*num_attributes))
@@ -128,7 +128,7 @@ class OptimalIntrusionResponseEnvV3(OptimalIntrusionResponseEnv):
                                traces=True,
                                action_to_state=action_to_state,
                                attack_idx_to_id=attack_idx_to_id,
-                               save_dynamics_model_dir="/home/kim/workspace/gym-optimal-intrusion-response/traces/",
-                               dynamics_model_name="traces.json"
+                               save_dynamics_model_dir=traces_dir,
+                               dynamics_model_name=traces_filename
                                )
         super().__init__(env_config=env_config)

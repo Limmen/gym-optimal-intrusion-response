@@ -10,7 +10,7 @@ class OptimalIntrusionResponseEnvV1(OptimalIntrusionResponseEnv):
     Version 1 of the optimal intrusion response environment.
     """
 
-    def __init__(self):
+    def __init__(self, traces_dir : str = "", traces_filename : str = ""):
         num_nodes = 4
         num_attributes = 4
         random_attacker = RandomAttacker(num_actions=(num_nodes*num_attributes))
@@ -48,6 +48,8 @@ class OptimalIntrusionResponseEnvV1(OptimalIntrusionResponseEnv):
                                attacker_intrusion_prevented_reward=-1,
                                target_id=3,
                                dp=True,
-                               dp_load=False
+                               dp_load=False,
+                               save_dynamics_model_dir=traces_dir,
+                               dynamics_model_name=traces_filename
                                )
         super().__init__(env_config=env_config)

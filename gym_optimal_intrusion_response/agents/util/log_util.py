@@ -255,6 +255,7 @@ class LogUtil:
 
         avg_episode_optimal_rewards = np.mean(train_log_dto.optimal_rewards)
         avg_episode_optimal_steps = np.mean(train_log_dto.optimal_steps)
+        avg_intrusion_steps = np.mean(train_log_dto.intrusion_steps)
 
         avg_episode_flags = np.mean(train_log_dto.episode_flags)
         avg_episode_flags_percentage = np.mean(train_log_dto.episode_flags_percentage)
@@ -435,7 +436,8 @@ class LogUtil:
             eval_avg_episode_flags=eval_avg_episode_flags,
             eval_avg_episode_flags_percentage=eval_avg_episode_flags_percentage,
             avg_optimal_reward=avg_episode_optimal_rewards,
-            avg_optimal_steps=avg_episode_optimal_steps
+            avg_optimal_steps=avg_episode_optimal_steps,
+            avg_intrusion_steps=avg_intrusion_steps
         )
         log_str = tensorboard_data_dto.log_str_defender()
         defender_agent_config.logger.info(log_str)
@@ -488,6 +490,7 @@ class LogUtil:
             result.eval_avg_episode_flags_percentage.append(eval_avg_episode_flags_percentage)
             result.optimal_rewards.append(avg_episode_optimal_rewards)
             result.optimal_steps.append(avg_episode_optimal_steps)
+            result.intrusion_steps.append(avg_intrusion_steps)
 
             if not eval:
                 train_log_dto.train_result = result

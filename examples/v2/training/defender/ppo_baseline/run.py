@@ -42,8 +42,10 @@ def default_config() -> ClientConfig:
                                  output_dir=experiments_util.default_output_dir(),
                                  title="Optimal Intrusion Response V2",
                                  run_many=True, random_seeds=[810, 8991, 6297],
-                                 random_seed=72899,
+                                 random_seed=11296,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,train_mode=TrainMode.TRAIN_DEFENDER,
+                                 traces_dir="/Users/kimham/workspace/gym-optimal-intrusion-response/traces/",
+                                 traces_filename="traces.json"
                                  )
     return client_config
 

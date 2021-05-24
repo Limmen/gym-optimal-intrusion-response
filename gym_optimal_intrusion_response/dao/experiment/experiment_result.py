@@ -91,7 +91,8 @@ class ExperimentResult:
                  eval_2_attacker_action_alerts_norm: List[float] = None,
                  time_elapsed : List[float] = None,
                  optimal_rewards: List[float] = None,
-                 optimal_steps: List[float] = None
+                 optimal_steps: List[float] = None,
+                 intrusion_steps: List[float] = None
                  ):
         """
         Constructor, initializes the DTO
@@ -156,6 +157,7 @@ class ExperimentResult:
         :param time_elapsed: the time elapsed from start of training
         :param optimal_rewards: the optimal rewards
         :param optimal_steps: the optimal steps
+        :param intrusion_steps: the number of intrusion steps
         """
         self.attacker_avg_episode_rewards = attacker_avg_episode_rewards
         self.defender_avg_episode_rewards = defender_avg_episode_rewards
@@ -258,6 +260,7 @@ class ExperimentResult:
         self.time_elapsed = time_elapsed
         self.optimal_rewards = optimal_rewards
         self.optimal_steps = optimal_steps
+        self.intrusion_steps = intrusion_steps
 
         if avg_episode_steps is None:
             self.avg_episode_steps = []
@@ -461,6 +464,8 @@ class ExperimentResult:
             self.optimal_rewards = []
         if optimal_steps is None:
             self.optimal_steps = []
+        if intrusion_steps is None:
+            self.intrusion_steps = []
 
     def to_csv(self, file_path : str) -> None:
         """
@@ -504,7 +509,7 @@ class ExperimentResult:
                    self.eval_attacker_action_alerts, self.eval_attacker_action_alerts_norm,
                    self.eval_2_attacker_action_costs, self.eval_2_attacker_action_costs_norm,
                    self.eval_2_attacker_action_alerts, self.eval_2_attacker_action_alerts_norm,
-                   self.time_elapsed, self.optimal_rewards, self.optimal_steps
+                   self.time_elapsed, self.optimal_rewards, self.optimal_steps, self.intrusion_steps
                    ]
         metric_labels = ["attacker_avg_episode_rewards", "defender_avg_episode_rewards", "avg_episode_steps",
                          "epsilon_values", "attacker_cumulative_reward", "defender_cumulative_reward",
@@ -538,7 +543,7 @@ class ExperimentResult:
                          "eval_attacker_action_alerts", "eval_attacker_action_alerts_norm",
                          "eval_2_attacker_action_costs", "eval_2_attacker_action_costs_norm",
                          "eval_2_attacker_action_alerts", "eval_2_attacker_action_alerts_norm",
-                         "time_elapsed", "optimal_rewards", "optimal_steps"
+                         "time_elapsed", "optimal_rewards", "optimal_steps", "intrusion_steps"
                          ]
         filtered_metric_labels = []
         filtered_metrics = []

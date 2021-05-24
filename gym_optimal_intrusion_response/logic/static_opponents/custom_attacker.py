@@ -16,20 +16,12 @@ class CustomAttacker(StaticAttacker):
         if t == 0:
             self.t = 0
             self.startup_phase = True
-        print("t")
-        if t < 7:
-            print("372")
-            return 372, self.t
+        if self.startup_phase and np.random.rand() < self.continue_prob:
+            return 372, 0
         else:
-            self.startup_phase = False
             self.t += 1
+            self.startup_phase = False
             return self.strategy[self.t - 1], self.t
-        # if self.startup_phase and np.random.rand() < self.continue_prob:
-        #     return 372, 0
-        # else:
-        #     self.t += 1
-        #     self.startup_phase = False
-        #     return self.strategy[self.t-1], self.t
 
     def reset(self):
         self.t = 0

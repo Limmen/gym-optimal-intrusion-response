@@ -137,7 +137,7 @@ class EnvState:
             defender_dynamics_model = DefenderDynamicsModel()
             new_model = DefenderDynamicsModel()
             if self.env_config.save_dynamics_model_dir is not None:
-                print("loading dynamics model")
+                print("loading dynamics model: {}/{}".format(self.env_config.save_dynamics_model_dir, self.env_config.dynamics_model_name))
                 defender_dynamics_model.read_model(self.env_config.save_dynamics_model_dir,
                                                    model_name=self.env_config.dynamics_model_name)
                 defender_dynamics_model.normalize()

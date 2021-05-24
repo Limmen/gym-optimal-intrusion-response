@@ -62,5 +62,5 @@ class Runner:
         :param config: the client configuration
         :return: the created env
         """
-        env = gym.make(config.env_name)
+        env = gym.make(config.env_name, traces_dir=config.traces_dir, traces_filename=config.traces_filename)
         return env

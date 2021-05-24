@@ -621,7 +621,7 @@ def plot_reward_fun() -> None:
 
     :return: None
     """
-    times = np.arange(0, 100, 1)
+    times = np.arange(1, 101, 1)
     continue_rew = 10
     stopping_rew = 100
     early_stopping_rew = -100
@@ -681,8 +681,15 @@ def plot_reward_fun() -> None:
     ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
 
     ax.axhline(y=0, color='k', linewidth=0.5)
-    ax.set_xlim(0, len(times))
+    ax.set_xlim(1, 101)
     ax.set_ylim(-130, 130)
+
+    a = ax.get_xticks().tolist()
+    a[-2] = r'$T=100$'
+    print(a)
+    ax.set_xticklabels(a)
+    # ax.set_xticks([1.0, 20.0, 40.0, 60.0, 80.0])
+
     # a = ax.get_xticks().tolist()
     # a[-1] = r'$T$'
     # ax.set_xticklabels(a)
