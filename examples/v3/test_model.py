@@ -34,9 +34,12 @@ def plot_alerts_threshold() -> None:
     :return: None
     """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-    env = gym.make("optimal-intrusion-response-v3")
-    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
-    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    # env = gym.make("optimal-intrusion-response-v3")
+    env = None
+    # v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
+    # v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/12_may/rl/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
+    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/12_may/rl/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
     model = initialize_model(env, v3_load_path, "cpu", None)
     model2 = initialize_model(env, v2_load_path, "cpu", None)
     num_alerts = np.arange(0, 200, 1)
@@ -75,7 +78,7 @@ def plot_alerts_threshold() -> None:
     plt.rcParams['axes.linewidth'] = 0.1
     plt.rcParams.update({'font.size': 8})
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4.8, 2.25))
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 2.85))
 
     # ylims = (0, 920)
 
@@ -94,13 +97,10 @@ def plot_alerts_threshold() -> None:
                     alpha=0.35, color="r")
 
     # if plot_opt:
-    ax.plot(x,
-            [0.5] * len(x), label=r"0.5",
-            color="black",
-            linestyle="dashed")
+    ax.plot(x, [0.5] * len(x), label=r"0.5", color="black", linestyle="dashed")
 
-    ax.set_title(r"$\pi_{\theta}(\text{stop}|a)$", fontsize=11)
-    ax.set_xlabel(r"\# Alerts $a$", fontsize=10)
+    ax.set_title(r"$\pi_{\theta}(\text{stop}|a)$", fontsize=13.5)
+    ax.set_xlabel(r"\# Alerts $a$", fontsize=12)
     ax.set_xlim(0, len(x)*2)
     ax.set_ylim(0, 1.1)
 
@@ -111,19 +111,22 @@ def plot_alerts_threshold() -> None:
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
 
-    xlab.set_size(8)
-    ylab.set_size(8)
+    xlab.set_size(12)
+    ylab.set_size(12)
 
     # change the color of the top and right spines to opaque gray
     ax.spines['right'].set_color((.8, .8, .8))
     ax.spines['top'].set_color((.8, .8, .8))
 
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
-              ncol=2, fancybox=True, shadow=True, fontsize=8)
-    ax.legend(loc="lower right")
+    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
+    #           ncol=2, fancybox=True, shadow=True, fontsize=13.5)
+    ax.legend(loc="lower right", fontsize=12)
 
     ttl = ax.title
     ttl.set_position([.5, 1.05])
+
+    ax.tick_params(axis='both', which='major', labelsize=12, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=12, length=2.2, width=0.6)
 
     fig.tight_layout()
     # plt.show()
@@ -140,9 +143,12 @@ def plot_3d() -> None:
     :return: None
     """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-    env = gym.make("optimal-intrusion-response-v3")
-    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
-    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    # env = gym.make("optimal-intrusion-response-v3")
+    # v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
+    # v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/12_may/rl/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
+    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/12_may/rl/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    env=None
     model = initialize_model(env, v3_load_path, "cpu", None)
     num_severe_alerts_recent = np.arange(200, 0, -1)
     num_severe_alerts_total = np.arange(0, 200, 1)
@@ -163,19 +169,19 @@ def plot_3d() -> None:
     fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(4.15, 2.9))
     ax.plot_surface(sev, warn, action_val, cmap='Blues', linewidth=0.3,
                     alpha=0.8, edgecolor='k', rstride=12, cstride=12)
-    ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{StealthyAttacker}", fontsize=11)
-    ax.set_xlabel(r"warn alerts $w_a$")
-    ax.set_ylabel(r"sev alerts $s_a$")
+    ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{StealthyAttacker}", fontsize=13.5)
+    # ax.set_xlabel(r"warn alerts $w_a$")
+    # ax.set_ylabel(r"sev alerts $s_a$")
     ax.xaxis.labelpad = 0
     ax.yaxis.labelpad = 0
     ax.set_xticks(np.arange(0, 200 + 1, 50))
     ax.set_yticks(np.arange(0, 200+1, 50))
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(10)
-    ylab.set_size(10)
-    ax.tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
-    ax.tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
+    xlab.set_size(12)
+    ylab.set_size(12)
+    ax.tick_params(axis='both', which='major', labelsize=12, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=12, length=2.2, width=0.6)
     fig.tight_layout()
     plt.subplots_adjust(bottom=0.55)
     # plt.show()
@@ -190,8 +196,11 @@ def plot_3d_2() -> None:
     :return: None
     """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-    env = gym.make("optimal-intrusion-response-v3")
-    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    # env = gym.make("optimal-intrusion-response-v3")
+    env=None
+    # v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
+    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/12_may/rl/v3_results/v3/results_1/data/1620801616.3180108_0_4575_policy_network.zip"
+    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/12_may/rl/v2_results/v2/results_2/data/1620760014.3964121_0_1150_policy_network.zip"
     model2 = initialize_model(env, v2_load_path, "cpu", None)
     num_severe_alerts_recent = np.arange(200, 0, -1)
     num_severe_alerts_total = np.arange(0, 200, 1)
@@ -213,19 +222,19 @@ def plot_3d_2() -> None:
     fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(4.15, 2.9))
     ax.plot_surface(sev, warn, action_val_2, cmap='Reds', linewidth=0.3,
                     alpha=0.8, edgecolor='k', rstride=12, cstride=12)
-    ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{NoisyAttacker}", fontsize=11)
-    ax.set_xlabel(r"warn alerts $w_a$")
-    ax.set_ylabel(r"sev alerts $s_a$")
+    ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{NoisyAttacker}", fontsize=13.5)
+    # ax.set_xlabel(r"warn alerts $w_a$")
+    # ax.set_ylabel(r"sev alerts $s_a$")
     ax.xaxis.labelpad = 0
     ax.yaxis.labelpad = 0
     ax.set_xticks(np.arange(0, 200 + 1, 50))
     ax.set_yticks(np.arange(0, 200+1, 50))
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(10)
-    ylab.set_size(10)
-    ax.tick_params(axis='both', which='major', labelsize=7, length=2.2, width=0.6)
-    ax.tick_params(axis='both', which='minor', labelsize=7, length=2.2, width=0.6)
+    xlab.set_size(12)
+    ylab.set_size(12)
+    ax.tick_params(axis='both', which='major', labelsize=12, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=12, length=2.2, width=0.6)
     fig.tight_layout()
     fig.subplots_adjust(bottom=0.55)
     fig.savefig("alerts_stopping_2" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
@@ -239,9 +248,10 @@ def plot_logins_threshold() -> None:
     :return: None
     """
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-    env = gym.make("optimal-intrusion-response-v3")
-    v2_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v2_results/results_1/data/1621504581.9928813_72899_400_policy_network.zip"
-    v3_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v3_results/results_1/data/1621513319.4798174_299_300_policy_network.zip"
+    # env = gym.make("optimal-intrusion-response-v3")
+    env = None
+    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/backup_pycr_cnsm_21_22_may/v2_results/results_1/data/1621504581.9928813_72899_400_policy_network.zip"
+    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/backup_pycr_cnsm_21_22_may/v3_results/results_1/data/1621513319.4798174_299_300_policy_network.zip"
     model = initialize_model(env, v2_load_path, "cpu", None)
     model2 = initialize_model(env, v3_load_path, "cpu", None)
     num_logins = np.arange(0, 100, 1)
@@ -282,9 +292,11 @@ def plot_logins_threshold() -> None:
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 2
     plt.rcParams['axes.linewidth'] = 0.1
-    plt.rcParams.update({'font.size': 8})
+    fontsize=16.5
+    labelsize=15
+    plt.rcParams.update({'font.size': fontsize})
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4.8, 2.25))
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5.2, 2.95))
 
     # ylims = (0, 920)
 
@@ -308,8 +320,8 @@ def plot_logins_threshold() -> None:
     #         color="black",
     #         linestyle="dashed")
 
-    ax.set_title(r"$\pi_{\theta}(\text{stop}|l)$", fontsize=11)
-    ax.set_xlabel(r"\# Login attempts $l$", fontsize=10)
+    ax.set_title(r"$\pi_{\theta}(\text{stop}|l)$", fontsize=fontsize)
+    ax.set_xlabel(r"\# Login attempts $l$", fontsize=fontsize)
     ax.set_xlim(0, len(x))
     ax.set_ylim(0, 0.15)
 
@@ -320,19 +332,21 @@ def plot_logins_threshold() -> None:
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
 
-    xlab.set_size(8)
-    ylab.set_size(8)
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
 
     # change the color of the top and right spines to opaque gray
     ax.spines['right'].set_color((.8, .8, .8))
     ax.spines['top'].set_color((.8, .8, .8))
 
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
-              ncol=2, fancybox=True, shadow=True, fontsize=8)
-    ax.legend(loc="lower right")
+    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
+    #           ncol=2, fancybox=True, shadow=True, fontsize=12)
+    ax.legend(loc="lower right", fontsize=12)
 
-    ttl = ax.title
-    ttl.set_position([.5, 1.05])
+    # ttl = ax.title
+    # ttl.set_position([.5, 1.05])
+    ax.tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
 
     fig.tight_layout()
     # plt.show()
@@ -373,6 +387,7 @@ def action_pred_core_state_severe_warning(severe_alerts, warning_alerts, model, 
 if __name__ == '__main__':
     # model = initialize_model(env, load_path, "cuda:0", None)
     # plot_3d()
-    plot_logins_threshold()
+    # plot_logins_threshold()
     # plot_3d_2()
     # plot_alerts_threshold()
+    plot_logins_threshold()

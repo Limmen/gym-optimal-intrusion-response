@@ -10,8 +10,9 @@ def plot() -> None:
 
     :return: None
     """
-    path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/new_defender_dynamics_model_2.json"
-    path = "/home/kim/workspace/gym-optimal-intrusion-response/traces/traces.json"
+    # path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/new_defender_dynamics_model_2.json"
+    # path = "/home/kim/workspace/gym-optimal-intrusion-response/traces/traces.json"
+    path="/Users/kimham/workspace/gym-optimal-intrusion-response/traces/traces.json"
     defender_dynamics_model = plot_dynamics_model.read_model(path)
     plot_dynamics_model.plot_ids_infra_and_one_machine_2(defender_dynamics_model)
 

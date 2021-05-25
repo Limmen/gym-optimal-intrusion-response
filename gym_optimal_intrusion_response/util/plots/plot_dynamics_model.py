@@ -1234,15 +1234,15 @@ def plot_ids_infra_and_one_machine_impl(num_colors : int = 75, fontsize : int = 
 
 
 
-def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fontsize : int = 5.5, figsize: Tuple[int,int] =  (3.65, 2),
+def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fontsize : int = 8, figsize: Tuple[int,int] =  (4.1, 2.9),
                                         nrows: int = 3, ncols: int = 2, file_name="test",
                                         machine_row_dists = None, machine_row_xks = None,
                                         machine_row_short_titles = None,
                                         machine_row_x_labels = None, machine_row_y_labels = None, ids_row_dists = None,
                                         ids_row_xks = None, ids_row_a_ids = None, ids_row_b_ids = None,
                                         ids_row_x_labels = None, ids_row_y_labels = None, ms=2.5,
-                                        title_fontsize=8, lw=0.5, wspace=0.02, hspace=0.3, top=0.9,
-                                        labelsize=5, ids_row_subtitles=None, machine_row_labels = None,
+                                        title_fontsize=8, lw=0.5, wspace=0.02, hspace=0.35, top=0.9,
+                                        labelsize=7.5, ids_row_subtitles=None, machine_row_labels = None,
                                         total_row_a_ids_orig=None
                                         ):
     cm = plt.cm.get_cmap('RdYlBu_r')
@@ -1266,11 +1266,12 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     print(total_row_a_ids_orig)
     # print("len row orig:{}".format(len(total_row_a_ids_orig[0][0])))
     # print("len row a:{}".format(len(ids_row_a_ids[0])))
-
+    ms1=3
+    ms2=2.25
     for i in range(len(ids_row_dists[0])):
         if total_row_a_ids_orig[1][i] == 85:
             color = colors[0]
-            ax[0][0].plot(ids_row_xks[1][i], ids_row_dists[1][i].pmf(ids_row_xks[1][i]), 'ro', ms=1.5,
+            ax[0][0].plot(ids_row_xks[1][i], ids_row_dists[1][i].pmf(ids_row_xks[1][i]), 'ro', ms=ms1,
                           mec=color, color=color, label="", alpha=1, marker="s")
             ax[0][0].vlines(ids_row_xks[1][i], 0, ids_row_dists[1][i].pmf(ids_row_xks[1][i]), colors=color,
                             linestyles='solid',
@@ -1279,7 +1280,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     for i in range(len(ids_row_dists[0])):
         if total_row_a_ids_orig[1][i] != 85:
             color = "#f9a65a"
-            ax[0][0].plot(ids_row_xks[1][i], ids_row_dists[1][i].pmf(ids_row_xks[1][i]), 'ro', ms=0.75,
+            ax[0][0].plot(ids_row_xks[1][i], ids_row_dists[1][i].pmf(ids_row_xks[1][i]), 'ro', ms=ms2,
                           mec=color, color=color, label="", alpha=1, marker="o")
             ax[0][0].vlines(ids_row_xks[1][i], 0, ids_row_dists[1][i].pmf(ids_row_xks[1][i]), colors=color,
                             linestyles='dashed',
@@ -1288,7 +1289,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     for i in range(len(ids_row_dists[1])):
         if total_row_a_ids_orig[2][i] == 85:
             color = colors[0]
-            ax[0][1].plot(ids_row_xks[2][i], ids_row_dists[2][i].pmf(ids_row_xks[2][i]), 'ro', ms=1.5,
+            ax[0][1].plot(ids_row_xks[2][i], ids_row_dists[2][i].pmf(ids_row_xks[2][i]), 'ro', ms=ms1,
                      mec=color, color=color,
                      label="", marker="s")
             ax[0][1].vlines(ids_row_xks[2][i], 0, ids_row_dists[2][i].pmf(ids_row_xks[2][i]), colors=color,
@@ -1297,7 +1298,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     for i in range(len(ids_row_dists[1])):
         if total_row_a_ids_orig[2][i] != 85:
             color = "#f9a65a"
-            ax[0][1].plot(ids_row_xks[2][i], ids_row_dists[2][i].pmf(ids_row_xks[2][i]), 'ro', ms=0.75,
+            ax[0][1].plot(ids_row_xks[2][i], ids_row_dists[2][i].pmf(ids_row_xks[2][i]), 'ro', ms=ms2,
                           mec=color, color=color, label="", marker="o")
             ax[0][1].vlines(ids_row_xks[2][i], 0, ids_row_dists[2][i].pmf(ids_row_xks[2][i]), colors=color,
                             linestyles='-', lw=lw)
@@ -1338,7 +1339,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[0][0].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][0].set_ylim(0, 1.1)
-    ax[0][0].set_title("\# New Severe IDS Alerts", fontsize=fontsize)
+    ax[0][0].set_title("\# Severe IDS Alerts", fontsize=fontsize)
 
     ax[0][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
 
@@ -1351,7 +1352,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[0][1].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][1].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][1].set_ylim(0, 1.1)
-    ax[0][1].set_title("\# New Warning IDS Alerts", fontsize=fontsize)
+    ax[0][1].set_title("\# Warning IDS Alerts", fontsize=fontsize)
     ax[0][1].set_yticks([])
 
     # ax[1][1].grid('on')
@@ -1375,7 +1376,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
                 label="normal operation"
                 label_set = True
             ax[1][0].plot(machine_row_xks[0][1][i], machine_row_dists[0][1][i].pmf(machine_row_xks[0][1][i]), 'ro',
-                          ms=1.5, mec=color, color=color, label=label, marker="s")
+                          ms=ms1, mec=color, color=color, label=label, marker="s")
             ax[1][0].vlines(machine_row_xks[0][1][i], 0, machine_row_dists[0][1][i].pmf(machine_row_xks[0][1][i]), colors=color,
                             linestyles='solid', lw=lw)
 
@@ -1388,7 +1389,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
                 label = "intrusion in progress"
                 label_set = True
             ax[1][0].plot(machine_row_xks[0][1][i], machine_row_dists[0][1][i].pmf(machine_row_xks[0][1][i]), 'ro',
-                          ms=0.75, mec=color, color=color, label=label, marker="o")
+                          ms=ms2, mec=color, color=color, label=label, marker="o")
             ax[1][0].vlines(machine_row_xks[0][1][i], 0, machine_row_dists[0][1][i].pmf(machine_row_xks[0][1][i]),
                             colors=color,
                             linestyles='dashed', lw=lw)
@@ -1397,7 +1398,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
         if total_row_a_ids_orig[1][i] == 85:
             color = colors[0]
             ax[1][1].plot(machine_row_xks[1][1][i], machine_row_dists[1][1][i].pmf(machine_row_xks[1][1][i]), 'ro',
-                          ms=1.5, mec=color,
+                          ms=ms1, mec=color,
                               color=color, label="", marker="s")
             ax[1][1].vlines(machine_row_xks[1][1][i], 0, machine_row_dists[1][1][i].pmf(machine_row_xks[1][1][i]), colors=color,
                             linestyles='solid', lw=lw)
@@ -1406,7 +1407,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
         if total_row_a_ids_orig[1][i] != 85:
             color = "#f9a65a"
             ax[1][1].plot(machine_row_xks[1][1][i], machine_row_dists[1][1][i].pmf(machine_row_xks[1][1][i]), 'ro',
-                          ms=0.75, mec=color,
+                          ms=ms2, mec=color,
                           color=color, label="", marker="o")
             ax[1][1].vlines(machine_row_xks[1][1][i], 0, machine_row_dists[1][1][i].pmf(machine_row_xks[1][1][i]),
                             colors=color,
@@ -1421,7 +1422,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[1][0].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][0].set_ylim(0, 1.1)
-    ax[1][0].set_title("\# New Failed Logins 172.18.9.2", fontsize=fontsize)
+    ax[1][0].set_title("\# Failed Logins 172.18.9.2", fontsize=fontsize)
 
     ax[1][1].grid('on')
     ax[1][1].set_yticks([])
@@ -1433,7 +1434,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[1][1].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][1].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][1].set_ylim(0, 1.1)
-    ax[1][1].set_title("\# New Failed Logins 172.18.9.3", fontsize=fontsize)
+    ax[1][1].set_title("\# Failed Logins 172.18.9.3", fontsize=fontsize)
 
     # plt.subplot(nrows, ncols, (5, 6))
     #
@@ -1466,14 +1467,19 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     # plt.xlim(0, 2300)
     # plt.title("Wallclock time (s) of executing actions", fontsize=fontsize)
 
+    ax[0][0].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax[0][1].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax[1][0].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax[1][1].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+
     handles, labels = ax[1][0].get_legend_handles_labels()
     print(handles)
     print(labels)
-    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.52, 0.096),
-               ncol=4, fancybox=True, shadow=True)
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.52, 0.11),
+               ncol=4, fancybox=True, shadow=True, fontsize=fontsize)
 
     fig.tight_layout()
-    fig.subplots_adjust(wspace=wspace, hspace=hspace, top=top)
+    fig.subplots_adjust(wspace=wspace, hspace=hspace, top=top, bottom=0.142)
 
     fig.savefig(file_name + ".png", format="png", dpi=600)
     fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)

@@ -653,21 +653,21 @@ def plot_reward_fun() -> None:
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 0.8
     plt.rcParams['axes.linewidth'] = 0.8
-    fontsize=9
-    labelsize=7
+    fontsize=15.5
+    labelsize=14
     # plt.rcParams.update({'font.size': 10})
 
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(7.5, 3))
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(8, 3.2))
 
     # ylims = (0, 920)
 
     # Plot Avg Eval rewards Gensim
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
     ax[0].plot(times,
-            st, label=r"Stopping reward $\mathcal{R}_{s_t}^{1}$",
+            st, label=r"Stopping reward",
             ls='-', color=colors[0], marker="s",  markevery=5, markersize=3.5)
     ax[0].plot(times,
-            ct, label=r"Continue reward $\mathcal{R}_{s_t}^{0}$",
+            ct, label=r"Continue reward",
             ls='-', color="#f9a65a",  marker="d", markevery=5, markersize=3.5)
     print([stopping_idx]*len(times))
     print(stopping_time_y)
@@ -680,7 +680,7 @@ def plot_reward_fun() -> None:
     # ax.fill_between(x[1:], y[1:], lower_bound,
     #                 alpha=0.35, color=colors[0])
 
-    ax[0].set_title(r"Reward function $\mathcal{R}_{s_t}^{a_t}$", fontsize=fontsize+2)
+    ax[0].set_title(r"Reward function $\mathcal{R}_{s_t}^{a_t}$", fontsize=fontsize)
     ax[0].set_xlabel(r"\# Time-step $t$", fontsize=labelsize)
 
     ax[0].axhline(y=0, color='k', linewidth=0.5)
@@ -707,10 +707,10 @@ def plot_reward_fun() -> None:
 
     # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
     #           ncol=2, fancybox=True, shadow=True, fontsize=8)
-    ax[0].legend(loc="upper right")
+    ax[0].legend(loc="upper right", fontsize=labelsize)
 
-    xlab.set_size(11.5)
-    ylab.set_size(11.5)
+    xlab.set_size(fontsize)
+    ylab.set_size(fontsize)
 
     p = 0.2
     x = geom.rvs(p, size=2000)
@@ -729,17 +729,17 @@ def plot_reward_fun() -> None:
     # set the grid on
     # ax.grid('on')
 
-    ax[1].set_title(r"$I_t \sim Ge(p=0.2)$", fontsize=fontsize+2)
-    ax[1].set_xlabel(r"Intrusion start time $i_t$", fontsize=labelsize)
-    ax[1].set_ylabel(r"$CDF_{I_t}(i_t)$", fontsize=labelsize)
+    ax[1].set_title(r"$I_t \sim Ge(p=0.2)$", fontsize=fontsize)
+    ax[1].set_xlabel(r"Intrusion start time $i_t$", fontsize=fontsize)
+    ax[1].set_ylabel(r"$CDF_{I_t}(i_t)$", fontsize=fontsize)
     ax[1].set_xlim(1, 29)
 
     # tweak the axis labels
     xlab = ax[1].xaxis.get_label()
     ylab = ax[1].yaxis.get_label()
 
-    xlab.set_size(11.5)
-    ylab.set_size(11.5)
+    xlab.set_size(fontsize)
+    ylab.set_size(fontsize)
 
 
 
@@ -749,11 +749,17 @@ def plot_reward_fun() -> None:
     ax[1].spines['right'].set_color((.8, .8, .8))
     ax[1].spines['top'].set_color((.8, .8, .8))
 
+    ax[0].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax[0].tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
+
+    ax[1].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax[1].tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
+
     # ttl = ax.title
     # ttl.set_position([.5, 1.05])
 
     fig.tight_layout()
-    plt.subplots_adjust(wspace=0.15, hspace=0)
+    plt.subplots_adjust(wspace=0.2, hspace=0)
     # plt.show()
     # plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig("reward_fun_geo" + ".png", format="png", dpi=600)

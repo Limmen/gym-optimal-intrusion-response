@@ -67,9 +67,11 @@ def plot_thresholds() -> None:
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 0.8
     plt.rcParams['axes.linewidth'] = 0.8
-    plt.rcParams.update({'font.size': 10})
+    fontsize=16
+    labelsize=14.5
+    plt.rcParams.update({'font.size': fontsize})
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.5, 3.2))
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 3.2))
 
     # ylims = (0, 920)
 
@@ -83,8 +85,8 @@ def plot_thresholds() -> None:
     ax.fill_between(x[1:], y[1:], lower_bound,
                     alpha=0.35, color=colors[0])
 
-    ax.set_title(r"Stopping thresholds $\alpha_t$", fontsize=12.5)
-    ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
+    ax.set_title(r"Stopping thresholds $\alpha_t$", fontsize=fontsize)
+    ax.set_xlabel(r"\# Time-step $t$", fontsize=labelsize)
 
     ax.axhline(y=0, color='k', linewidth=0.5)
     ax.set_xlim(x[1], len(x)-1)
@@ -104,8 +106,10 @@ def plot_thresholds() -> None:
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
 
-    xlab.set_size(11.5)
-    ylab.set_size(11.5)
+    ax.tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
 
     # change the color of the top and right spines to opaque gray
     ax.spines['right'].set_color((.8, .8, .8))

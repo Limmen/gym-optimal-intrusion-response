@@ -28,13 +28,17 @@ def plot_policy() -> None:
 
     :return: None
     """
-    env = gym.make("optimal-intrusion-response-v2")
-    v2_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v2_results/results_1/data/1621504581.9928813_72899_400_policy_network.zip"
-    v3_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v3_results/results_1/data/1621513319.4798174_299_300_policy_network.zip"
-    model = initialize_model(env, v2_load_path, "cuda:0", None)
+    os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+    # env = gym.make("optimal-intrusion-response-v2")
+    env = None
+    # v2_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v2_results/results_1/data/1621504581.9928813_72899_400_policy_network.zip"
+    # v3_load_path = "/home/kim/workspace/gym-optimal-intrusion-response/examples/v3/training/v3_results/results_1/data/1621513319.4798174_299_300_policy_network.zip"
+    v2_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/backup_pycr_cnsm_21_22_may/v2_results/results_1/data/1621504581.9928813_72899_400_policy_network.zip"
+    v3_load_path = "/Users/kimham/workspace/gym-optimal-intrusion-response/examples/v3/backup_pycr_cnsm_21_22_may/v3_results/results_1/data/1621513319.4798174_299_300_policy_network.zip"
+    model = initialize_model(env, v2_load_path, "cpu", None)
 
-    fontsize = 8.5
-    labelsize = 8
+    fontsize = 10.5
+    labelsize = 9.5
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
     plt.rcParams['font.family'] = ['serif']
@@ -44,7 +48,7 @@ def plot_policy() -> None:
     plt.rcParams['axes.labelpad'] = 2.4
     plt.rcParams['axes.linewidth'] = 0.8
     plt.rcParams.update({'font.size': 6.5})
-    fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(4.8, 2.95))
+    fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(5.2, 3.4))
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
 
     x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
@@ -62,7 +66,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -109,7 +113,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -156,7 +160,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -203,7 +207,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -250,7 +254,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -298,7 +302,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -346,7 +350,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -396,7 +400,7 @@ def plot_policy() -> None:
         else:
             y.append(1)
         state = np.array([t, sev_alerts[i], warn_alerts[i], logins[i]])
-        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cuda:0"),
+        actions, values, log_prob = model.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
                                                                   deterministic=False,
                                                                   attacker=True, env=env, filter_illegal=False)
         if actions.item() == 1:
@@ -503,7 +507,7 @@ def plot_policy() -> None:
 
     handles, labels = ax[0][1].get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.51, 0.096),
-               ncol=2, fancybox=True, shadow=True, fontsize=fontsize)
+               ncol=2, fancybox=True, shadow=True, fontsize=labelsize)
 
     fig.tight_layout()
     plt.subplots_adjust(wspace=0.1, hspace=0.15, bottom=0.17)
