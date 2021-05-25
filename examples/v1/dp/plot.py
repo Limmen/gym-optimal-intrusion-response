@@ -9,6 +9,7 @@ import pickle
 import gym_optimal_intrusion_response.constants.constants as constants
 from gym_optimal_intrusion_response.logic.defender_dynamics.dp import DP
 import math
+from scipy.stats import geom
 
 
 def Q_helper(ttcs : np.ndarray, ts : np.ndarray, policy: np.ndarray, state_to_id: dict, action : int) -> np.ndarray:
@@ -626,7 +627,7 @@ def plot_reward_fun() -> None:
     stopping_rew = 100
     early_stopping_rew = -100
 
-    stopping_idx = 39
+    stopping_idx = 29
     st=[]
     ct=[]
     stopping_time_y = []
@@ -652,23 +653,25 @@ def plot_reward_fun() -> None:
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 0.8
     plt.rcParams['axes.linewidth'] = 0.8
-    plt.rcParams.update({'font.size': 10})
+    fontsize=9
+    labelsize=7
+    # plt.rcParams.update({'font.size': 10})
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4.5, 3.2))
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(7.5, 3))
 
     # ylims = (0, 920)
 
     # Plot Avg Eval rewards Gensim
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
-    ax.plot(times,
+    ax[0].plot(times,
             st, label=r"Stopping reward $\mathcal{R}_{s_t}^{1}$",
             ls='-', color=colors[0], marker="s",  markevery=5, markersize=3.5)
-    ax.plot(times,
+    ax[0].plot(times,
             ct, label=r"Continue reward $\mathcal{R}_{s_t}^{0}$",
             ls='-', color="#f9a65a",  marker="d", markevery=5, markersize=3.5)
     print([stopping_idx]*len(times))
     print(stopping_time_y)
-    ax.plot([stopping_idx]*len(times),
+    ax[0].plot([stopping_idx]*len(times),
                stopping_time_y, label=r"Intrusion started",
                color="black", linestyle="dashed")
     # lower_bound = np.zeros(len(y[1:]))
@@ -677,17 +680,17 @@ def plot_reward_fun() -> None:
     # ax.fill_between(x[1:], y[1:], lower_bound,
     #                 alpha=0.35, color=colors[0])
 
-    ax.set_title(r"Reward function $\mathcal{R}_{s_t}^{a_t}$", fontsize=12.5)
-    ax.set_xlabel(r"\# Time-step $t$", fontsize=11.5)
+    ax[0].set_title(r"Reward function $\mathcal{R}_{s_t}^{a_t}$", fontsize=fontsize+2)
+    ax[0].set_xlabel(r"\# Time-step $t$", fontsize=labelsize)
 
-    ax.axhline(y=0, color='k', linewidth=0.5)
-    ax.set_xlim(1, 101)
-    ax.set_ylim(-130, 130)
+    ax[0].axhline(y=0, color='k', linewidth=0.5)
+    ax[0].set_xlim(1, 101)
+    ax[0].set_ylim(-130, 130)
 
-    a = ax.get_xticks().tolist()
+    a = ax[0].get_xticks().tolist()
     a[-2] = r'$T=100$'
     print(a)
-    ax.set_xticklabels(a)
+    ax[0].set_xticklabels(a)
     # ax.set_xticks([1.0, 20.0, 40.0, 60.0, 80.0])
 
     # a = ax.get_xticks().tolist()
@@ -696,31 +699,65 @@ def plot_reward_fun() -> None:
     # ax.set_xticks([1.0, 5.0, 10.0, 15.0, 19.0])
 
     # set the grid on
-    ax.grid('on')
+    ax[0].grid('on')
 
     # tweak the axis labels
-    xlab = ax.xaxis.get_label()
-    ylab = ax.yaxis.get_label()
+    xlab = ax[0].xaxis.get_label()
+    ylab = ax[0].yaxis.get_label()
 
     # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
     #           ncol=2, fancybox=True, shadow=True, fontsize=8)
-    ax.legend(loc="upper right")
+    ax[0].legend(loc="upper right")
 
     xlab.set_size(11.5)
     ylab.set_size(11.5)
 
-    # change the color of the top and right spines to opaque gray
-    ax.spines['right'].set_color((.8, .8, .8))
-    ax.spines['top'].set_color((.8, .8, .8))
+    p = 0.2
+    x = geom.rvs(p, size=2000)
+    # x = np.random.randn(200)
+    colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
+    kwargs = {'cumulative': True}
 
-    ttl = ax.title
-    ttl.set_position([.5, 1.05])
+    n, bins, patches = ax[1].hist(x, cumulative=True, density=True, bins=50, alpha=1, color=colors[0])
+
+    theoretical_y = []
+    for i in bins:
+        theoretical_y.append(geom.cdf(i, p))
+
+    ax[1].plot(bins, theoretical_y, 'k--', linewidth=1.5, label='Theoretical')
+
+    # set the grid on
+    # ax.grid('on')
+
+    ax[1].set_title(r"$I_t \sim Ge(p=0.2)$", fontsize=fontsize+2)
+    ax[1].set_xlabel(r"Intrusion start time $i_t$", fontsize=labelsize)
+    ax[1].set_ylabel(r"$CDF_{I_t}(i_t)$", fontsize=labelsize)
+    ax[1].set_xlim(1, 29)
+
+    # tweak the axis labels
+    xlab = ax[1].xaxis.get_label()
+    ylab = ax[1].yaxis.get_label()
+
+    xlab.set_size(11.5)
+    ylab.set_size(11.5)
+
+
+
+    # change the color of the top and right spines to opaque gray
+    ax[0].spines['right'].set_color((.8, .8, .8))
+    ax[0].spines['top'].set_color((.8, .8, .8))
+    ax[1].spines['right'].set_color((.8, .8, .8))
+    ax[1].spines['top'].set_color((.8, .8, .8))
+
+    # ttl = ax.title
+    # ttl.set_position([.5, 1.05])
 
     fig.tight_layout()
+    plt.subplots_adjust(wspace=0.15, hspace=0)
     # plt.show()
     # plt.subplots_adjust(wspace=0, hspace=0)
-    fig.savefig("reward_fun" + ".png", format="png", dpi=600)
-    fig.savefig("reward_fun" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    fig.savefig("reward_fun_geo" + ".png", format="png", dpi=600)
+    fig.savefig("reward_fun_geo" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     # plt.close(fig)
 
 if __name__ == '__main__':
