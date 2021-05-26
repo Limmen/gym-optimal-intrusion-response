@@ -657,7 +657,7 @@ def plot_reward_fun() -> None:
     labelsize=14
     # plt.rcParams.update({'font.size': 10})
 
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(8, 3.2))
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(8.25, 3.3))
 
     # ylims = (0, 920)
 
@@ -759,7 +759,7 @@ def plot_reward_fun() -> None:
     # ttl.set_position([.5, 1.05])
 
     fig.tight_layout()
-    plt.subplots_adjust(wspace=0.2, hspace=0)
+    plt.subplots_adjust(wspace=0.22, hspace=0)
     # plt.show()
     # plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig("reward_fun_geo" + ".png", format="png", dpi=600)
