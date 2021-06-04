@@ -38,8 +38,8 @@ def plot_policy() -> None:
     model = initialize_model(env, v2_load_path, "cpu", None)
     model2 = initialize_model(env, v3_load_path, "cpu", None)
 
-    fontsize = 10.5
-    labelsize = 9.5
+    fontsize = 12.5
+    labelsize = 11.5
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
     plt.rcParams['font.family'] = ['serif']
@@ -48,8 +48,8 @@ def plot_policy() -> None:
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 2.4
     plt.rcParams['axes.linewidth'] = 0.8
-    plt.rcParams.update({'font.size': 6.5})
-    fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(5.2, 3.4))
+    plt.rcParams.update({'font.size': labelsize})
+    fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(5.5, 3.8))
     colors = plt.cm.viridis(np.linspace(0.3, 1, 2))[-2:]
 
     x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
@@ -95,15 +95,15 @@ def plot_policy() -> None:
 
     ax[0][0].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[0][0].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[0][0].plot(x[0:],
                   y[0:], label=r"Optimal $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[0][0].set_xlim(0, 15)
 
     ax[0][0].set_title(r"$i_t=1$", fontsize=fontsize)
@@ -119,6 +119,9 @@ def plot_policy() -> None:
     ax[0][0].spines['right'].set_color((.8, .8, .8))
     ax[0][0].spines['top'].set_color((.8, .8, .8))
 
+    # ax[0][0].tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.2)
+    # ax[0][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.2)
+
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     sev_alerts = [0, 0, 208, 274, 274, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330]
     warn_alerts = [0, 0, 15, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215]
@@ -127,6 +130,7 @@ def plot_policy() -> None:
     warn_alerts_2 = [0, 1, 11, 161, 161, 161, 161, 361, 361, 361, 361, 361, 361, 361, 361]
     y = []
     y2 = []
+    y3 = []
     t = 2
     opt_t = 3
     for i in np.arange(0, 15):
@@ -144,20 +148,31 @@ def plot_policy() -> None:
         else:
             val = 1 - math.exp(log_prob.item())
         y2.append(val)
+
+        # Next Model
+        state = np.array([t, sev_alerts_2[i], warn_alerts_2[i], logins[i]])
+        actions, values, log_prob = model2.defender_policy.forward(torch.tensor(np.array([state])).to("cpu"),
+                                                                   deterministic=False,
+                                                                   attacker=True, env=env, filter_illegal=False)
+        if actions.item() == 1:
+            val = math.exp(log_prob.item())
+        else:
+            val = 1 - math.exp(log_prob.item())
+        y3.append(val)
     means_y2 = y2
     means_y3 = y3
 
     ax[0][1].plot(x[0:],
                   means_y2[0:], label=r"$\pi_{\theta}$ vs \textsc{NoisyAttacker}",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[0][1].plot(x[0:],
                   means_y3[0:], label=r"$\pi_{\theta}$ vs \textsc{StealthyAttacker}",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[0][1].plot(x[0:],
-                  y[0:], label=r"Optimal $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  y[0:], label=r"$\pi^{*}$",
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[0][1].set_xlim(0, 15)
 
     ax[0][1].set_title(r"$i_t=2$", fontsize=fontsize)
@@ -215,15 +230,15 @@ def plot_policy() -> None:
 
     ax[0][2].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[0][2].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[0][2].plot(x[0:],
                   y[0:], label=r"Optimal $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[0][2].set_xlim(0, 15)
 
     ax[0][2].set_title(r"$i_t=3$", fontsize=fontsize)
@@ -281,15 +296,15 @@ def plot_policy() -> None:
 
     ax[0][3].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[0][3].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[0][3].plot(x[0:],
                   y[0:], label=r"Optimal $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[0][3].set_xlim(0, 15)
 
     ax[0][3].set_title(r"$i_t=4$", fontsize=fontsize)
@@ -345,15 +360,15 @@ def plot_policy() -> None:
 
     ax[1][0].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[1][0].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[1][0].plot(x[0:],
                   y[0:], label=r"Optimal $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed")
+                  ls='-', color="black", alpha=1, linestyle="dashed", linewidth=2.0)
     ax[1][0].set_xlim(0, 15)
 
     ax[1][0].set_title(r"$i_t=5$", fontsize=fontsize)
@@ -412,15 +427,15 @@ def plot_policy() -> None:
 
     ax[1][1].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[1][1].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[1][1].plot(x[0:],
                   y[0:], label=r"$Optimal \pi^{*}",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[1][1].set_xlim(0, 15)
 
     ax[1][1].set_title(r"$i_t=6$", fontsize=fontsize)
@@ -479,15 +494,15 @@ def plot_policy() -> None:
 
     ax[1][2].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[1][2].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[1][2].plot(x[0:],
                   y[0:], label=r"Optimal $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[1][2].set_xlim(0, 15)
 
     ax[1][2].set_title(r"$i_t=7$", fontsize=fontsize)
@@ -548,15 +563,15 @@ def plot_policy() -> None:
 
     ax[1][3].plot(x[0:],
                   means_y2[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='-', color=colors[0], alpha=1)
+                  ls='-', color=colors[0], alpha=1, linewidth=2.0)
 
     ax[1][3].plot(x[0:],
                   means_y3[0:], label=r"Learned $\pi_{\theta}$",
-                  ls='dotted', color="#661D98", alpha=1)
+                  ls='dotted', color="#661D98", alpha=1, linewidth=2.0)
 
     ax[1][3].plot(x[0:],
                   y[0:], label=r"Optimal  $\pi^{*}$",
-                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(3, 7))
+                  ls='-', color="black", alpha=1, linestyle="dashed", dashes=(2, 2), linewidth=2.0)
     ax[1][3].set_xlim(0, 15)
 
     ax[1][3].set_title(r"$i_t=8$", fontsize=fontsize)
@@ -641,16 +656,25 @@ def plot_policy() -> None:
     ax[0][1].set_xticks([])
     ax[0][2].set_xticks([])
     ax[0][3].set_xticks([])
+
+    ax[1][0].set_xticks(np.arange(min(x), max(x)+1, 4.0))
+    ax[1][1].set_xticks(np.arange(min(x), max(x) + 1, 4.0))
+    ax[1][2].set_xticks(np.arange(min(x), max(x) + 1, 4.0))
+    ax[1][3].set_xticks(np.arange(min(x), max(x) + 1, 4.0))
+
+    ax[0][0].set_yticks(np.arange(0.0, 1.2, 0.25))
+    ax[1][0].set_yticks(np.arange(0.0, 1.2, 0.25))
     # ax[1][0].set_xticks([])
     # ax[1][1].set_xticks([])
     # ax[1][2].set_xticks([])
 
     handles, labels = ax[0][1].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.53, 0.096),
-               ncol=3, fancybox=True, shadow=True, fontsize=labelsize)
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.49, 0.096),
+               ncol=3, fancybox=True, shadow=True, fontsize=labelsize, columnspacing=0.5, labelspacing=0.0,
+               handletextpad=0.4)
 
     fig.tight_layout()
-    plt.subplots_adjust(wspace=0.1, hspace=0.15, bottom=0.17)
+    plt.subplots_adjust(wspace=0.1, hspace=0.16, bottom=0.17)
     # plt.show()
     # plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig("opt_learned_policies_3" + ".png", format="png", dpi=600)

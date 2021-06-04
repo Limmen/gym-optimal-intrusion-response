@@ -1241,7 +1241,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
                                         machine_row_x_labels = None, machine_row_y_labels = None, ids_row_dists = None,
                                         ids_row_xks = None, ids_row_a_ids = None, ids_row_b_ids = None,
                                         ids_row_x_labels = None, ids_row_y_labels = None, ms=2.5,
-                                        title_fontsize=8, lw=0.5, wspace=0.02, hspace=0.35, top=0.9,
+                                        title_fontsize=8, lw=0.5, wspace=0.14, hspace=0.35, top=0.9,
                                         labelsize=7.5, ids_row_subtitles=None, machine_row_labels = None,
                                         total_row_a_ids_orig=None
                                         ):
@@ -1339,9 +1339,10 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[0][0].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][0].set_ylim(0, 1.1)
-    ax[0][0].set_title("\# Severe IDS Alerts", fontsize=fontsize)
+    ax[0][0].set_title(r"\# Severe IDS Alerts $\Delta_x$", fontsize=fontsize)
 
-    ax[0][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
+    #ax[0][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
+    ax[0][0].set_ylabel(r"$\hat{f}_X(\Delta_x|t,i_t)$", fontsize=labelsize)
 
     ax[0][1].grid('on')
     # ax[0][0].set_xlabel("", fontsize=labelsize)
@@ -1352,8 +1353,9 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[0][1].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][1].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][1].set_ylim(0, 1.1)
-    ax[0][1].set_title("\# Warning IDS Alerts", fontsize=fontsize)
+    ax[0][1].set_title(r"\# Warning IDS Alerts $\Delta_y$", fontsize=fontsize)
     ax[0][1].set_yticks([])
+    ax[0][1].set_ylabel(r"$\hat{f}_Y(\Delta_y|t,i_t)$", fontsize=labelsize)
 
     # ax[1][1].grid('on')
     # # ax[0][1].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
@@ -1414,7 +1416,8 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
                             linestyles='dashed', lw=lw)
 
     ax[1][0].grid('on')
-    ax[1][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
+    #ax[1][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
+    ax[1][0].set_ylabel(r"$\hat{f}_Z(\Delta_z|t,i_t)$", fontsize=labelsize)
     xlab = ax[1][0].xaxis.get_label()
     ylab = ax[1][0].yaxis.get_label()
     xlab.set_size(labelsize)
@@ -1422,11 +1425,12 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[1][0].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][0].set_ylim(0, 1.1)
-    ax[1][0].set_title("\# Failed Logins 172.18.9.2", fontsize=fontsize)
+    ax[1][0].set_title(r"\# Failed Logins $\Delta_z$ 172.18.9.2", fontsize=fontsize)
 
     ax[1][1].grid('on')
     ax[1][1].set_yticks([])
     #ax[1][1].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
+    ax[1][1].set_ylabel(r"$\hat{f}_Z(\Delta_z|t,i_t)$", fontsize=labelsize)
     xlab = ax[1][1].xaxis.get_label()
     ylab = ax[1][1].yaxis.get_label()
     xlab.set_size(labelsize)
@@ -1434,7 +1438,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[1][1].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][1].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][1].set_ylim(0, 1.1)
-    ax[1][1].set_title("\# Failed Logins 172.18.9.3", fontsize=fontsize)
+    ax[1][1].set_title(r"\# Failed Logins $\Delta_z$ 172.18.9.3", fontsize=fontsize)
 
     # plt.subplot(nrows, ncols, (5, 6))
     #

@@ -67,6 +67,8 @@ def plot_alerts_threshold() -> None:
         else:
             val = 1 - math.exp(log_prob.item())
         y2.append(val)
+    fontsize = 14
+    labelsize=12.5
 
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
@@ -76,9 +78,9 @@ def plot_alerts_threshold() -> None:
     plt.rcParams['ytick.major.pad'] = 0.05
     plt.rcParams['axes.labelpad'] = 2
     plt.rcParams['axes.linewidth'] = 0.1
-    plt.rcParams.update({'font.size': 8})
+    plt.rcParams.update({'font.size': fontsize})
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5, 2.85))
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.5, 2.85))
 
     # ylims = (0, 920)
 
@@ -97,10 +99,10 @@ def plot_alerts_threshold() -> None:
                     alpha=0.35, color="r")
 
     # if plot_opt:
-    ax.plot(x, [0.5] * len(x), label=r"0.5", color="black", linestyle="dashed")
+    ax.plot(x, [0.5] * len(x), color="black", linestyle="dashed")
 
-    ax.set_title(r"$\pi_{\theta}(\text{stop}|a)$", fontsize=13.5)
-    ax.set_xlabel(r"\# Alerts $a$", fontsize=12)
+    ax.set_title(r"$\pi_{\theta}(\text{stop}|x+y)$", fontsize=fontsize)
+    ax.set_xlabel(r"\# Total alerts $x+y$", fontsize=labelsize)
     ax.set_xlim(0, len(x)*2)
     ax.set_ylim(0, 1.1)
 
@@ -111,8 +113,8 @@ def plot_alerts_threshold() -> None:
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
 
-    xlab.set_size(12)
-    ylab.set_size(12)
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
 
     # change the color of the top and right spines to opaque gray
     ax.spines['right'].set_color((.8, .8, .8))
@@ -120,13 +122,15 @@ def plot_alerts_threshold() -> None:
 
     # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18),
     #           ncol=2, fancybox=True, shadow=True, fontsize=13.5)
-    ax.legend(loc="lower right", fontsize=12)
+    # ax.legend(loc="lower right", fontsize=12)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2),
+              ncol=1, fancybox=True, shadow=True, fontsize=12)
 
     ttl = ax.title
     ttl.set_position([.5, 1.05])
 
-    ax.tick_params(axis='both', which='major', labelsize=12, length=2.2, width=0.6)
-    ax.tick_params(axis='both', which='minor', labelsize=12, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
 
     fig.tight_layout()
     # plt.show()
@@ -154,6 +158,8 @@ def plot_3d() -> None:
     num_severe_alerts_total = np.arange(0, 200, 1)
     sev, warn = np.meshgrid(num_severe_alerts_recent, num_severe_alerts_total)
     action_val = action_pred_core_state_severe_warning(sev, warn, model, env)
+    fontsize=14
+    labelsize=12.5
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
     plt.rcParams['font.family'] = ['serif']
@@ -164,12 +170,12 @@ def plot_3d() -> None:
     plt.rcParams['axes.linewidth'] = 0.2
     plt.rcParams.update({'font.size': 6.5})
     plt.rcParams['font.serif'] = ['Times New Roman']
-    plt.rcParams.update({'font.size': 8})
+    plt.rcParams.update({'font.size': fontsize})
     plt.rcParams.update({'figure.autolayout': True})
-    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(4.15, 2.9))
+    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(5, 3))
     ax.plot_surface(sev, warn, action_val, cmap='Blues', linewidth=0.3,
                     alpha=0.8, edgecolor='k', rstride=12, cstride=12)
-    ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{StealthyAttacker}", fontsize=13.5)
+    ax.set_title(r"$\pi_{\theta}(\text{stop} | x, y)$ vs \textsc{StealthyAttacker}", fontsize=fontsize)
     # ax.set_xlabel(r"warn alerts $w_a$")
     # ax.set_ylabel(r"sev alerts $s_a$")
     ax.xaxis.labelpad = 0
@@ -178,10 +184,10 @@ def plot_3d() -> None:
     ax.set_yticks(np.arange(0, 200+1, 50))
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(12)
-    ylab.set_size(12)
-    ax.tick_params(axis='both', which='major', labelsize=12, length=2.2, width=0.6)
-    ax.tick_params(axis='both', which='minor', labelsize=12, length=2.2, width=0.6)
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+    ax.tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
     fig.tight_layout()
     plt.subplots_adjust(bottom=0.55)
     # plt.show()
@@ -206,7 +212,8 @@ def plot_3d_2() -> None:
     num_severe_alerts_total = np.arange(0, 200, 1)
     sev, warn = np.meshgrid(num_severe_alerts_recent, num_severe_alerts_total)
     action_val_2 = action_pred_core_state_severe_warning(sev, warn, model2, env)
-
+    fontsize=14
+    labelsize=12.5
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts,amsmath}')
     plt.rcParams['font.family'] = ['serif']
@@ -217,12 +224,12 @@ def plot_3d_2() -> None:
     plt.rcParams['axes.linewidth'] = 0.2
     plt.rcParams.update({'font.size': 6.5})
     plt.rcParams['font.serif'] = ['Times New Roman']
-    plt.rcParams.update({'font.size': 10})
+    plt.rcParams.update({'font.size': fontsize})
     plt.rcParams.update({'figure.autolayout': True})
-    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(4.15, 2.9))
+    fig, ax = plt.subplots(nrows=1, ncols=1, subplot_kw={'projection': '3d'}, figsize=(5, 3.5))
     ax.plot_surface(sev, warn, action_val_2, cmap='Reds', linewidth=0.3,
                     alpha=0.8, edgecolor='k', rstride=12, cstride=12)
-    ax.set_title(r"$\pi_{\theta}(\text{stop} | w_a, s_a)$ vs \textsc{NoisyAttacker}", fontsize=13.5)
+    ax.set_title(r"$\pi_{\theta}(\text{stop} | x, y)$ vs \textsc{NoisyAttacker}", fontsize=fontsize)
     # ax.set_xlabel(r"warn alerts $w_a$")
     # ax.set_ylabel(r"sev alerts $s_a$")
     ax.xaxis.labelpad = 0
@@ -231,10 +238,10 @@ def plot_3d_2() -> None:
     ax.set_yticks(np.arange(0, 200+1, 50))
     xlab = ax.xaxis.get_label()
     ylab = ax.yaxis.get_label()
-    xlab.set_size(12)
-    ylab.set_size(12)
-    ax.tick_params(axis='both', which='major', labelsize=12, length=2.2, width=0.6)
-    ax.tick_params(axis='both', which='minor', labelsize=12, length=2.2, width=0.6)
+    xlab.set_size(labelsize)
+    ylab.set_size(labelsize)
+    ax.tick_params(axis='both', which='major', labelsize=labelsize, length=2.2, width=0.6)
+    ax.tick_params(axis='both', which='minor', labelsize=labelsize, length=2.2, width=0.6)
     fig.tight_layout()
     fig.subplots_adjust(bottom=0.55)
     fig.savefig("alerts_stopping_2" + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
@@ -388,6 +395,6 @@ if __name__ == '__main__':
     # model = initialize_model(env, load_path, "cuda:0", None)
     # plot_3d()
     # plot_logins_threshold()
-    # plot_3d_2()
+    plot_3d_2()
     # plot_alerts_threshold()
-    plot_logins_threshold()
+    # plot_logins_threshold()
