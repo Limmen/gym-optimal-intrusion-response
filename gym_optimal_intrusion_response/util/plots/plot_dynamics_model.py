@@ -1339,10 +1339,10 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[0][0].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][0].set_ylim(0, 1.1)
-    ax[0][0].set_title(r"\# Severe IDS Alerts $\Delta_x$", fontsize=fontsize)
+    ax[0][0].set_title(r"\# Severe IDS Alerts $\Delta x$", fontsize=fontsize)
 
     #ax[0][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
-    ax[0][0].set_ylabel(r"$\hat{f}_X(\Delta_x|t,i_t)$", fontsize=labelsize)
+    ax[0][0].set_ylabel(r"$\hat{f}_X(\Delta x|i_t,t)$", fontsize=labelsize)
 
     ax[0][1].grid('on')
     # ax[0][0].set_xlabel("", fontsize=labelsize)
@@ -1353,9 +1353,9 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[0][1].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][1].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[0][1].set_ylim(0, 1.1)
-    ax[0][1].set_title(r"\# Warning IDS Alerts $\Delta_y$", fontsize=fontsize)
+    ax[0][1].set_title(r"\# Warning IDS Alerts $\Delta y$", fontsize=fontsize)
     ax[0][1].set_yticks([])
-    ax[0][1].set_ylabel(r"$\hat{f}_Y(\Delta_y|t,i_t)$", fontsize=labelsize)
+    ax[0][1].set_ylabel(r"$\hat{f}_Y(\Delta y|i_t,t)$", fontsize=labelsize)
 
     # ax[1][1].grid('on')
     # # ax[0][1].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
@@ -1417,7 +1417,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
 
     ax[1][0].grid('on')
     #ax[1][0].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
-    ax[1][0].set_ylabel(r"$\hat{f}_Z(\Delta_z|t,i_t)$", fontsize=labelsize)
+    ax[1][0].set_ylabel(r"$\hat{f}_Z(\Delta z|i_t,t)$", fontsize=labelsize)
     xlab = ax[1][0].xaxis.get_label()
     ylab = ax[1][0].yaxis.get_label()
     xlab.set_size(labelsize)
@@ -1425,12 +1425,12 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[1][0].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][0].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][0].set_ylim(0, 1.1)
-    ax[1][0].set_title(r"\# Failed Logins $\Delta_z$ 172.18.9.2", fontsize=fontsize)
+    ax[1][0].set_title(r"\# Failed Logins $\Delta z$ 172.18.9.2", fontsize=fontsize)
 
     ax[1][1].grid('on')
     ax[1][1].set_yticks([])
     #ax[1][1].set_ylabel(r"$\mathbb{P}[ \cdot | (s_i, a_i)]$", fontsize=labelsize)
-    ax[1][1].set_ylabel(r"$\hat{f}_Z(\Delta_z|t,i_t)$", fontsize=labelsize)
+    ax[1][1].set_ylabel(r"$\hat{f}_Z(\Delta z|i_t,t)$", fontsize=labelsize)
     xlab = ax[1][1].xaxis.get_label()
     ylab = ax[1][1].yaxis.get_label()
     xlab.set_size(labelsize)
@@ -1438,7 +1438,7 @@ def plot_ids_infra_and_one_machine_impl_int_non_int(num_colors : int = 75, fonts
     ax[1][1].tick_params(axis='both', which='major', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][1].tick_params(axis='both', which='minor', labelsize=labelsize, length=1.2, width=0.2)
     ax[1][1].set_ylim(0, 1.1)
-    ax[1][1].set_title(r"\# Failed Logins $\Delta_z$ 172.18.9.3", fontsize=fontsize)
+    ax[1][1].set_title(r"\# Failed Logins $\Delta z$ 172.18.9.3", fontsize=fontsize)
 
     # plt.subplot(nrows, ncols, (5, 6))
     #

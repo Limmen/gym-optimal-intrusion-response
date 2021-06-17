@@ -19,6 +19,7 @@ class CustomAttacker(StaticAttacker):
         if self.startup_phase and np.random.rand() < self.continue_prob:
             return 372, 0
         else:
+            # print("intrusion started, {}".format(t))
             self.t += 1
             self.startup_phase = False
             return self.strategy[self.t - 1], self.t

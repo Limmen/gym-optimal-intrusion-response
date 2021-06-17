@@ -40,7 +40,6 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
         attack_action_id, defense_action_id = action_id
         if attack_action_id is None:
             attack_action_id, attack_t = self.env_config.attacker_static_opponent.action(env=self, t=self.env_state.t)
-            # print("attack action:{}".format(attack_action_id))
 
         if defense_action_id is None:
             defense_action_id = self.env_config.defender_static_opponent.action(env=self)
@@ -76,7 +75,6 @@ class OptimalIntrusionResponseEnv(gym.Env, ABC):
             if not self.env_state.intrusion_in_progress:
                 self.env_state.intrusion_in_progress = intrusion_in_progress
                 if intrusion_in_progress:
-                    # print("update intrsion t!")
                     self.env_state.intrusion_t = self.env_state.t-1
             if self.env_state.intrusion_in_progress:
                 info["optimal_step"] = self.env_state.intrusion_t+1
