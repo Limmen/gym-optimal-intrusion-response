@@ -1,12 +1,12 @@
 # Optimal Intrusion Response
 
-An OpenAI Gym interface to a MDP/Markov Game model for optimal intrusion response of a realistic infrastructure simulated using system traces. 
+An OpenAI Gym interface to a MDP/Markov Game model for optimal intrusion response of a realistic infrastructure simulated using system traces.
 
 <p align="center">
     <a href="https://img.shields.io/badge/license-CC%20BY--SA%204.0-green">
         <img src="https://img.shields.io/badge/license-CC%20BY--SA%204.0-green" /></a>
     <a href="https://img.shields.io/badge/version-1.0.0-blue">
-        <img src="https://img.shields.io/badge/version-1.0.0-blue" /></a>               
+        <img src="https://img.shields.io/badge/version-1.0.0-blue" /></a>
 </p>
 
 ## Included Environments
@@ -63,7 +63,17 @@ Alert/login traces from the emulated infrastructure are available in ([./traces]
 
 ## Publications
 
-TODO
+Preprint is available ([here](https://arxiv.org/abs/2106.07160))
+
+``` bash
+@misc{hammar2021learning,
+      title={Learning Intrusion Prevention Policies through Optimal Stopping},
+      author={Kim Hammar and Rolf Stadler},
+      year={2021},
+      eprint={2106.07160},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI}
+```
 
 ## Author & Maintainer
 
