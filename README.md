@@ -117,7 +117,7 @@ that policy convergence in self-play remains a challenge."
 
 ```bash
 @misc{hammar2021intrusion,
-      title={Intrusion Prevention through Optimal Stopping}, 
+      title={Intrusion Prevention through Optimal Stopping},
       author={Kim Hammar and Rolf Stadler},
       year={2021},
       eprint={2111.00289},
@@ -129,6 +129,7 @@ that policy convergence in self-play remains a challenge."
 ## See also
 
 - [gym-idsgame](https://github.com/Limmen/gym-idsgame)
+- [awesome-rl-for-cybersecurity](https://github.com/Limmen/awesome-rl-for-cybersecurity)
 
 ## Author & Maintainer
 
