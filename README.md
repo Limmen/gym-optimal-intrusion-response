@@ -113,7 +113,7 @@ that policy convergence in self-play remains a challenge."
 ```
 
 
-- [TNSM Preprint submission](https://arxiv.org/abs/2111.00289)
+- [TNSM22 Preprint submission](https://arxiv.org/abs/2111.00289)
 
 ```bash
 @misc{hammar2021intrusion,
@@ -123,6 +123,15 @@ that policy convergence in self-play remains a challenge."
       eprint={2111.00289},
       archivePrefix={arXiv},
       primaryClass={cs.LG}
+}
+```
+
+- [NOMS22 Demo paper](https://limmen.dev/assets/papers/NOMS22_Demo_Policy_Examination_System_Hammar_Stadler_28_Jan_2022.pdf)
+```bash
+@misc{hammar2022policyexamination,
+      title={A System for Interactive Examination  of Learned Security Policies},
+      author={Kim Hammar and Rolf Stadler},
+      year={2022}
 }
 ```
 
